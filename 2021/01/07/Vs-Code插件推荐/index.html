@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>Vs Code插件推荐 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Vs Code插件推荐">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-07 11:28" pubdate>
+        2021年1月7日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Vs Code插件推荐</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="VS-Code-插件推荐"><a href="#VS-Code-插件推荐" class="headerlink" title="VS Code 插件推荐"></a>VS Code 插件推荐</h1><p>前言：本文主要内容转载于<a target="_blank" rel="noopener" href="https://github.com/qianguyihao/Web%EF%BC%8C%E6%84%9F%E8%B0%A2%E5%8D%83%E5%8F%A4%E5%A3%B9%E5%8F%B7%E7%9A%84%E5%88%86%E4%BA%AB%EF%BC%8C%E7%84%B6%E6%88%91%E8%83%BD%E5%A4%9F%E9%9D%9E%E5%B8%B8%E9%A1%BA%E5%88%A9%E7%9A%84%E5%85%A5%E5%9D%91vscode%E3%80%82">https://github.com/qianguyihao/Web，感谢千古壹号的分享，然我能够非常顺利的入坑vscode。</a></p>
+<p>对于主要做前端的师傅来说，<a target="_blank" rel="noopener" href="https://github.com/qianguyihao/Web%E5%8E%9F%E6%96%87%E7%9A%84%E6%8F%92%E4%BB%B6%E6%8E%A8%E8%8D%90%E9%9D%9E%E5%B8%B8%E5%85%A8%E9%9D%A2%EF%BC%8C%E8%BF%99%E9%87%8C%E6%88%91%E5%8F%AA%E6%8C%91%E4%BA%86%E4%B8%80%E4%BA%9B%E5%B9%B3%E5%B8%B8%E7%94%A8%E7%9A%84%E5%A4%9A%E7%9A%84%E8%BF%9B%E8%A1%8C%E8%AE%B0%E5%BD%95%E3%80%82">https://github.com/qianguyihao/Web原文的插件推荐非常全面，这里我只挑了一些平常用的多的进行记录。</a></p>
+<h2 id="1、GitLens"><a href="#1、GitLens" class="headerlink" title="1、GitLens"></a>1、GitLens</h2><p>Git 神器</p>
+<p>GitLens 在 Git 管理上有很多强大的功能，比如：</p>
+<ul>
+<li>将光标放置在代码的当前行，可以看到这样代码的提交者是谁，以及提交时间。这一点，是 GitLens 最便捷的功能。</li>
+<li>查看某个 commit 的代码改动记录</li>
+<li>查看不同的分支</li>
+<li>可以将两个 commit 进行代码对比</li>
+<li>甚至可以将两个 branch 分支进行整体的代码对比。这一点，简直是 GitLens 最强大的功能。当我们在不同分支 review 代码的时候，就可以用到这一招。</li>
+</ul>
+<h2 id="2、Chinese-Simplified-Language-Pack-for-Visual-Studio-Code"><a href="#2、Chinese-Simplified-Language-Pack-for-Visual-Studio-Code" class="headerlink" title="2、Chinese (Simplified) Language Pack for Visual Studio Code"></a>2、Chinese (Simplified) Language Pack for Visual Studio Code</h2><p>让软件显示为简体中文语言。</p>
+<h2 id="3、sftp：文件传输"><a href="#3、sftp：文件传输" class="headerlink" title="3、sftp：文件传输"></a>3、sftp：文件传输</h2><p>如果你需要将本地文件通过 ftp 的形式上传到局域网的服务器，可以安装<code>sftp</code>这个插件，很好用。在公司会经常用到。</p>
+<h2 id="4、vscode-icons"><a href="#4、vscode-icons" class="headerlink" title="4、vscode-icons"></a>4、vscode-icons</h2><p>vscode-icons 会根据文件的后缀名来显示不同的图标，让你更直观地知道每种文件是什么类型的。</p>
+<h2 id="5、Markdown-Preview-Github-Styling"><a href="#5、Markdown-Preview-Github-Styling" class="headerlink" title="5、Markdown Preview Github Styling"></a>5、Markdown Preview Github Styling</h2><p>以 GitHub 风格预览 Markdown 样式，十分简洁优雅。就像下面这样，左侧书写 Markdown 文本，右侧预览 Markdown 的渲染效果：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200618_2025.png"></p>
+<h2 id="6、Markdown-All-in-One"><a href="#6、Markdown-All-in-One" class="headerlink" title="6、Markdown All in One"></a>6、Markdown All in One</h2><p>这个插件将帮助你更高效地在 Markdown 中编写文档。</p>
+<h2 id="7、Settings-Sync"><a href="#7、Settings-Sync" class="headerlink" title="7、Settings Sync"></a>7、Settings Sync</h2><ul>
+<li>多台设备之间，同步 VS Code 配置。</li>
+</ul>
+<p>配置步骤上面说过了。</p>
+<h2 id="8、Prettier：代码格式化"><a href="#8、Prettier：代码格式化" class="headerlink" title="8、Prettier：代码格式化"></a>8、Prettier：代码格式化</h2><p>Prettier 是一个代码格式化工具，只关注格式化，但不具备校验功能。在一个多人协同开发的团队中，统一的代码编写规范非常重要。一套规范可以让我们编写的代码达到一致的风格，提高代码的可读性和统一性。自然维护性也会有所提高。</p>
+<h2 id="9、Beautify"><a href="#9、Beautify" class="headerlink" title="9、Beautify"></a>9、Beautify</h2><p>代码格式化工具。也挺好用</p>
+<p>备注：相比之下，Prettier 是当前最流行的代码格式化工具，比 Beautify 用得更多。</p>
+<h2 id="10、Polacode-2020：生成代码截图-【荐】"><a href="#10、Polacode-2020：生成代码截图-【荐】" class="headerlink" title="10、Polacode-2020：生成代码截图 【荐】"></a>10、Polacode-2020：生成代码截图 【荐】</h2><p>可以把代码片段保存成美观的图片，主题不同，代码的配色方案也不同，也也可以自定义设置图片的边框颜色、大小、阴影。</p>
+<p>尤其是在我们做 PPT 分享时需要用到代码片段时，或者需要在网络上优雅地分享代码片段时，这一招很有用。</p>
+<p>生成的效果如下：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200619_1403.png"></p>
+<h2 id="11、Docker"><a href="#11、Docker" class="headerlink" title="11、Docker"></a>11、Docker</h2><p>Docker扩展使从Visual Studio Code轻松构建，管理和部署容器化应用程序变得容易。 它还提供了在容器内对Node.js，Python和.NET Core的一键式调试。</p>
+<p><img src="https://github.com/microsoft/vscode-docker/raw/master/resources/readme/overview.gif" alt="Docker extension overview"></p>
+<h2 id="12、Google-Translate"><a href="#12、Google-Translate" class="headerlink" title="12、Google Translate"></a>12、Google Translate</h2><p>翻译插件，虽然star没有vscode Google translate高，但是感觉查询速度更快。</p>
+<p>快捷键 <code>Ctrl + Shift + T</code>.</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210106233909231.png" alt="image-20210106233909231"></p>
+<h2 id="13、PHP-Debug"><a href="#13、PHP-Debug" class="headerlink" title="13、PHP Debug"></a>13、PHP Debug</h2><p>php调试必须要安装的插件，具体的php+xdebuger的调试环境会在后面介绍。</p>
+<h2 id="14、PHP-Intelephense"><a href="#14、PHP-Intelephense" class="headerlink" title="14、PHP Intelephense"></a>14、PHP Intelephense</h2><p>PHP语法支持</p>
+<h2 id="15、Project-Manager"><a href="#15、Project-Manager" class="headerlink" title="15、Project Manager"></a><strong>15、Project Manager</strong></h2><p>强烈推荐，管理项目非常方便，再也不用频繁的创建新窗口在打开文件夹了，使用Project Manager可以直接在不同项目间切换。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210106234504319.png" alt="image-20210106234504319"></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210106234442141.png" alt="image-20210106234442141"></p>
+<h2 id="16、Remote-SSH"><a href="#16、Remote-SSH" class="headerlink" title="16、Remote - SSH"></a>16、Remote - SSH</h2><p>远程管理的利器</p>
+<h2 id="17、vscode-drawio"><a href="#17、vscode-drawio" class="headerlink" title="17、vscode-drawio"></a>17、vscode-drawio</h2><p>vscode里也可以画流程图，太帅了</p>
+<h2 id="18、XML-Formatter"><a href="#18、XML-Formatter" class="headerlink" title="18、XML Formatter"></a>18、XML Formatter</h2><p>XML文件的格式化插件</p>
+<h2 id="19、Go"><a href="#19、Go" class="headerlink" title="19、Go"></a>19、Go</h2><p>golang支持</p>
+<h2 id="20、Node-Debug"><a href="#20、Node-Debug" class="headerlink" title="20、Node Debug"></a>20、Node Debug</h2><p>vscode中调试nodejs的必备插件</p>
+<h2 id="21、Python"><a href="#21、Python" class="headerlink" title="21、Python"></a>21、Python</h2><p>python插件怎么能忘，切换python版本，python虚拟环境的搭建后面进行介绍</p>
+<p><img src="https://raw.githubusercontent.com/microsoft/vscode-python/main/images/InterpreterSelectionZoom.gif" alt="img"></p>
+<h2 id="22、Zhihu-On-VSCode"><a href="#22、Zhihu-On-VSCode" class="headerlink" title="22、Zhihu On VSCode"></a>22、Zhihu On VSCode</h2><p>摸鱼插件哈哈</p>
+<h2 id="常见主题插件"><a href="#常见主题插件" class="headerlink" title="常见主题插件"></a>常见主题插件</h2><p>给你的 VS Code 换个皮肤吧，免费的那种。我个人使用的是Dracula Theme </p>
+<ul>
+<li><p>Dracula Theme </p>
+</li>
+<li><p>Material Theme</p>
+</li>
+<li><p>Nebula Theme</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=zhuangtongfa.Material-theme">One Dark Pro</a></p>
+</li>
+<li><p>One Monokai Theme</p>
+</li>
+<li><p>Monokai Pro</p>
+</li>
+<li><p>Ayu</p>
+</li>
+</ul>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=akarlsten.vscode-snazzy-akarlsten">Snazzy Plus</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=alexanderte.dainty-vscode">Dainty</a></p>
+</li>
+<li><p><code>SynthWave &#39;84</code></p>
+</li>
+</ul>
+<ul>
+<li>GitHub Plus Theme：白色主题</li>
+<li>Horizon Theme：红色主题</li>
+</ul>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/qianguyihao/Web">https://github.com/qianguyihao/Web</a></li>
+<li><a target="_blank" rel="noopener" href="https://thedarkbay797951995.wordpress.com/2020/08/15/install-vs-code-in-kali-linux/">Install Visual Studio Code (VS Code) Editor in Kali linux</a></li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug">PHP Debug Adapter for Visual Studio Code</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/vscode/">vscode</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/vscode/">vscode</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/01/07/Vs-Code-Python%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Vs Code Python开发环境配置</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/01/07/Vs-Code%E9%85%8D%E7%BD%AE%E4%BA%91%E5%90%8C%E6%AD%A5/">
+                        <span class="hidden-mobile">Vs Code配置云同步</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2021/01/07/Vs-Code%E6%8F%92%E4%BB%B6%E6%8E%A8%E8%8D%90/';
+        this.page.identifier = '/2021/01/07/Vs-Code%E6%8F%92%E4%BB%B6%E6%8E%A8%E8%8D%90/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

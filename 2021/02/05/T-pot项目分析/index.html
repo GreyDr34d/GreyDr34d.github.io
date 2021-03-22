@@ -1,0 +1,643 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>T-pot项目分析 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/tpot_banner.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="T-pot项目分析">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-02-05 16:26" pubdate>
+        2021年2月5日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      41
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">T-pot项目分析</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：9 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="T-pot结构分析"><a href="#T-pot结构分析" class="headerlink" title="T-pot结构分析"></a>T-pot结构分析</h1><h2 id="0x01-目录结构"><a href="#0x01-目录结构" class="headerlink" title="0x01 目录结构"></a>0x01 目录结构</h2><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210128155902933.png" alt="image-20210128155902933"></p>
+<h3 id="bin"><a href="#bin" class="headerlink" title="bin"></a>bin</h3><p>存放了一系列bash脚本</p>
+<h4 id="2fa-sh"><a href="#2fa-sh" class="headerlink" title="2fa.sh"></a>2fa.sh</h4><p>用于Cockpit的双因素认证。原文中这样描述</p>
+<blockquote>
+<p>SSH and web access</p>
+<p>By default, the SSH daemon allows access on <strong>tcp/64295</strong> with a user / password combination and prevents credential brute forcing attempts using <code>fail2ban</code>. This also counts for Admin UI (<strong>tcp/64294</strong>) and Web UI (<strong>tcp/64297</strong>) access.</p>
+<p>If you do not have a SSH client at hand and still want to access the machine via command line you can do so by accessing the Admin UI from <code>https://&lt;your.ip&gt;:64294</code>, enter</p>
+<ul>
+<li>user: <strong>[tsec or user]</strong> <em>you chose during one of the post install methods</em></li>
+<li>pass: <strong>[password]</strong> <em>you chose during the installation</em></li>
+</ul>
+<p>You can also add two factor authentication to Cockpit just by running <code>2fa.sh</code> on the command line.</p>
+</blockquote>
+<p>也就是说可以在终端执行2fa.sh开启双因素认证，提高系统访问控制策略。</p>
+<p>下面是双因素认证的说明：</p>
+<blockquote>
+<p>什么是双因素认证???</p>
+<p>　从密码学理论上说,用于身份认证主要有三方面要素:一是需要用户记忆的身份认证内容,例如密码或×××号码等;二是用户拥有认证硬件,例如USB Key,智能卡(以下简称IC 卡),磁卡等;三是用户本身拥有的唯一特征,例如指纹、瞳孔、声音等。单独来看,每个要素独立存在时,都有其脆弱性。而把两种要素结合起来,实现双重要素认证,可以有效提高系统访问控制的安全性,就是双因素认证。</p>
+<p>　　双因素认证是一种适合企业的访问控制策略, 它将访问控制过程中个人身份识别更客观化, 有效地防止来自外部的身份欺诈和来自内部的更隐蔽的网络侵犯。一般的企业都有标识身份的员工IC 卡,可以利用这张卡来实现双因素认证。基于过多增加企业信息化成本的角度出发,以下方案采用的是员工卡IC卡+用户密码来进行安全访问控制。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://blog.51cto.com/victorly/2346430">双因素认证(two-factor authentication)</a></p>
+</blockquote>
+<h4 id="backup-es-folders-sh"><a href="#backup-es-folders-sh" class="headerlink" title="backup_es_folders.sh"></a>backup_es_folders.sh</h4><p>备份所有和Elasticsearch相关的文件</p>
+<p><code>elkall_$(date +%Y%m%d%H%M).tgz</code></p>
+<p><code>elkbase_$(date +%Y%m%d%H%M).tgz</code></p>
+<p>的形式存放在<code>/data/elk/data</code>下</p>
+<h4 id="change-ews-config-sh"><a href="#change-ews-config-sh" class="headerlink" title="change_ews_config.sh"></a>change_ews_config.sh</h4><p>ewsposte用于<strong>收集</strong>来自不同蜜罐（例如Glastopf，Honeytrap，Dionaea，Cowrie，Kippo，eMobility，Conpot，Elasticpot，Mailoney，RDPY，VNClowPot，Heralding，Ciscoasa，Tanner和Clutton）的日志和警报）并将其传输到Peba</p>
+<p>默认情况下，T-pot会把收集到的数据发送到<a target="_blank" rel="noopener" href="https://sicherheitstacho.eu/">Sicherheitstacho</a>以对其进行支持。</p>
+<p>此文件用于修改其配置</p>
+<h4 id="clean-sh"><a href="#clean-sh" class="headerlink" title="clean.sh"></a>clean.sh</h4><p>日志数据过多的时候进行清除与文件夹重建，部分文件进行压缩还原操作</p>
+<h4 id="dps-sh"><a href="#dps-sh" class="headerlink" title="dps.sh"></a>dps.sh</h4><p>用于检查各个服务是否工作正常</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210129160510160.png" alt="image-20210129160510160"></p>
+<h4 id="dump-es-sh"><a href="#dump-es-sh" class="headerlink" title="dump_es.sh"></a>dump_es.sh</h4><p>导出es所有数据</p>
+<h4 id="export-kibana-objects-sh"><a href="#export-kibana-objects-sh" class="headerlink" title="export_kibana-objects.sh"></a>export_kibana-objects.sh</h4><p>导出所有Kibana对象，包括索引、仪表盘、可视化模块、搜索、配置等</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210129160413357.png" alt="image-20210129160413357"></p>
+<h4 id="hpfeeds-optin-sh"><a href="#hpfeeds-optin-sh" class="headerlink" title="hpfeeds_optin.sh"></a>hpfeeds_optin.sh</h4><p>hpfeeds是一个轻量级的验证发布-订阅协议，使用这个脚本可以配置ews服务，以便自己的数据发送到第三方。</p>
+<p>hpfeeds协议可参考：</p>
+<p><a target="_blank" rel="noopener" href="https://das.scusec.org/2016/02/19/hpfeeds/">蜜罐中常用协议——HPFEEDS协议</a></p>
+<h4 id="hptest-sh"><a href="#hptest-sh" class="headerlink" title="hptest.sh"></a>hptest.sh</h4><p>简单测试T-pot是否正常工作的脚本，基于nmap</p>
+<h4 id="import-kibana-objects-sh"><a href="#import-kibana-objects-sh" class="headerlink" title="import_kibana-objects.sh"></a>import_kibana-objects.sh</h4><p>导入kibana配置脚本</p>
+<h4 id="myip-sh"><a href="#myip-sh" class="headerlink" title="myip.sh"></a>myip.sh</h4><p>获取此主机的外部IP</p>
+<h4 id="mytopips-sh"><a href="#mytopips-sh" class="headerlink" title="mytopips.sh"></a>mytopips.sh</h4><p>测试ES是否正常工作</p>
+<h4 id="restore-es-sh"><a href="#restore-es-sh" class="headerlink" title="restore_es.sh"></a>restore_es.sh</h4><p>恢复ES备份，与上面的change_ews_config.sh配合使用</p>
+<h4 id="rule-sh"><a href="#rule-sh" class="headerlink" title="rule.sh"></a>rule.sh</h4><p>配置iptable防火墙的脚本。如果我们要对T-pot进行修改，必须确保iptable中也得到相应配置</p>
+<h4 id="tped-sh（重要）"><a href="#tped-sh（重要）" class="headerlink" title="tped.sh（重要）"></a>tped.sh（重要）</h4><p>如果你修改了<code>docker-compose</code>文件或者使用了不同类型架构，如在standard与collector之间切换，就可以重新链接<code>tpot.yml</code>，然后运行<code>tped.sh</code>选择相应版本，这个脚本非常方便，我们只需要添加新的或者修改原有的docker-compose.yml文件，就可以定制服务。</p>
+<p>在更新时也需要用到<code>tped.sh</code>，首先运行<code>/opt/tpot/update.sh</code>，然后重启运行<code>tped.sh</code>，选择NextGen安装。</p>
+<h4 id="unlock-es-sh"><a href="#unlock-es-sh" class="headerlink" title="unlock_es.sh"></a>unlock_es.sh</h4><p>硬盘使用达到上限后，ES会锁定索引的读写，进行磁盘清理之后可以使用此脚本进行解锁。</p>
+<h4 id="updateip-sh"><a href="#updateip-sh" class="headerlink" title="updateip.sh"></a>updateip.sh</h4><p>更新获取外部IP</p>
+<h3 id="cloud"><a href="#cloud" class="headerlink" title="cloud"></a>cloud</h3><p>云部署相关资料</p>
+<h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><blockquote>
+<h5 id="Standard"><a href="#Standard" class="headerlink" title="Standard"></a>Standard</h5><ul>
+<li>Honeypots: adbhoney, ciscoasa, citrixhoneypot, conpot, cowrie, dicompot, dionaea, elasticpot, heralding, honeysap, honeytrap, mailoney, medpot, rdpy, snare &amp; tanner</li>
+<li>Tools: cockpit, cyberchef, ELK, fatt, elasticsearch head, ewsposter, nginx / heimdall, spiderfoot, p0f &amp; suricata</li>
+</ul>
+</blockquote>
+<h4 id="Honeypots"><a href="#Honeypots" class="headerlink" title="Honeypots"></a>Honeypots</h4><p>**<a target="_blank" rel="noopener" href="https://github.com/huuck/ADBHoney">adbhoney</a>**：一种为Android Debug Bridge （ADB）设计的蜜罐，ADB服务可以暴露在5555端口，该蜜罐用于捕获攻击者将恶意软件发送到5555端口的行为。</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/Cymmetria/ciscoasa_honeypot">ciscoasa</a>**：用于Cisco ASA组件的低交互蜜罐，能够检测CVE-2018-0101，DoS和远程代码执行漏洞</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/MalwareTech/CitrixHoneypot">citrixhoneypot</a>**：适用于CVE-2019-19781的Honepot，检测并记录CVE-2019-19781扫描和利用尝试。 监听端口443.</p>
+<p>**<a target="_blank" rel="noopener" href="http://conpot.org/">conpot</a>**：低交互工控蜜罐，提供一系列通用工业控制协议, 能够模拟复杂的工控基础设施。其监听端口为1025、50100、10001、623、161</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/cowrie/cowrie">cowrie</a>**：基于kippo更改的中交互ssh蜜罐, 可以对暴力攻击账号密码等记录，并提供伪造的文件系统环境记录黑客操作行为, 并保存通过wget/curl下载的文件以及通过SFTP、SCP上传的文件。</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/nsmfoo/dicompot">dicompot</a>**：医学数字成像和通信（DICOM）蜜罐，其监听端口为11112</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/DinoTools/dionaea">dionaea</a>**：dionaea是运行于Linux上的一个应用程序，将程序运行于网络环境下，它开放Internet常见服务的默认端口，当有外来连接时，模拟正常服务给予反馈，同时记录下出入网络数据流。网络数据流经由检测模块检测后按类别进行处理，如果有 shellcode 则进行仿真执行；程序会自动下载 shellcode 中指定或后续攻击命令指定下载的恶意文件。其监听端口很多，包括20-21、42、81、135、445、1433、1723、1883、3306、1883、69、5060udp、5061、27017</p>
+<p><strong><a target="_blank" rel="noopener" href="https://gitlab.com/bontchev/elasticpot">elasticpot</a>:</strong> 模拟elastcisearch RCE漏洞的蜜罐，通过伪造函数在/,/search, /nodes的请求上回应脆弱ES实例的JSON格式消息。</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/johnnykv/heralding">heralding</a>**：收集口令的蜜罐，当前支持：ftp，telnet，ssh，http，https，pop3，pop3s，imap，imaps，smtp，vnc，postgresql和socks5。T-pot里默认监听110、143、993、995、1080、5432、5900</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/SecureAuthCorp/HoneySAP">honeysap</a>**：honeySAP是针对SAP服务的低交互性研究专用蜜罐</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/armedpot/honeytrap/">honeytrap</a>**：观察针对TCP或UDP服务的攻击，作为一个守护程序模拟一些知名的服务，并能够分析攻击字符串，执行相应的下载文件指令。</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/awhitehatter/mailoney">mailoney</a>**：SMTP蜜罐，监听端口25</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/schmalle/medpot">medpot</a>**：HL7 / FHIR蜜罐，监听端口2575</p>
+<p>**<a target="_blank" rel="noopener" href="https://github.com/citronneur/rdpy">rdpy</a>**：Microsoft RDP（远程桌面协议）协议蜜罐，监听3389</p>
+<p>**<a target="_blank" rel="noopener" href="http://mushmush.org/">snare</a>**：一种Web应用程序蜜罐</p>
+<p>**<a target="_blank" rel="noopener" href="http://mushmush.org/">tanner</a>**：是一个远程数据分析和分类服务，用于评估HTTP请求并由<a target="_blank" rel="noopener" href="https://github.com/mushorg/snare"><strong>snare</strong></a>服务响应。</p>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/p0f/p0f">p0f</a></strong> 是一个多功能工具，用于被动式获取 操作系统指纹 以识别远程主机操作系统，并且可以穿透防火墙。</p>
+<p>**<a target="_blank" rel="noopener" href="http://suricata-ids.org/">Suricata</a>**：一个网络监控引擎</p>
+<h4 id="Tools"><a href="#Tools" class="headerlink" title="Tools"></a>Tools</h4><p><a target="_blank" rel="noopener" href="https://cockpit-project.org/running">Cockpit</a>：一个轻量级的web ui，提供实时操作系统性能监控和web 终端管理</p>
+<p><a target="_blank" rel="noopener" href="https://gchq.github.io/CyberChef/">Cyberchef</a>：一个用户加密、编码、压缩和数据分析的web平台</p>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/videos">ELK stack</a>：可视化展示T-pot收集到的事件</p>
+<p><a target="_blank" rel="noopener" href="https://mobz.github.io/elasticsearch-head/">Elasticsearch Head</a>：一个Web前端，用于浏览和与Elastic Search集群进行交互。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/telekom-security/ewsposter">ewsposter</a>：用于<strong>收集</strong>来自不同蜜罐（例如Glastopf，Honeytrap，Dionaea，Cowrie，Kippo，eMobility，Conpot，Elasticpot，Mailoney，RDPY，VNClowPot，Heralding，Ciscoasa，Tanner和Clutton）的日志和警报）并将其传输到Peba</p>
+<p>nginx / heimdall：提供web ui，统一管理ELK与其他tools，需要以https输入账号密码访问，监听端口64297</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/smicallef/spiderfoot">Spiderfoot</a>：一个开源智能自动化工具，用于开源威胁情报收集和数据分析</p>
+<blockquote>
+<p><strong>Conpot:</strong> 低交互工控蜜罐，提供一系列通用工业控制协议, 能够模拟复杂的工控基础设施。</p>
+<p><strong>Cowrie:</strong> 基于kippo更改的中交互ssh蜜罐, 可以对暴力攻击账号密码等记录，并提供伪造的文件系统环境记录黑客操作行为, 并保存通过wget/curl下载的文件以及通过SFTP、SCP上传的文件。</p>
+<p><strong>Dionaea:</strong> Dionaea是运行于Linux上的一个应用程序，将程序运行于网络环境下，它开放Internet常见服务的默认端口，当有外来连接时，模拟正常服务给予反馈，同时记录下出入网络数据流。网络数据流经由检测模块检测后按类别进行处理，如果有 shellcode 则进行仿真执行；程序会自动下载 shellcode 中指定或后续攻击命令指定下载的恶意文件。</p>
+<p><strong>Elasticpot:</strong> 模拟elastcisearch RCE漏洞的蜜罐，通过伪造函数在/,/_search, /_nodes的请求上回应脆弱ES实例的JSON格式消息。</p>
+<p><strong>Emobility:</strong> 在T-Pot中使用的高交互蜜罐容器， 旨在收集针对下一代交通基础设施的攻击动机和方法。Emobility蜜网包含一个中央收费系统，几个收费点，模拟用户的事务。一旦攻击者访问中控系统web界面，监控并处理运行收费交易，并与收费点交互。除此之外，在随机时间，黑客可能与正在收取车辆费用的用户进行交互。</p>
+<p><strong>Glastopf:</strong> 低交互型Web应用蜜罐, Glastopf蜜罐它能够模拟成千上万的web漏洞，针对攻击的不同攻击手段来回应攻击者，然后从对目标Web应用程序的攻击过程中收集数据。它的目标是针对自动化漏洞扫描/利用工具，通过对漏洞利用方式进行归类，针对某一类的利用方式返回对应的合理结果，以此实现低交互。</p>
+<p><strong>Honeytrap:</strong> 观察针对TCP或UDP服务的攻击，作为一个守护程序模拟一些知名的服务，并能够分析攻击字符串，执行相应的下载文件指令。</p>
+<p><strong>Conpot:</strong> 低交互工控蜜罐，提供一系列通用工业控制协议, 能够模拟复杂的工控基础设施。</p>
+<p><strong>Cowrie:</strong> 基于kippo更改的中交互ssh蜜罐, 可以对暴力攻击账号密码等记录，并提供伪造的文件系统环境记录黑客操作行为, 并保存通过wget/curl下载的文件以及通过SFTP、SCP上传的文件。</p>
+<p><strong>Dionaea:</strong> Dionaea是运行于Linux上的一个应用程序，将程序运行于网络环境下，它开放Internet常见服务的默认端口，当有外来连接时，模拟正常服务给予反馈，同时记录下出入网络数据流。网络数据流经由检测模块检测后按类别进行处理，如果有 shellcode 则进行仿真执行；程序会自动下载 shellcode 中指定或后续攻击命令指定下载的恶意文件。</p>
+<p><strong>Elasticpot:</strong> 模拟elastcisearch RCE漏洞的蜜罐，通过伪造函数在/,/_search, /_nodes的请求上回应脆弱ES实例的JSON格式消息。</p>
+<p><strong>Emobility:</strong> 在T-Pot中使用的高交互蜜罐容器， 旨在收集针对下一代交通基础设施的攻击动机和方法。Emobility蜜网包含一个中央收费系统，几个收费点，模拟用户的事务。一旦攻击者访问中控系统web界面，监控并处理运行收费交易，并与收费点交互。除此之外，在随机时间，黑客可能与正在收取车辆费用的用户进行交互。</p>
+<p><strong>Glastopf:</strong> 低交互型Web应用蜜罐, Glastopf蜜罐它能够模拟成千上万的web漏洞，针对攻击的不同攻击手段来回应攻击者，然后从对目标Web应用程序的攻击过程中收集数据。它的目标是针对自动化漏洞扫描/利用工具，通过对漏洞利用方式进行归类，针对某一类的利用方式返回对应的合理结果，以此实现低交互。</p>
+<p><strong>Honeytrap:</strong> 观察针对TCP或UDP服务的攻击，作为一个守护程序模拟一些知名的服务，并能够分析攻击字符串，执行相应的下载文件指令。</p>
+</blockquote>
+<h3 id="etc"><a href="#etc" class="headerlink" title="etc"></a>etc</h3><p>etc目录目录结构如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash">.
+├── compose
+├── curator
+├── logrotate
+├── objects
+└── tpot.yml</code></pre></div>
+
+<p>compose目录存放不同类型的配置文件，与我们安装时的选项相同，分别是：collector、industrial、medical、nextgen、sensor、standard</p>
+<h4 id="Standard-yml"><a href="#Standard-yml" class="headerlink" title="Standard.yml"></a>Standard.yml</h4><h3 id="host"><a href="#host" class="headerlink" title="host"></a>host</h3><h3 id="iso"><a href="#iso" class="headerlink" title="iso"></a>iso</h3><h3 id="install-sh-安装脚本"><a href="#install-sh-安装脚本" class="headerlink" title="install.sh (安装脚本)"></a>install.sh (安装脚本)</h3><p>T-pot安装脚本</p>
+<p>主要分为以下几个部分</p>
+<ul>
+<li>Global vars 设定全局变量</li>
+<li>Functions 环境检查与配置函数</li>
+<li>Pre-Installer 预安装</li>
+<li>Prepare installer environmen 预安装环境</li>
+<li>Installer user interaction phase 交互式安装过程</li>
+<li>Installation phase 安装阶段</li>
+</ul>
+<h4 id="Functions"><a href="#Functions" class="headerlink" title="Functions"></a>Functions</h4><ul>
+<li>功能性函数，比较重要的是<ul>
+<li>fuGOT_ROOT 检查root</li>
+<li>fuCHECKPACKAGES 安装apt-fast并检查依赖</li>
+<li>fuCHECKNET 检查远程网址是否可以访问，网址为<ul>
+<li><a target="_blank" rel="noopener" href="https://ghcr.io/">https://ghcr.io</a> </li>
+<li><a target="_blank" rel="noopener" href="https://github.com/">https://github.com</a> </li>
+<li><a target="_blank" rel="noopener" href="https://pypi.python.org/">https://pypi.python.org</a> </li>
+<li><a target="_blank" rel="noopener" href="https://debian.org/">https://debian.org</a></li>
+</ul>
+</li>
+<li>fuGET_DEPS 安装T-pot依赖<ul>
+<li>dist-upgrade</li>
+<li>安装依赖库</li>
+<li>卸载有问题的包</li>
+</ul>
+</li>
+<li>fuCHECK_PORTS 检查其他服务，通过端口判断</li>
+</ul>
+</li>
+</ul>
+<h4 id="Pre-Installer"><a href="#Pre-Installer" class="headerlink" title="Pre-Installer"></a>Pre-Installer</h4><ul>
+<li>检查依赖，如果不完整会再次安装<ul>
+<li>调用fuGOT_ROOT 、fuCHECKPACKAGES</li>
+</ul>
+</li>
+</ul>
+<h4 id="Prepare-installer-environmen"><a href="#Prepare-installer-environmen" class="headerlink" title="Prepare installer environmen"></a>Prepare installer environmen</h4><ul>
+<li>检查Debian环境并通过输入的参数选择安装方式，例如参数 –type=user</li>
+<li>检查是否设定了配置文件，由于我们安装时没有指定 –conf参数，所以这里的检查会直接跳过</li>
+<li>打印出一些信息，调用fuCHECK_PORTS检查已有服务</li>
+</ul>
+<h4 id="Installer-user-interaction-phase"><a href="#Installer-user-interaction-phase" class="headerlink" title="Installer user interaction phase"></a>Installer user interaction phase</h4><ul>
+<li>调用fuCHECKNET 检查网络</li>
+<li>如果是iso的安装方式，会自动加载iso配置并配置代理，其他安装方式不会自动处理代理。</li>
+<li>选择安装模式，STANDARD、SENSOR等</li>
+<li>输入用户名密码</li>
+</ul>
+<h4 id="Installation-phase"><a href="#Installation-phase" class="headerlink" title="Installation phase"></a>Installation phase</h4><ul>
+<li>调用fuGET_DEPS 安装依赖</li>
+<li>对于sensor模式的安装，安装脚本不会自动写入web凭证</li>
+<li>配置网络</li>
+<li>安装elasticdump、elasticsearch-curator</li>
+<li>如果不是iso方式安装，会从github上重新下载tpotce到/opt/tpot</li>
+<li>修改sshd服务端口、重写/opt/hosts配置</li>
+<li>根据交互安装时的选择，将不同的docker-compose文件链接到tpot目录下</li>
+<li>下载docker镜像</li>
+<li>进行定时任务配置</li>
+<li>建立日志文件夹:/data/***</li>
+<li>修改文件夹权限、与ews社区服务建立联系等</li>
+</ul>
+<h3 id="update-sh"><a href="#update-sh" class="headerlink" title="update.sh"></a>update.sh</h3><h2 id="0x02-T-pot架构"><a href="#0x02-T-pot架构" class="headerlink" title="0x02 T-pot架构"></a>0x02 T-pot架构</h2><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/v2-bfd14215d9efcd3b8cac28eb8850cba9_r.jpg" alt="preview"></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%9C%9C%E7%BD%90/">蜜罐</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%9C%9C%E7%BD%90/T-pot/">T-pot</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/T-pot/">T-pot</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E8%9C%9C%E7%BD%90/">蜜罐</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/03/09/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91%E7%BA%A2%E9%98%9F%E6%8A%80%E6%88%98%E6%B3%95/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【转载】红队技战法</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/02/01/Openresty-Debian%E9%83%A8%E7%BD%B2%E3%80%90%E8%AF%91%E6%96%87%E3%80%91/">
+                        <span class="hidden-mobile">【转载】Openresty Debian部署</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2021/02/05/T-pot%E9%A1%B9%E7%9B%AE%E5%88%86%E6%9E%90/';
+        this.page.identifier = '/2021/02/05/T-pot%E9%A1%B9%E7%9B%AE%E5%88%86%E6%9E%90/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

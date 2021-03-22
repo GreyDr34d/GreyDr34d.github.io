@@ -1,0 +1,694 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>域渗透分析工具 BloodHound-预置功能学习与记录 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/bloodhound_banner.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="域渗透分析工具 BloodHound-预置功能学习与记录">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-10-14 12:58" pubdate>
+        2020年10月14日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      47
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">域渗透分析工具 BloodHound-预置功能学习与记录</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：7 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="0x01-BloodHound简介"><a href="#0x01-BloodHound简介" class="headerlink" title="0x01 BloodHound简介"></a>0x01 BloodHound简介</h1><blockquote>
+<p>BloodHound 是一个免费的工具。BloodHound 以用图与线的形式将域内用户、计算机、组、会话、ACL 及域内所有相关用户、组、计算机、登录信息、访问控制策略之间的关系直观地展现 在 Red Team 成员面前，更便捷地分析域内情况，更快地在域内提升权限。BloodHound 也可以使Blue Team 成员对己方网络系统进行更好的安全检测，以及保证域的安全性。BloodHound 使用图形理论，自动化地在 Active Directory 环境中理清大部分人员之间的关系和细节。使用 BloodHound，可以快速地深入了解 AD 中的一些用户关系、哪些用户具有管理员权限、哪些用户有权对任何计算机都拥有管理权限，以及有效的用户组成员信息。</p>
+</blockquote>
+<h1 id="0x02-BloodHound预置分析功能"><a href="#0x02-BloodHound预置分析功能" class="headerlink" title="0x02 BloodHound预置分析功能"></a>0x02 BloodHound预置分析功能</h1><p>目前（2021年3月），BloodHound内置25个功能。</p>
+<h2 id="0-预置功能列表"><a href="#0-预置功能列表" class="headerlink" title="0. 预置功能列表"></a>0. 预置功能列表</h2><ul>
+<li><strong>Find all Domain Admins</strong> 查找所有域管理员</li>
+<li><strong>Find Shortest Paths to Domain Admins</strong> 查找到域管理员的最短路径</li>
+<li><strong>Find Principals with DCSync Rights</strong> 查找具有DCSync权限的主体</li>
+<li><strong>Users with Foreign Domain Group Membership</strong> 具有外部域组成员资格的用户</li>
+<li><strong>Groups with Foreign Domain Group Membership</strong> 具有外部域组成员身份的组</li>
+<li><strong>Map Domain Trusts</strong> 映射域信任</li>
+<li><strong>Shortest Paths to Unconstrained Delegation Systems</strong> 无约束委托系统的最短路径</li>
+<li><strong>Shortest Paths from Kerberoastable Users</strong> 用户的最短路径</li>
+<li><strong>Shortest Paths to Domain Admins from Kerberoastable Users</strong> Kerberoastable用户到域管理员的最短路径</li>
+<li><strong>Shortest Path from Owned Principals</strong> 从拥有的主体的最短路径</li>
+<li><strong>Shortest Paths to Domain Admins from Owned Principals</strong> 从拥有的主体到域管理员的最短路径</li>
+<li><strong>Shortest Paths to High Value Targets</strong> 通往高价值目标的最短路径</li>
+<li><strong>Find Computers where Domain Users are Local Admin</strong> 查找域用户为本地管理员的计算机</li>
+<li><strong>Find Computers where Domain Users can read LAPS passwords</strong> 查找域用户可以读取LAPS密码的计算机</li>
+<li><strong>Shortest Paths from Domain Users to High Value Targets</strong> 从域用户到高价值目标的最短路径</li>
+<li>**Find All Paths from Domain Users to High Value Targets **查找从域用户到高价值目标的所有路径</li>
+<li><strong>Find Workstations where Domain Users can RDP</strong> 查找域用户可以RDP的工作站</li>
+<li><strong>Find Servers where Domain Users can RDP</strong> 查找域用户可以RDP的服务器</li>
+<li>**Find Dangerous Rights for Domain Users Groups **查找域用户组的危险权限</li>
+<li><strong>Find Kerberoastable Members of High Value Groups</strong> 寻找高价值群体中的Kerberosatable成员</li>
+<li><strong>List all Kerberoastable Accounts</strong> 列出所有Kerberostable帐户</li>
+<li><strong>Find Kerberoastable Users with most privileges</strong> 查找拥有最多权限的Kerberostable用户</li>
+<li><strong>Find Domain Admin Logons to non-Domain Controllers</strong> 查找到非域控制器的域管理员登录</li>
+<li><strong>Find Computers with Unsupported Operating Systems</strong> 查找具有不受支持的操作系统的计算机</li>
+<li><strong>Find AS-REP Roastable Users (DontReqPreAuth)</strong> 查找AS-REP Roastable用户（DontReqPreAuth）</li>
+</ul>
+<p>对于一个内网新手来说，以上的很多功能暂时都无法理解，很多前辈的分析可以帮助我们理解每一个功能，笔者在此进行摘录与汇总。</p>
+<h2 id="1-Find-all-Domain-Admins-查找所有域管理员"><a href="#1-Find-all-Domain-Admins-查找所有域管理员" class="headerlink" title="1. Find all Domain Admins 查找所有域管理员"></a>1. Find all Domain Admins 查找所有域管理员</h2><p>单击“Find all Domain Admins”选项，选择需要查询的域名进行查询，如图 2-98 所示。BloodHound 可以帮助我们查询出当前域中有多少个域管理员。可以看到，当前域中有 15 个域管理员权限的用户。按“Ctrl”键，将循环显示默认阈值、始终显示、从不显示三个选项，以显示不同的节点标签，也可以单击并按住某个节点，将其拖动到其他位置。 </p>
+<img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20201021093359537.png" alt="image-20201021093359537" style="zoom:150%;" />
+
+
+
+
+
+<h2 id="2-Find-Shortest-Paths-to-Domain-Admins-寻找到达域管理员的最短路径"><a href="#2-Find-Shortest-Paths-to-Domain-Admins-寻找到达域管理员的最短路径" class="headerlink" title="2. Find Shortest Paths to Domain Admins 寻找到达域管理员的最短路径"></a>2. Find Shortest Paths to Domain Admins 寻找到达域管理员的最短路径</h2><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210314155338260.png" alt="image-20210314155338260" style="zoom:150%;" />
+
+
+
+<p>单击“Find Shortest Paths to Domain Admins”选项，使用 BloodHound 进行分析，如图 2-99 所示。BloodHound 列出了数条路径可以到达域管理员的路径。</p>
+<ul>
+<li><p>左上角为目标域管理员组，既是本次渗透测试的核心目标，也是图中的一个节点，还是所有路线的尽头。</p>
+</li>
+<li><p>左下角第一条线路上的三个用户，属于第一个节点的组，第一节点组又在第二节点组内。第二节点组对其上部的第三节点的用户具有权限，而该用户又是上一台（第四个节点）计算机的本地管理员，可以在这台计算机上拿到上面一个（第五个节点）用户的会话。该用户属于 Domain Admins 组，可以通过 PTH 方法获取域管理员和域控制器。在第三个节点分支中的用户，可以对处于第三个节点的用户强制推送策略，直接修改第三个节点用户的密码，进而再次通过 PTH 拿下第四个节点，依此类推。 </p>
+</li>
+<li><p>中间的一组，第一个节点中的三个用户为域管理员委派服务账号，可以对该域的域控制器进行 dcsync 同步，将第二个节点的用户（属于 Domain Admins 组）的散列值同步过来，进而获取域控制器权限。 </p>
+</li>
+<li><p>右边的组，第一个节点的用户是第二个节点计算机的本地管理员，在该计算机上可以获得第三个节点的用户散列值。第三个节点用户又属于第四个节点的组。第四节点组是第五个节点计算机的本地管理员组，在该计算机可以获取第五个节点用户（属于 Domain Admins组）的散列值，进而获取域控制器权限。</p>
+</li>
+</ul>
+<h2 id="3-Find-Principals-with-DCSync-Rights-查找具有DCSync权限的主体"><a href="#3-Find-Principals-with-DCSync-Rights-查找具有DCSync权限的主体" class="headerlink" title="3. Find Principals with DCSync Rights 查找具有DCSync权限的主体"></a>3. Find Principals with DCSync Rights 查找具有DCSync权限的主体</h2><p><strong>DCsync知识补充</strong></p>
+<blockquote>
+<p>DCsync大致原理是通过<code>GetNCChanges</code>请求域控制器（利用<code>Directory Replication Service</code>协议）复制用户凭据。</p>
+<p><strong>利用条件：</strong></p>
+<p>获得以下任一用户的权限：</p>
+<ul>
+<li>Administrators组内的用户</li>
+<li>Domain Admins组内的用户</li>
+<li>Enterprise Admins组内的用户</li>
+<li>域控制器的计算机帐户</li>
+</ul>
+<p><strong>利用方法：</strong></p>
+<p>具体可参考：<a target="_blank" rel="noopener" href="https://3gstudent.github.io/3gstudent.github.io/%E5%9F%9F%E6%B8%97%E9%80%8F-DCSync/">域渗透——DCSync</a></p>
+</blockquote>
+<blockquote>
+<p>运行DCSync需要特殊权限，<code>Administrators</code>组、<code>Domain Admins</code>组或<code>Enterprise Admins</code>组以及域控中的任何成员都通过DCSync来提取用户凭证。<strong>如果配置不当，可导致普通用户也能具有DCsync权限</strong></p>
+</blockquote>
+<p>如果普通用户想具有DCsync权限，可以给对象添加以下三条ACE：</p>
+<ul>
+<li><code>DS-Replication-Get-Changes</code>，对应GUID为：<code>1131f6aa-9c07-11d1-f79f-00c04fc2dcd2</code></li>
+<li><code>DS-Replication-Get-Changes-All</code>，对应GUID为：<code>1131f6ad-9c07-11d1-f79f-00c04fc2dcd2</code></li>
+<li><code>DS-Replication-Get-Changes-In-Filtered-Set</code>，对应GUID为：<code>89e95b76-444d-4c62-991a-0facbeda640c</code></li>
+</ul>
+<p>powerview模块集成了添加<code>DCsync</code>权限的方法，所以我们不需要一个一个添加了</p>
+<div class="hljs code-wrapper"><pre><code class="hljs coq"><span class="hljs-keyword">Add</span>-DomainObjectAcl -TargetIdentity <span class="hljs-string">&quot;DC=test,DC=local&quot;</span> -PrincipalIdentity qiyou -Rights DCSync -<span class="hljs-keyword">Verbose</span></code></pre></div>
+
+<p><a target="_blank" rel="noopener" href="https://xzfile.aliyuncs.com/media/upload/picture/20200229210337-e62969d8-5af3-1.png"><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229210337-e62969d8-5af3-1.png" alt="img"></a></p>
+<p>回到BloodHound</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229210241-c4febd30-5af3-1.png" alt="img"></p>
+<p>利用用户qiyou即可dump出域内所有用户的hash</p>
+<h2 id="4-Users-with-Foreign-Domain-Group-Membership-具有外部域组成员资格的用户"><a href="#4-Users-with-Foreign-Domain-Group-Membership-具有外部域组成员资格的用户" class="headerlink" title="4. Users with Foreign Domain Group Membership 具有外部域组成员资格的用户"></a>4. Users with Foreign Domain Group Membership 具有外部域组成员资格的用户</h2><p><strong>知识补充</strong></p>
+<blockquote>
+<p><strong>外部域</strong></p>
+<p>当林中的域与林之外的域之间建立信任关系时，来自外部域的安全主体可以访问内部域中的资源。</p>
+</blockquote>
+<p>活动目录AD中就有一栏：ForeignSecurityPrincipals，：代表域中来自森林外部域的组中的成员</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/v2-9f8dfbd03eb6662caa1b58952241682e_r.jpg" alt="preview"></p>
+<p>如果我们控制的用户具有访问外部域的权限，我们即可考虑跨域攻击</p>
+<h2 id="5-Shortest-Paths-to-Unconstrained-Delegation-Systems-无约束委托系统的最短路径"><a href="#5-Shortest-Paths-to-Unconstrained-Delegation-Systems-无约束委托系统的最短路径" class="headerlink" title="5. Shortest Paths to Unconstrained Delegation Systems 无约束委托系统的最短路径"></a>5. Shortest Paths to Unconstrained Delegation Systems 无约束委托系统的最短路径</h2><p><strong>知识补充</strong></p>
+<blockquote>
+<p><strong>域委派</strong></p>
+<p>摘自：<a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/92484">利用域委派获取域管理权限</a></p>
+<p>域委派是大型网络中经常部署的应用模式，给多跳认证带来很大的便利，同时也带来很大的安全隐患，利用委派可获取域管理员权限，甚至制作深度隐藏的后门。</p>
+<p>域委派是指，将域内用户的权限委派给服务账号，使得服务账号能以用户权限开展域内活动。</p>
+<p>服务账号（Service Account），域内用户的一种类型，服务器运行服务时所用的账号，将服务运行起来并加入域。例如MS SQL Server在安装时，会在域内自动注册服务账号SqlServiceAccount，这类账号不能用于交互式登录。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/t010f5041cb270886de.png" alt="img"></p>
+<p>上图是经典的应用场景。一个域内普通用户jack通过Kerberos协议认证到前台WEB服后，前台运行WEB服务的服务账号websvc模拟（Impersonate）用户jack，以Kerberos协议继续认证到后台服务器，从而在后台服务器中获取jack用户的访问权限，即域中跳或者多跳的Kerberos认证。按照图中红色字体的数字，具体步骤如下：</p>
+<ul>
+<li>域内用户jack以Kerberos方式认证后访问Web服务器；</li>
+<li>Web服务以websvc服务账号运行，websvc向KDC发起jack用户的票据申请；</li>
+<li>KDC检查websvc用户的委派属性，如果被设置，则返回jack用户的可转发票据TGT；</li>
+<li>websvc收到jack用户TGT后，使用该票据向KDC申请访问文件服务器的服务票据TGS；</li>
+<li>KDC检查websvc的委派属性，如果被设置，且申请的文件服务在允许的列表清单中，则返回一个jack用户访问文件服务的授权票据TGS；</li>
+<li>websvc收到的jack用户的授权票据TGS后，可访问文件服务，完成多跳认证。</li>
+</ul>
+<p>域内委派主要有3种应用方式：</p>
+<ul>
+<li><strong>一是非约束性委派（Unconstrained Delegation）</strong>，服务账号可以获取某用户的TGT，从而服务账号可使用该TGT，模拟用户访问任意服务。</li>
+</ul>
+<p>举例说明，如果某个服务A的服务账号B被设置为非约束委派，当用户C通过Kerberos认证访问服务A时，KDC会检查服务账号B的属性，发现是非约束性委派时，KDC会将用户C的TGT放在TGS中，这样B在验证TGS的同时获取了C用户的TGT，从而可以模拟用户C访问任意服务。</p>
+<p><em>从网络攻击的角度看，如果攻击者控制了服务账号B，并诱骗管理员来访问服务A，则可以获取管理员的TGT，进而模拟管理员访问任意服务，即获得管理员权限。越是大型网络、应用越多的网络，服务账号越多，委派的应用越多，越容易获取域管理员权限。</em></p>
+<ul>
+<li><p><strong>二是约束性委派（Constrained Delegation）</strong>，即Kerberos的扩展协议S4U2Proxy，服务账号只能获取某用户的TGS，从而只能模拟用户访问特定的服务；</p>
+</li>
+<li><p><strong>三是协议传递，即Kerberos的扩展协议S4U2Self</strong>，服务账号针对某一个特定服务，可查询获取任意用户的TGS，从而能模拟任意用户访问该特定服务。</p>
+</li>
+</ul>
+<p>在Windows系统中，普通用户的属性中没有委派（Delegation）这个选项卡，只有服务账号、主机账号才有。如下图所示。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/t01f8cfe7e1c4fc013a.png" alt="img"></p>
+<p><strong>GPO</strong>（<a target="_blank" rel="noopener" href="https://technet.microsoft.com/en-us/windowsserver/bb310732.aspx">Group Policy Objects</a>）：</p>
+<ul>
+<li>组策略使管理员能够管理Active Directory中的计算机和用户。组策略保存为组策略对象（GPO）</li>
+<li>攻击者可以滥用GPO，通过欺诈方式进一步自动化地传播恶意软件、实现持久化驻留目的</li>
+<li>恶意软件可以利用GPO穿越IDS/IPS等防火墙，最终访问到域内所有的系统。</li>
+<li>GPO的另一优点就是攻击过程期间并不需要目标系统在线，一旦离线状态下的目标系统重新登录到域中，恶意的GPO载荷就会被投递到目标系统。</li>
+<li>组策略默认情况下每90分钟（域控制器5分钟）可包括安全选项，注册表项，软件安装以及启动和关闭脚本以及域成员刷新组策略设置。这意味着组策略在目标计算机上执行配置的设置。</li>
+</ul>
+</blockquote>
+<p><strong>BloodHund 示例</strong></p>
+<p>摘自<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7311#toc-0">利用BloodHound分析域中的攻击路径</a>，前辈分析的很清楚</p>
+<p>点击一下即可看到路径</p>
+<p><a target="_blank" rel="noopener" href="https://xzfile.aliyuncs.com/media/upload/picture/20200229170834-1046899c-5ad3-1.png"><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229170834-1046899c-5ad3-1.png" alt="img"></a></p>
+<p>因为这个域上的关系结构比较简单，所有看起来也不是很复杂，我们这里以域用户<code>qiyou</code>为例吧，可以把鼠标放在这个用户图标上，然后与它相关的路径都会变红，如下图</p>
+<p><a target="_blank" rel="noopener" href="https://xzfile.aliyuncs.com/media/upload/picture/20200229170722-e5883aa2-5ad2-1.png"><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229170722-e5883aa2-5ad2-1.png" alt="img"></a></p>
+<p>有两个具有非约束委派的系统，一个是<code>win10</code>一个是<code>windows server 2008R2</code></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229171247-a7312a88-5ad3-1.png" alt="img"></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229171610-1fc20eae-5ad4-1.png" alt="img"></p>
+<p>首先看到第一条路径，用户<code>qiyou</code>是对<code>Default Domain Policy</code>具有委派权限的，权限为<code>GenericWrite</code>，也就是说用户qiyou对这个<strong>GPO</strong>具有修改权限的，那么我们就可以通过这个用户来修改域上默认组策略的一些设置，比如设置计划任务，<code>Default Domain Policy</code>这个GPO默认是链接到域本身的，也就说这个GPO的计划任务默认是对域控生效的，通过命令行来注册GPO计划任务可以参考三好学生师傅这个篇文章：<a target="_blank" rel="noopener" href="https://3gstudent.github.io/3gstudent.github.io/%E5%9F%9F%E6%B8%97%E9%80%8F-%E5%88%A9%E7%94%A8GPO%E4%B8%AD%E7%9A%84%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1%E5%AE%9E%E7%8E%B0%E8%BF%9C%E7%A8%8B%E6%89%A7%E8%A1%8C(%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E4%B8%8E%E8%84%9A%E6%9C%AC%E7%BB%86%E8%8A%82)/">地址</a>，因为不是这里重点就不多赘述了</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229171123-74da2828-5ad3-1.png" alt="img"></p>
+<p>回到域控验证用户qiyou对该GPO是否具有委派权限</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200228215936-8db7e778-5a32-1.png" alt="img"></p>
+<p>第二条路径，如下图所示</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229171908-89ddca62-5ad4-1.png" alt="img"></p>
+<p>路径的大概描述是：用户qiyou对test具有<code>GenericAll</code>权限（完全控制权限），而<code>test</code>对主机<code>DM2012.TEST.LOCAL</code>具有某个服务的约束委派权限，那么就有可能通过约束委派得到<code>DM2012.TEST.LOCAL</code>的权限，而用户administrator又在主机<code>DM2012.TEST.LOCAL</code>上有一个会话，那么就有可能从内存中dump出用户administrator的凭证，而用户<code>administrator</code>又属于<code>DOMAIN ADMINS</code>组，<code>DOMAIN ADMINS</code>组又对该非约束委派的主机具有完全控制权限，从而形成了整条利用链</p>
+<p>用户qiyou对test具有完全控制权限，那么用户qiyou可以给用户test注册spn、修改密码等等</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200228234046-aff8367c-5a40-1.png" alt="img"></p>
+<h2 id="6-Shortest-Path-from-Owned-Principals-从拥有的主体的最短路径"><a href="#6-Shortest-Path-from-Owned-Principals-从拥有的主体的最短路径" class="headerlink" title="6. Shortest Path from Owned Principals 从拥有的主体的最短路径"></a>6. Shortest Path from Owned Principals 从拥有的主体的最短路径</h2><p>当我们将已控制的结点标记为Owned后，我们就可以使用这个功能。</p>
+<p>标记方法如下：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210314223154687.png" alt="image-20210314223154687"></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210314223253211.png" alt="image-20210314223253211"></p>
+<h2 id="7-Find-Computers-where-Domain-Users-can-read-LAPS-passwords-查找域用户可以读取LAPS密码的计算机"><a href="#7-Find-Computers-where-Domain-Users-can-read-LAPS-passwords-查找域用户可以读取LAPS密码的计算机" class="headerlink" title="7. Find Computers where Domain Users can read LAPS passwords 查找域用户可以读取LAPS密码的计算机"></a>7. Find Computers where Domain Users can read LAPS passwords 查找域用户可以读取LAPS密码的计算机</h2><p><strong>知识补充</strong></p>
+<blockquote>
+<p><strong>LAPS</strong>：</p>
+<p>摘自：<a target="_blank" rel="noopener" href="https://www.buaq.net/go-28036.html">渗透中的内网渗透</a></p>
+<p>Local Administrator Password Solution是密码解决方案，为了防止一台机器被抓到密码后，然后网内都是同密码机器导致被横向渗透。</p>
+<p>但是也存在相应的安全隐患，当我们拿下域控时，可以查看计算机本地密码;当权限配置不当时，也会导致其他用户有权限查看他人计算机本地密</p>
+<p>如果安装LAPS，在安装的软件列表里能看到：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/img.php" alt="img"></p>
+</blockquote>
+<h2 id="8-Shortest-Paths-to-Domain-Admins-from-Kerberoastable-Users-Kerberoastable用户到域管理员的最短路径"><a href="#8-Shortest-Paths-to-Domain-Admins-from-Kerberoastable-Users-Kerberoastable用户到域管理员的最短路径" class="headerlink" title="8. Shortest Paths to Domain Admins from Kerberoastable Users Kerberoastable用户到域管理员的最短路径"></a>8. Shortest Paths to Domain Admins from Kerberoastable Users Kerberoastable用户到域管理员的最短路径</h2><p><strong>知识补充</strong></p>
+<blockquote>
+<p>**SPN (Service Principal Names)**：</p>
+<p>摘自：<a target="_blank" rel="noopener" href="https://3gstudent.github.io/%E5%9F%9F%E6%B8%97%E9%80%8F-Kerberoasting/">域渗透——Kerberoasting</a></p>
+<p>SPN是服务器上所运行服务的唯一标识，每个使用Kerberos的服务都需要一个SPN</p>
+<p>SPN分为两种，一种注册在AD上机器帐户(Computers)下，另一种注册在域用户帐户(Users)下</p>
+<ul>
+<li><p>当一个服务的权限为<code>Local System</code>或<code>Network Service</code>，则SPN注册在机器帐户(Computers)下</p>
+</li>
+<li><p>当一个服务的权限为一个域用户，则SPN注册在域用户帐户(Users)下</p>
+</li>
+</ul>
+<p><strong>Kerberoasting</strong>：</p>
+</blockquote>
+<p><strong>具体示例</strong></p>
+<p>这个就比较简单了，也不用多讲了上面也说过了用户test是<code>Kerberoastable</code>，域上的所有用户都是可以通过<code>Kerberoasting</code>得到<code>Kerberoastable</code>用户hash的</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229100223-86a8dbe4-5a97-1.png" alt="img"></p>
+<p>注册的SPN可以在左侧<code>Node Info</code>看到，为<code>test/test.local</code></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229100728-3c7f01e6-5a98-1.png" alt="img"></p>
+<p><code>Kerberoasting</code>可以得到用户hash，然后<code>hashcat</code>枚举口令即可</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/20200229102001-fd306c08-5a99-1.png" alt="img"></p>
+<h2 id="9-Find-AS-REP-Roastable-Users-DontReqPreAuth-查找AS-REP-Roastable用户（DontReqPreAuth）"><a href="#9-Find-AS-REP-Roastable-Users-DontReqPreAuth-查找AS-REP-Roastable用户（DontReqPreAuth）" class="headerlink" title="9.  Find AS-REP Roastable Users (DontReqPreAuth) 查找AS-REP Roastable用户（DontReqPreAuth）"></a>9.  Find AS-REP Roastable Users (DontReqPreAuth) 查找AS-REP Roastable用户（DontReqPreAuth）</h2><p><strong>知识补充</strong></p>
+<blockquote>
+<p>AS-REP Roasting 是针对不需要预身份验证的用户帐户的Kerberos攻击。预身份验证是Kerberos身份验证的第一步，旨在防止暴力破解密码猜测攻击。</p>
+<p>在预身份验证期间，用户将输入其密码，该密码将用于加密时间戳，然后域控制器将尝试对其进行解密，并验证是否使用了正确的密码，并且该密码不会重播先前的请求。从那里，将发出TGT，供用户用于将来的身份验证。如果禁用了预身份验证，则攻击者可以为任何用户请求身份验证数据，并且DC将返回加密的TGT，该TGT可以通过离线暴力破解。 </p>
+<p>幸运的是，默认情况下，Active Directory中需要预身份验证。但是，可以通过每个用户帐户上的用户帐户控制设置来控制此设置，如下所示：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/ASREP-1.png" alt="AS-REP烘焙"></p>
+</blockquote>
+<h1 id="0x03-参考资料"><a href="#0x03-参考资料" class="headerlink" title="0x03 参考资料"></a>0x03 参考资料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7311#toc-6">利用BloodHound分析域中的攻击路径</a></li>
+<li><a target="_blank" rel="noopener" href="https://3gstudent.github.io/3gstudent.github.io/%E5%9F%9F%E6%B8%97%E9%80%8F-DCSync/">域渗透——DCSync</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/174748699">内网渗透入门–域相关概念</a></li>
+<li><a target="_blank" rel="noopener" href="https://rootrain.me/2020/02/29/bloodhound%E6%8A%80%E6%9C%AF%E5%88%86%E6%9E%90/#%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8">bloodhound技术分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/92484">利用域委派获取域管理权限</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/52020167">我所了解的内网渗透——内网渗透知识大总结</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@riccardo.ancarani94/bloodhound-tips-and-tricks-e1853c4b81ad">BloodHound Tips and Tricks</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.buaq.net/go-28036.html">渗透中的内网渗透</a></li>
+<li><a target="_blank" rel="noopener" href="https://3gstudent.github.io/%E5%9F%9F%E6%B8%97%E9%80%8F-Kerberoasting/">域渗透——Kerberoasting</a></li>
+<li><a target="_blank" rel="noopener" href="https://stealthbits.com/blog/cracking-active-directory-passwords-with-as-rep-roasting/">CRACKING ACTIVE DIRECTORY PASSWORDS WITH AS-REP ROASTING</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/">安全工具</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/BloodHound/">BloodHound</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/BloodHound/">BloodHound</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/">安全工具</a>
+                    
+                      <a class="hover-with-bg" href="/tags/BloodHound/">BloodHound</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a>
+                    
+                      <a class="hover-with-bg" href="/tags/DCSync/">DCSync</a>
+                    
+                      <a class="hover-with-bg" href="/tags/GPO/">GPO</a>
+                    
+                      <a class="hover-with-bg" href="/tags/SPN/">SPN</a>
+                    
+                      <a class="hover-with-bg" href="/tags/AS-REP/">AS-REP</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/10/14/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7-BloodHound-%E5%9F%BA%E6%9C%AC%E5%AE%89%E8%A3%85/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">域渗透分析工具 BloodHound-基本安装</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/10/05/python%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8-flask-SSTI/">
+                        <span class="hidden-mobile">python沙箱逃逸&flask SSTI</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2020/10/14/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7-BloodHound-%E9%A2%84%E7%BD%AE%E5%8A%9F%E8%83%BD%E5%AD%A6%E4%B9%A0%E4%B8%8E%E8%AE%B0%E5%BD%95/';
+        this.page.identifier = '/2020/10/14/%E5%9F%9F%E6%B8%97%E9%80%8F%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7-BloodHound-%E9%A2%84%E7%BD%AE%E5%8A%9F%E8%83%BD%E5%AD%A6%E4%B9%A0%E4%B8%8E%E8%AE%B0%E5%BD%95/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>

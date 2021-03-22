@@ -1,0 +1,969 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="make changes, make perfect">
+  <meta name="author" content="Dr34d">
+  <meta name="keywords" content="blog">
+  <title>IPV6学习 - Dr34d&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/xt256.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"greydr34d.github.io","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Dr34d's blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Dr34d's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/IPv6_banner.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="IPV6学习">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-12-04 09:20" pubdate>
+        2019年12月4日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      71
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">IPV6学习</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：9 天前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="IPv6-学习"><a href="#IPv6-学习" class="headerlink" title="IPv6 学习"></a>IPv6 学习</h1><p>参考资料：51cto课程：<a target="_blank" rel="noopener" href="https://edu.51cto.com/center/course/lesson/index?id=336744">https://edu.51cto.com/center/course/lesson/index?id=336744</a></p>
+<h2 id="0x00-背景"><a href="#0x00-背景" class="headerlink" title="0x00 背景"></a>0x00 背景</h2><p>参考链接：</p>
+<ol>
+<li>维基百科：<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/IPv6">https://zh.wikipedia.org/wiki/IPv6</a></li>
+</ol>
+<p> 现今的互联网络发展蓬勃，截至2018年1月，<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%85%A8%E7%90%83%E7%B6%B2%E9%9A%9B%E7%B6%B2%E8%B7%AF%E4%BD%BF%E7%94%A8%E7%8E%87">全球上网人数</a>已达40.21亿，<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/IPv4">IPv4</a>仅能提供约42.9亿个IP位置。虽然当前的<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2">网络地址转换</a>及<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%97%A0%E7%B1%BB%E5%88%AB%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1">无类别域间路由</a>等技术可延缓网络位置匮乏之现象，但为求解决根本问题 </p>
+<p>IPv6的出现，一方面是为了解决ip地址短缺的问题，另一方面也是为了解决IPv4长期以来存在的诸多安全问题。</p>
+<p>在不久的将来，IPv4必将逐渐被IPv6所取代，在这个过程当中，IPv6除了要面对协议本身的安全问题以外，还需要面对IPv4向IPV6过渡中来自历史的安全威胁。</p>
+<p>值得注意的是，现在正值IPv4向IPv6的过渡时期。Microsoft、linux、Sun、BSD等设备和软件的主要厂商都部署并经过测试公布出了其在实现IPv6发现的弱点。为了确保IPv6迁移计划的完成，在没有用户的干预下，这些操作系统可能运行着两种协议，若用户没有进行专门配置，没有实施针对IPv6的安全防护，就要冒着被攻击的风险，因为很多安全系统和策略都只保障IPv4数据包风险，而忽视了IPv6数据包的安全。所以进一步研究IPv6协议的安全尤为重要。</p>
+<h2 id="0x01-Ipv6概述"><a href="#0x01-Ipv6概述" class="headerlink" title="0x01 Ipv6概述"></a>0x01 Ipv6概述</h2><p><a target="_blank" rel="noopener" href="http://www.potaroo.net/tools/ipv4">http://www.potaroo.net/tools/ipv4</a> ipv4地址使用情况报告</p>
+<h3 id="IPv4-Address-Report"><a href="#IPv4-Address-Report" class="headerlink" title="IPv4 Address Report"></a>IPv4 Address Report</h3><p>This report generated at 06-Nov-2019 08:31 UTC.</p>
+<hr>
+<table>
+<thead>
+<tr>
+<th>IANA Unallocated Address Pool Exhaustion:</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+<td><strong>03-Feb-2011</strong></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Projected RIR Address Pool Exhaustion Dates:</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>RIR</td>
+<td>Projected Exhaustion Date</td>
+<td>Remaining Addresses in RIR Pool (/8s)</td>
+</tr>
+<tr>
+<td></td>
+<td>APNIC:</td>
+<td><strong>19-Apr-2011</strong> (actual)</td>
+<td>0.1839</td>
+</tr>
+<tr>
+<td></td>
+<td>RIPE NCC:</td>
+<td><strong>14-Sep-2012</strong> (actual)</td>
+<td>0.0289</td>
+</tr>
+<tr>
+<td></td>
+<td>LACNIC:</td>
+<td><strong>10-Jun-2014</strong> (actual)</td>
+<td>0.0134</td>
+</tr>
+<tr>
+<td></td>
+<td>ARIN:</td>
+<td><strong>24 Sep-2015</strong> (actual)</td>
+<td>0.0002</td>
+</tr>
+<tr>
+<td></td>
+<td>AFRINIC:</td>
+<td><strong>15-Mar-2020</strong></td>
+<td>0.2096</td>
+</tr>
+</tbody></table>
+<p>以上是当前全球最新的IPV4地址池使用报告，从表格中的最后一栏Remaining Addresses in RIR Pool中可以看出，全球各大洲，特别是亚洲和美洲的地址池即将分配殆尽。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/plotend.png" alt="img"></p>
+<p>大致统计中国掌握的地址池资源在三亿左右，所以当前地址资源的缺乏是一个全球性的问题</p>
+<h3 id="临时解决方案"><a href="#临时解决方案" class="headerlink" title="临时解决方案"></a>临时解决方案</h3><p>dhcp：使用时发放，不使用时收回</p>
+<p>nat：内网转换为外网统一的ip地址</p>
+<p>缺陷：不能从最根本的角度解决ipv4地址池短缺的问题。</p>
+<h2 id="0x02-IPV6基础知识"><a href="#0x02-IPV6基础知识" class="headerlink" title="0x02 IPV6基础知识"></a>0x02 IPV6基础知识</h2><p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38265137/article/details/80439611">https://blog.csdn.net/qq_38265137/article/details/80439611</a> IPv6基础</p>
+<h3 id="一、简介："><a href="#一、简介：" class="headerlink" title="一、简介："></a>一、简介：</h3><ol>
+<li><p>地址空间巨大</p>
+<ol>
+<li><p>ipv4 长度32 位，地址数量为42亿左右</p>
+</li>
+<li><p>ipv6 长度128位，地址数量更加大</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191106210059058.png" alt="image-20191106210059058"></p>
+</li>
+</ol>
+</li>
+<li><p>报文结构优化</p>
+<p>去掉了长度，特征值，Flags，片偏移，头部校验和、选项、Padding</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191106210339419.png" alt="image-20191106210339419"></p>
+<ol>
+<li>ipv4报头长度不固定，基本头部有20字节，加上扩展选项最多可以有60字节，如果ipv4数据报中包含了option选项，会对路由器带来两个两个消极影响，第一是会导致路由器的分流处理，使得路由器效率变低，第二，报头长度不固定，不利于路由器中使用硬件来实现路由。internet发展到如今，制约其发展的因素已经不再是数据链路速率上瓶颈，路由器的处理速度成为制约internet发展的一大重要因素。</li>
+<li>ipv6不仅仅是将地址长度扩展到了128位，还对报头的头部字段进行了优化。去掉了一些冗余的字段，上图中用红色标明的字段就是被去掉了的字段。</li>
+<li>ipv6头部分为固定头部（如上图）和扩展头部，对于ipv4中Option中的选项，如果要在ipv6中实现，都被移动到了扩展头部中。这样的设计使得路由器能够对ipv6报文进行高效的处理。</li>
+</ol>
+</li>
+<li><p>快速实现自动配置和重新编址</p>
+</li>
+<li><p>支持层次化的网络结构和路由聚合</p>
+<ol>
+<li>减少路由器中路由表的长度，提高路由转发的效率</li>
+</ol>
+</li>
+<li><p>支持安全和移动特性</p>
+<ol>
+<li>ipv4中要实现安全，就需要额外地部署ipsec</li>
+<li>ipv6中的扩展报头中，就有ah和esp，也就是说ipv6本身就实现有ipsec，可以通过扩展头部实现端到端的安全。</li>
+</ol>
+</li>
+<li><p>更好的支持Qos</p>
+<ol>
+<li>流标签：可以使路由器对同一种流的数据包进行标识和特殊处理</li>
+</ol>
+</li>
+</ol>
+<h3 id="二、对比报文中保留的字段"><a href="#二、对比报文中保留的字段" class="headerlink" title="二、对比报文中保留的字段"></a>二、对比报文中保留的字段</h3><p>主要对比黄色保留字段</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191106210339419.png" alt="image-20191106210339419"></p>
+<ol>
+<li>ipv4中以五元组来表示，格式为：{源ip地址：源端口号：目的ip地址，目的端口号，传输层协议}，而ipv6采用三元组：{源地址，目的地址，流标签}来表示。</li>
+<li>ipv4字段非常多，然而地址信息部分只占了8个字节，占头部比重小，ipv6地址信息占32个字节，占头部的比重大，路由器处理效率高</li>
+</ol>
+<h3 id="三、IPV6的地址表示"><a href="#三、IPV6的地址表示" class="headerlink" title="三、IPV6的地址表示"></a>三、IPV6的地址表示</h3><p>IPV6地址长度为128位，每16位划分为一组，每一组用四个十六进制位来表示。中间用:分开。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107002929155.png" alt="image-20191107002929155"></p>
+<p>前缀相当于ipv4的子网部分，后面的接口标识相当于ipv4中的主机部分</p>
+<h5 id="压缩地址规则："><a href="#压缩地址规则：" class="headerlink" title="压缩地址规则："></a>压缩地址规则：</h5><ol>
+<li>每一组中的前导0可以省略</li>
+<li>地址中包含连续的全为0的组，就可以使用双冒号来代替，但是每个ipv6地址中只能使用一次</li>
+</ol>
+<h5 id="浏览器访问规则："><a href="#浏览器访问规则：" class="headerlink" title="浏览器访问规则："></a>浏览器访问规则：</h5><p>在浏览器中访问如下ip地址：</p>
+<p><code>http://2001:bd6::1234:8080</code> 如果这样去访问的话，就不知道最后的端口号8080到底是端口号还是属于ipv6的一部分，所以在浏览器中使用ipv6地址的时候，加上[ ]然后再加上端口号</p>
+<p><code>http://[2001:db6::1234:8080]:8080</code></p>
+<h5 id="ipv6-接口标识生成方式"><a href="#ipv6-接口标识生成方式" class="headerlink" title="ipv6 接口标识生成方式"></a>ipv6 接口标识生成方式</h5><ol>
+<li>手工配置</li>
+<li>系统通过软件自动生成</li>
+<li>IEEE EUI-64规范自动生成（linux，mac，安卓）（windows 使用这个规范的时候会同时生成一个临时ipv6地址）</li>
+</ol>
+<h5 id="EUI-64规范"><a href="#EUI-64规范" class="headerlink" title="EUI-64规范"></a>EUI-64规范</h5><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107003751925.png" alt="image-20191107003751925"></p>
+<p>mac地址第七位（前面的部分为厂商信息）：U-I位，如果为1，则为全球唯一，为0则为本地唯一。</p>
+<p>生成规则：在mac地址的前24位和后24位中间加上16位</p>
+<p>第七位的0改成1，由于mac地址唯一，所以生成的接口标识加上前面的前缀得到的ipv6地址也唯一</p>
+<h3 id="四、IPV6报文格式"><a href="#四、IPV6报文格式" class="headerlink" title="四、IPV6报文格式"></a>四、IPV6报文格式</h3><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107004317769.png" alt="image-20191107004317769"></p>
+<ol>
+<li><p>基本头部（必须要有）</p>
+</li>
+<li><p>扩展头部（可有可无，和ipv4不同，没有最大长度限制，只有目标设备才处理，某些情况下路由器也会处理，而ipv4的选项在路由器中也处理）</p>
+</li>
+<li><p>上层协议数据单元</p>
+</li>
+</ol>
+<h3 id="五、IPV6基本报头"><a href="#五、IPV6基本报头" class="headerlink" title="五、IPV6基本报头"></a>五、IPV6基本报头</h3><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107004613225.png" alt="image-20191107004613225"></p>
+<p>总共八个字段：</p>
+<ol>
+<li>version 4bit，对于ipv6，这个值为6</li>
+<li>Traffic Class ，流类别，长度8bit，等同ipv4中的tos，表示这一类ipv6数据包的优先级</li>
+<li>Flow label，流标签，20bit，区分实时流量（流标签+源地址+目的地址）</li>
+<li>Payload Length，16bit，含义为负载长度，代表首部长度和数据长度之和</li>
+<li>Next Header ：8bit，定义紧跟在ipv6基本报头后的第一扩展头</li>
+<li>Hop limit，8bit，条数，类似TTL</li>
+<li>源地址和目的地址共128*2位，也就是32字节</li>
+</ol>
+<p>以上的字段总共40个字节，除了扩展头之外有40字节</p>
+<h3 id="六、IPV6扩展头部"><a href="#六、IPV6扩展头部" class="headerlink" title="六、IPV6扩展头部"></a>六、IPV6扩展头部</h3><ol>
+<li>将原ipv4的Option字段放入ipv6的扩展头中</li>
+<li>IPV6报文包含0个1个或者多个扩展头</li>
+<li>扩展头的长度固定为8字节的整数倍</li>
+</ol>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107215635633.png" alt="image-20191107215635633"></p>
+<p>扩展头部中的内容：</p>
+<ol>
+<li>Next Header 与基本报头中的Next Header含义一致，表示这一个扩展头部的下一个紧接着的报头，也是8bit</li>
+<li>扩展头部的长度</li>
+<li>扩展头部的数据</li>
+</ol>
+<h3 id="七、IPV6报文解析"><a href="#七、IPV6报文解析" class="headerlink" title="七、IPV6报文解析"></a>七、IPV6报文解析</h3><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107215931297.png" alt="image-20191107215931297"></p>
+<ol>
+<li>版本：6</li>
+<li>流类型：0x00</li>
+<li>流标签：0x00000</li>
+<li>长度：60</li>
+<li>Next Header ICMPv6（58），使用58表示ICMP</li>
+<li>跳数限制：64</li>
+</ol>
+<h2 id="0x03-IPV6-地址类型"><a href="#0x03-IPV6-地址类型" class="headerlink" title="0x03 IPV6 地址类型"></a>0x03 IPV6 地址类型</h2><p>IPV6中没有广播的概念，但是添加了任播地址</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107224430434.png" alt="image-20191107224430434"></p>
+<ol>
+<li><p>全球单播地址占所有地址的1/8 地址范围为2000:FFFF….可以直接表示为2000::/3</p>
+</li>
+<li><p>保留地址为全球单播地址的一部分，不可以路由，公网上没有这一网段</p>
+</li>
+<li><p>私有地址</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107224711830.png" alt="image-20191107224711830"></p>
+<p>ipv6有自己的私有地址</p>
+</li>
+<li><p>链路本地地址，也就是只能够在本链路中使用，可以用在二层交换机中的各个结点。不跨第三层设备</p>
+</li>
+</ol>
+<p>以上为单播地址，下面是组播地址。</p>
+<ol>
+<li>组播地址：用来标识一组结点</li>
+<li>特殊地址：未指定地址，回环地址</li>
+</ol>
+<p>任播地址：用于标识多个接口，但是这些借口都使用统一IP地址，就是用一个单播地址分配给了多个接口。</p>
+<h3 id="一、全球单播地址"><a href="#一、全球单播地址" class="headerlink" title="一、全球单播地址"></a>一、全球单播地址</h3><p><em>（  Global unicast address(es):）</em></p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107230645678.png" alt="image-20191107230645678"></p>
+<p>全球路由前缀是有运营商分配，一般是48位，全球路由前缀由iternet注册机构进行分发，包含多个前缀：</p>
+<ol>
+<li>注册机构的前缀：亚太、拉丁、北美等</li>
+<li>根据亚太地区进行进一步划分，补充前缀</li>
+<li>移动等运营商拿到注册的IPv6地址后，根据自己的需求进行进一步划分，这时候划分的部分就是Subnet ID，子网id</li>
+<li>子网地址为16bit</li>
+<li>接口地址用于标识节点，64bit</li>
+</ol>
+<h3 id="二、链路本地地址"><a href="#二、链路本地地址" class="headerlink" title="二、链路本地地址"></a>二、链路本地地址</h3><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107231655257.png" alt="image-20191107231655257"></p>
+<p>只能用于连接到同一个链路节点的结点使用。比如二层交换机连接的PC之间。不会跨到第二条链路</p>
+<p>只要是这个前缀，就是链路本地地址，后54bit全零，再加上64位的接口id。</p>
+<p><strong>IPv6的邻居发现，无状态自动配置，路由的下一跳都用到了链路本地地址</strong></p>
+<h3 id="三、站点本地地址"><a href="#三、站点本地地址" class="headerlink" title="三、站点本地地址"></a>三、站点本地地址</h3><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107232122879.png" alt="image-20191107232122879"></p>
+<p>EFC0::</p>
+<p>相当于私有地址，不会路由到公网上。使用局限性：两个网络进行合并的时候，容易产生地址冲突。</p>
+<p>所以为了避免这种情况的出现，就有了另一种IP地址——唯一本地地址</p>
+<h3 id="四、唯一本地地址"><a href="#四、唯一本地地址" class="headerlink" title="四、唯一本地地址"></a>四、唯一本地地址</h3><p>相当于改名以后的IPV4私有地址，在RFC419文档中规定。</p>
+<p>只能用于企业的内网中。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107232437034.png" alt="image-20191107232437034"></p>
+<ol>
+<li>前缀 FC00:: 不会传播到公网上。</li>
+<li>L 标志位</li>
+<li>全球唯一前缀 40bit，通过随机的方式分配，当两个私有网络合并的时候，主机间可以直接通讯，不用担心冲突。冲突的概率特别低。</li>
+<li>子网ID，16bit，</li>
+</ol>
+<h3 id="五、IPV6的组播地址"><a href="#五、IPV6的组播地址" class="headerlink" title="五、IPV6的组播地址"></a>五、IPV6的组播地址</h3><p>ipv6使用多播代替了广播</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107232911458.png" alt="image-20191107232911458"></p>
+<p>组播地址用于组播应用和协议，由于IPV6不再使用广播，所以通讯核心大量地使用了组播地址：邻居发现、ARP请求、组播请求</p>
+<p>前16bit:</p>
+<ol>
+<li><p>前缀：FF00 8bit</p>
+</li>
+<li><p>FLAG：4bit，前三个bit都是0，第四个bit位如果是0的话，代表永久组播，是1的话，表示临时组播</p>
+</li>
+<li><p>范围字段：</p>
+<ol>
+<li><p>本地的接口范围</p>
+</li>
+<li><p>本地的链路范围（用的最多），链路中的所有路由器</p>
+</li>
+<li><p>本地子网范围</p>
+</li>
+<li><p>本地管理范围</p>
+</li>
+<li><p>本地站点范围</p>
+</li>
+<li><p>如果是8，就是整个组织机构</p>
+</li>
+<li><p>如果是e，就是全球范围</p>
+</li>
+<li><p>如果是9，就是链路中所有RIP路由器</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>后112位：</p>
+<ol>
+<li>Group ID：用于对MAC地址的映射。</li>
+</ol>
+<p>组播地址：<br><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107234427785.png" alt="image-20191107234427785" style="zoom: 67%;" /></p>
+<p>Solited-Node组播地址：请求节点组播，用于IPV6中的ARP请求。当一个节点或者路由器节点配置了一个单播地址，就会自动地将该结点或者接口加入该组播组。<strong>如果某一个PC机想要获取这个节点的MAC地址的话，就向这个组播组发送相应的ARP请求。后面的24位地址就是由相应的IPV6单播地址的最后24位直接映射过来的。</strong>（还有一点疑问）</p>
+<h3 id="六、任播地址"><a href="#六、任播地址" class="headerlink" title="六、任播地址"></a>六、任播地址</h3><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191107235009497.png" alt="image-20191107235009497"></p>
+<p>任播地址：表示一组提供一类服务的多个网络接口。比如图中所示的一组都提供http服务的主机，共享单播地址。</p>
+<p>将单一的任播地址分给不同的网络服务器节点。 当用户进行请求的时候，这个请求报文会被发送到离请求者路由最近的一台网络服务器中。</p>
+<p>当与用户建立请求的主机坏掉之后，其他的主机可以直接接替从而与用户通信。任播地址可以实现冗余。</p>
+<h3 id="七、特殊地址"><a href="#七、特殊地址" class="headerlink" title="七、特殊地址"></a>七、特殊地址</h3><ol>
+<li>未指定的地址：0:0:0:0:0:0:0:0/128或者::128表示某个接口或者节点没有ip地址</li>
+<li>回环地址：0:0:0:0:0:0:0:1/128或者::1/128，作用与IPv4当中的127.0.0.1作用相同，实际发送的数据包不能使用回环地址作为源IP地址或者目的IP地址。</li>
+</ol>
+<hr>
+<h2 id="补充：NDP协议、ICMPv6协议"><a href="#补充：NDP协议、ICMPv6协议" class="headerlink" title="补充：NDP协议、ICMPv6协议"></a>补充：NDP协议、ICMPv6协议</h2><h3 id="一、ICMPv6-协议"><a href="#一、ICMPv6-协议" class="headerlink" title="一、ICMPv6 协议"></a>一、ICMPv6 协议</h3><p>参考资料： <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/ICMPv6/2987440?fr=aladdin">https://baike.baidu.com/item/ICMPv6/2987440?fr=aladdin</a> 百度百科–ICMPv6</p>
+<p>​     ICMPv6协议继承了IPv4中ICMP协议的功能，用于向源节点报告关于目的地址传输IPv6包的错误和信息，具有差错报告、网络诊断，邻节点发现和多播实现等功能。在<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/IPv6">IPv6</a>中，ICMPv6实现<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/IPv4">IPv4</a>中<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/ICMP">ICMP</a>、<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/ARP">ARP</a>和<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/IGMP">IGMP</a>的功能。</p>
+<ol>
+<li><p>通告网络错误。比如，某台<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E4%B8%BB%E6%9C%BA">主机</a>或整个网络由于某些<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%95%85%E9%9A%9C">故障</a>不可达。如果有指向某个<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E5%8F%B7">端口号</a>的TCP或UDP包没有指明接受端，这也由ICMP报告。</p>
+</li>
+<li><p>通告<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E7%BD%91%E7%BB%9C%E6%8B%A5%E5%A1%9E">网络拥塞</a>。当<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E8%B7%AF%E7%94%B1%E5%99%A8">路由器</a>缓存太多包，由于传输速度无法达到它们的接收速度，将会生成“ ICMP 源结束”信息。对于发送者，这些信息将会导致传输速度降低。当然，更多的 ICMP 源结束信息的生成也将引起更多的网络拥塞，所以使用起来较为保守。</p>
+</li>
+<li><p>协助解决故障。ICMP支持Echo功能，即在两个<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E4%B8%BB%E6%9C%BA">主机</a>间一个往返路径上发送一个包。Ping是一种基于这种特性的通用网络管理工具，它将传输一系列的包，测量平均往返次数并计算丢失百分比。</p>
+</li>
+<li><p>通告超时。如果一个IP包的TTL降低到零，路由器就会丢弃此包，这时会生成一个 ICMP 包通告这一事实。TraceRoute是一个工具，它通过发送小TTL值的包及监视ICMP超时通告可以显示网络<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E8%B7%AF%E7%94%B1">路由</a>。</p>
+<p>ICMPv6报文总体上被分为两种类型：差错报文和信息报文。差错报文的识别是通过在消息类型字段值的高比特位中设置0。因此：</p>
+</li>
+</ol>
+<p><strong>差错报文的报文类型从0到127；信息报文的类型从128到255。（比如ND协议就是基于ICMPv6协议实现，类型号为135）</strong></p>
+<p>ICMPv6报文格式：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191127144515719.png" alt="image-20191127144515719"></p>
+<ol>
+<li>Type：标识ICMPv6报文类型，它的值根据报文的内容来确定。</li>
+<li>Code：用于确定ICMPv6进一步的信息，对同一类型的报文进行了更详细的分类。</li>
+<li>Checksum：用于检测ICMPv6的报文是否正确传送。</li>
+<li>Data：用于返回出错的参数和记录出错报文的片段，帮助源节点判断错误的原因或是其它参数。</li>
+</ol>
+<h3 id="二、NDP协议"><a href="#二、NDP协议" class="headerlink" title="二、NDP协议"></a>二、NDP协议</h3><p>参考链接：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/qiaopeng688/2150114?source=dra">https://blog.51cto.com/qiaopeng688/2150114?source=dra</a> 【IPv6】NS,NA 报文学习</li>
+<li><a target="_blank" rel="noopener" href="https://baijiahao.baidu.com/s?id=1609424059183543390&amp;wfr=spider&amp;for=pc">https://baijiahao.baidu.com/s?id=1609424059183543390&amp;wfr=spider&amp;for=pc</a> 下一代IP协议—IPv6邻居发现协议（NDP）</li>
+</ol>
+<ol>
+<li>NDP基于ICMPv6实现，ICMP类型135</li>
+<li>邻居请求NS，邻居通告NA（重复地址检测DAD也使用这样的机制）</li>
+</ol>
+<p>NS和NA报文：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191125204012757.png" alt="image-20191125204012757"></p>
+<h4 id="功能（1）：重复地址检测"><a href="#功能（1）：重复地址检测" class="headerlink" title="功能（1）：重复地址检测"></a>功能（1）：重复地址检测</h4><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191112204328851.png" alt="image-20191112204328851"></p>
+<p>地址自动配置时使用：</p>
+<p> 节点会发送NS报文（有人叫张拉拉吗？），其源地址为未指定地址，目的地址为接口配置的IPv6地址。如果收到自己的报文（听到自己的回音，奥，自己的声音不管他），直接忽略。在NS报文发送到链路上后，如果在规定时间内没有收到应答的NA报文，则认为这个单播地址在链路上是唯一的，可以分配给接口（好了，我就叫张拉拉了）；反之，如果收到应答的NA报文（一个响亮的声音回来，我就叫张拉拉！呀丫丫，有人和我同名啊，算了，改个名字吧），则表明这个地址已经被其他节点所使用，不能配置到接口。 </p>
+<h4 id="功能（2）：邻居地址解析"><a href="#功能（2）：邻居地址解析" class="headerlink" title="功能（2）：邻居地址解析"></a>功能（2）：邻居地址解析</h4><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191112204342316.png" alt="image-20191112204342316"></p>
+<p>主机A：谁叫李法拉？你住在哪里？</p>
+<p>主机B: 我叫李法拉，住在MAC地址的xxxxx。</p>
+<p>主机C: 不是叫我，不管他。</p>
+<hr>
+<p><strong>补充</strong>：</p>
+<p> 多播是一种允许一个或者多个发送者发送单一数据包到多个接收者的网络技术。 </p>
+<hr>
+<h4 id="功能（3）：重定向功能"><a href="#功能（3）：重定向功能" class="headerlink" title="功能（3）：重定向功能"></a>功能（3）：重定向功能</h4><p> 当网关路由器发现更好的报文转发路径时候，会用重定向报文告诉主机。 </p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191112204517066.png" alt="image-20191112204517066"></p>
+<p> 上图主机H1要发送数据到网络N2，经过路由器R1，由R1再转发到到R2，但路由器R1发现R2和它是同一网段，并且R2是直接连接着网络N2，这时候路由器R1就发送重定向报文（ND redirect）告诉主机H1，以后再给网络N2的报文就直接给R2好了，别那么绕弯子，费劲！ </p>
+<h4 id="功能（4）：路由器发现"><a href="#功能（4）：路由器发现" class="headerlink" title="功能（4）：路由器发现"></a>功能（4）：路由器发现</h4><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191112204224294.png" alt="image-20191112204224294"></p>
+<p>RA：路由通告报文</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191112204209472.png" alt="image-20191112204209472"></p>
+<p> 主机发送RS（route solicitation），路由器回应RA(route advertisement)。 很多情况下主机接入网络后希望尽快获取网络前缀进行通信，此时主机可以立刻发送RS报文，网络上的设备将回应RA报文。主机收到包含路由信息的RA报文后，会更新自己的路由表。当主机向其他设备发送报文时，通过查询该列表的路由信息，选择合适的路由发送报文。 </p>
+<h3 id="三、DHCPv6协议"><a href="#三、DHCPv6协议" class="headerlink" title="三、DHCPv6协议"></a>三、DHCPv6协议</h3><p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Neo233/article/details/80464428">https://blog.csdn.net/Neo233/article/details/80464428</a> DHCPv6基础 </li>
+</ol>
+<h4 id="DHCPv6数据包格式"><a href="#DHCPv6数据包格式" class="headerlink" title="DHCPv6数据包格式"></a>DHCPv6数据包格式</h4><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191127153241952.png" alt="image-20191127153241952"></p>
+<ol>
+<li>msg-type 报文类型，详细的几种类型见如下表格</li>
+<li>transaction-ID 交互ID，用于标识一个DHCPv6报文交互（solicit和advertise就是一个交互）</li>
+<li>Option 可选字段， 此字段包含了DHCPv6服务器分配给IPv6主机的配置信息 </li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>报文类型</th>
+<th>DHCPv6报文</th>
+<th align="left">DHCPv4报文</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>SOLICIT</td>
+<td align="left">DHCP DISCOVER</td>
+<td>DHCPv6客户端使用Solicit报文来确定DHCPv6服务器的位置。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ADVERTISE</td>
+<td align="left">DHCP OFFER</td>
+<td>DHCPv6服务器发送Advertise报文来对Solicit报文进行回应，宣告自己能够提供DHCPv6服务。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>REQUEST</td>
+<td align="left">DHCP REQUEST</td>
+<td>DHCPv6客户端发送Request报文来向DHCPv6服务器请求IPv6地址和其它配置信息。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>CONFIRM</td>
+<td align="left">-</td>
+<td>DHCPv6客户端向任意可达的DHCPv6服务器发送Confirm报文检查自己目前获得的IPv6地址是否适用与它所连接的链路。</td>
+</tr>
+<tr>
+<td>5</td>
+<td>RENEW</td>
+<td align="left">DHCP REQUEST</td>
+<td>DHCPv6客户端向给其提供地址和配置信息的DHCPv6服务器发送Renew报文来延长地址的生存期并更新配置信息。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>REBIND</td>
+<td align="left">DHCP REQUEST</td>
+<td>如果Renew报文没有得到应答，DHCPv6客户端向任意可达的DHCPv6服务器发送Rebind报文来延长地址的生存期并更新配置信息。</td>
+</tr>
+<tr>
+<td>7</td>
+<td>REPLY</td>
+<td align="left">DHCP ACK/NAK</td>
+<td>DHCPv6服务器在以下场合发送Reply报文：DHCPv6服务器发送携带了地址和配置信息的Reply消息来回应从DHCPv6客户端收到的Solicit、Request、Renew、Rebind报文。DHCPv6服务器发送携带配置信息的Reply消息来回应收到的Information-Request报文。用来回应DHCPv6客户端发来的Confirm、Release、Decline报文。</td>
+</tr>
+<tr>
+<td>8</td>
+<td>RELEASE</td>
+<td align="left">DHCP RELEASE</td>
+<td>DHCPv6客户端向为其分配地址的DHCPv6服务器发送Release报文，表明自己不再使用一个或多个获取的地址。</td>
+</tr>
+<tr>
+<td>9</td>
+<td>DECLINE</td>
+<td align="left">DHCP DECLINE</td>
+<td>DHCPv6客户端向DHCPv6服务器发送Decline报文，声明DHCPv6服务器分配的一个或多个地址在DHCPv6客户端所在链路上已经被使用了。</td>
+</tr>
+<tr>
+<td>10</td>
+<td>RECONFIGURE</td>
+<td align="left">-</td>
+<td>DHCPv6服务器向DHCPv6客户端发送Reconfigure报文，用于提示DHCPv6客户端，在DHCPv6服务器上存在新的网络配置信息。</td>
+</tr>
+<tr>
+<td>11</td>
+<td>INFORMATION-REQUEST</td>
+<td align="left">DHCP INFORM</td>
+<td>DHCPv6客户端向DHCPv6服务器发送Information-Request报文来请求除IPv6地址以外的网络配置信息。</td>
+</tr>
+<tr>
+<td>12</td>
+<td>RELAY-FORW</td>
+<td align="left">-</td>
+<td>中继代理通过Relay-Forward报文来向DHCPv6服务器转发DHCPv6客户端请求报文。</td>
+</tr>
+<tr>
+<td>13</td>
+<td>RELAY-REPL</td>
+<td align="left">-</td>
+<td>DHCPv6服务器向中继代理发送Relay-Reply报文，其中携带了转发给DHCPv6客户端的报文。</td>
+</tr>
+</tbody></table>
+<h4 id="DHCPv6工作原理"><a href="#DHCPv6工作原理" class="headerlink" title="DHCPv6工作原理"></a>DHCPv6工作原理</h4><p>DHCPv6自动分配分为DHCPv6有状态自动分配和DHCPv6无状态自动分配。</p>
+<ul>
+<li>DHCPv6有状态自动分配。DHCPv6服务器自动配置IPv6地址/前缀，同时分配DNS、NIS、SNTP服务器等网络配置参数。</li>
+<li>DHCPv6无状态自动分配。主机IPv6地址仍然通过路由通告方式自动生成，DHCP服务器只分配除IPv6地址以外的配置参数，包括DNS、NIS、SNTP服务器地址等参数。</li>
+</ul>
+<h4 id="DHCPv6有状态自动分配"><a href="#DHCPv6有状态自动分配" class="headerlink" title="DHCPv6有状态自动分配"></a>DHCPv6有状态自动分配</h4><p>主要分为两种分配方式：1. 四步交互 2. 两步交互</p>
+<h5 id="1-四步交互分配"><a href="#1-四步交互分配" class="headerlink" title="1. 四步交互分配"></a>1. 四步交互分配</h5><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191127155119975.png" alt="image-20191127155119975"></p>
+<ol>
+<li>DHCPv6客户端发送Solicit报文，请求DHCPv6服务器为其分配IPv6地址和网络配置参数。</li>
+<li>如果Solicit报文中没有携带Rapid Commit选项，或Solicit报文中携带Rapid Commit选项，但服务器不支持快速分配过程，则DHCPv6服务器回复Advertise报文，通知客户端可以为其分配的地址和网络配置参数。</li>
+<li>如果DHCPv6客户端接收到多个服务器回复的Advertise报文，则根据Advertise报文中的服务器优先级等参数，选择优先级最高的一台服务器，并向所有的服务器发送Request组播报文，该报文中携带已选择的DHCPv6服务器的<strong>DUID</strong>。</li>
+<li>DHCPv6服务器回复Reply报文，确认将地址和网络配置参数分配给客户端使用。</li>
+</ol>
+<hr>
+<p> <strong>DUID</strong>(DHCP Unique Identifier,DHCP唯一标识符)是唯一标识一台DHCPv6设备(包括客户端、中继和服务器)的标识符 </p>
+<hr>
+<h5 id="2-两步交互快速分配"><a href="#2-两步交互快速分配" class="headerlink" title="2. 两步交互快速分配"></a>2. 两步交互快速分配</h5><p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191127155448677.png" alt="image-20191127155448677"></p>
+<p> 两步交互常用于网络中只有一个DHCPv6服务器的情况。DHCPv6客户端首先通过组播发送Solicit报文来定位可以为其提供服务的DHCPv6服务器，DHCPv6服务器收到客户端的Solicit报文后，为其分配地址和配置信息，直接回应Reply报文，完成地址申请和分配过程。 </p>
+<hr>
+<p>Rapid Commit option用于指定在多DHCP服务器的情况下是否使用快速分配模式，如果规定不支持快速分配过程，则采用四部交互方式进行IP地址分配</p>
+<hr>
+<h4 id="DHCPv6无状态自动分配"><a href="#DHCPv6无状态自动分配" class="headerlink" title="DHCPv6无状态自动分配"></a>DHCPv6无状态自动分配</h4><p>无状态自动分配地址也只需要两步来完成，不同的是客户端发送的DHCPv6数据包类型为information-Request</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20191127155648023.png" alt="image-20191127155648023"></p>
+<h5 id="1-工作流程"><a href="#1-工作流程" class="headerlink" title="1. 工作流程"></a>1. 工作流程</h5><p>如下：</p>
+<ol>
+<li>DHCPv6客户端以组播方式向DHCPv6服务器发送Information-Request报文，该报文中携带Option Request选项，指定DHCPv6客户端需要从DHCPv6服务器获取的配置参数。</li>
+<li>DHCPv6服务器收到Information-Request报文后，为DHCPv6客户端分配网络配置参数，并单播发送Reply报文，将网络配置参数返回给DHCPv6客户端。DHCPv6客户端根据收到Reply报文提供的参数完成DHCPv6客户端无状态配置</li>
+</ol>
+<h3 id="四、无DHCP时的IP分配机制"><a href="#四、无DHCP时的IP分配机制" class="headerlink" title="四、无DHCP时的IP分配机制"></a>四、无DHCP时的IP分配机制</h3><p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/nbvnvnvbn/article/details/97902155">https://blog.csdn.net/nbvnvnvbn/article/details/97902155</a> EUI-64格式生成</p>
+<h4 id="无状态自动配置"><a href="#无状态自动配置" class="headerlink" title="无状态自动配置"></a>无状态自动配置</h4><p>在IPV6中，无状态自动配置机制使用EUI-64格式来自动配置IPV6地址</p>
+<p>无状态自动配置是指在网络中没有DHCP服务器的情况下，允许节点自动配置IPV6地址的机制。</p>
+<h5 id="1-构造规则"><a href="#1-构造规则" class="headerlink" title="1. 构造规则"></a>1. 构造规则</h5><p> 自动将48bit的以太网MAC地址扩展成64bit，再组合一个64位的ipv6地址前缀，组成一个IPV6地址。 </p>
+<p>示例：</p>
+<p> a. MAC地址为 00-AA-00-3F-2A-1C</p>
+<p> b.转换EUI-64为 00-AA-00-FF-FE-3F-2A-1C</p>
+<p>  c.第一个字节为0000 0000，第7为反转为0000 0010转换16进制为0x02。</p>
+<p>  d.得到结果为02-AA-00-FF-FE-3F-2A-1C，转换为ip6表示格式为2AA:FF:FE3F:2A1C</p>
+<p>链路本地地址也是采取这个规则进行</p>
+<hr>
+<p>版权声明：本文为CSDN博主「nbvnvnvbn」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。<br>原文链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/nbvnvnvbn/article/details/97902155">https://blog.csdn.net/nbvnvnvbn/article/details/97902155</a></p>
+<h2 id="0x04-IPV6-模拟环境搭建"><a href="#0x04-IPV6-模拟环境搭建" class="headerlink" title="0x04 IPV6 模拟环境搭建"></a>0x04 IPV6 模拟环境搭建</h2><p>参考链接：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/cxb14897/article/details/90021740">https://blog.csdn.net/cxb14897/article/details/90021740</a> 华为模拟器eNSP下载与安装教程</li>
+</ol>
+<h2 id="0x05-IPv6安全问题"><a href="#0x05-IPv6安全问题" class="headerlink" title="0x05 IPv6安全问题"></a>0x05 IPv6安全问题</h2><p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="http://www.h3c.com/cn/d_201309/796460_30008_0.htm">http://www.h3c.com/cn/d_201309/796460_30008_0.htm</a> 浅谈IPv6协议安全及攻击</li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_33895475/article/details/92827636">https://blog.csdn.net/weixin_33895475/article/details/92827636</a> 支持ipv6类型的ddos测试工具thc-ipv6 </li>
+</ol>
+<h3 id="一、安装IPv6安全工具THC-IPV6"><a href="#一、安装IPv6安全工具THC-IPV6" class="headerlink" title="一、安装IPv6安全工具THC-IPV6"></a>一、安装IPv6安全工具THC-IPV6</h3><p>参考文章：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33199299">https://zhuanlan.zhihu.com/p/33199299</a></li>
+<li><a target="_blank" rel="noopener" href="https://download.csdn.net/download/chengxi1014/10665729">https://download.csdn.net/download/chengxi1014/10665729</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.kancloud.cn/haoyuanqiang/kali_linux_tools_documents/1060389">https://www.kancloud.cn/haoyuanqiang/kali_linux_tools_documents/1060389</a></li>
+<li><a target="_blank" rel="noopener" href="https://tools.kali.org/information-gathering/thc-ipv6">https://tools.kali.org/information-gathering/thc-ipv6</a></li>
+<li><a target="_blank" rel="noopener" href="https://kali.tuisec.win/kalitools/thc-ipv6_zh.html">https://kali.tuisec.win/kalitools/thc-ipv6_zh.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://gitlab.com/kalilinux/packages/thc-ipv6/">https://gitlab.com/kalilinux/packages/thc-ipv6/</a></li>
+</ol>
+<h4 id="攻击测试："><a href="#攻击测试：" class="headerlink" title="攻击测试："></a>攻击测试：</h4><h5 id="1-fake-router6"><a href="#1-fake-router6" class="headerlink" title="1. fake_router6"></a>1. fake_router6</h5><p>参考链接：<a target="_blank" rel="noopener" href="http://theevilbit.blogspot.com/2012/02/ipv6-pentesting-5-fakerouter6.html">http://theevilbit.blogspot.com/2012/02/ipv6-pentesting-5-fakerouter6.html</a></p>
+<p>2001:db8:bad:bad::/64</p>
+<h3 id="二、各种威胁的汇总文章："><a href="#二、各种威胁的汇总文章：" class="headerlink" title="二、各种威胁的汇总文章："></a>二、各种威胁的汇总文章：</h3><p><a target="_blank" rel="noopener" href="https://www.secrss.com/articles/13813">https://www.secrss.com/articles/13813</a></p>
+<p>移动白皮书</p>
+<p><a target="_blank" rel="noopener" href="https://www.secrss.com/articles/13103">https://www.secrss.com/articles/13103</a> IPv6环境下的网络安全观察</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/IPv6/">IPv6</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a>
+                    
+                      <a class="hover-with-bg" href="/tags/IPv6/">IPv6</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/20/mysql%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">mysql注入基础</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/10/19/%E3%80%90CISCN-2019%E5%88%9D%E8%B5%9B%E3%80%91Love-Math/">
+                        <span class="hidden-mobile">【CISCN 2019初赛】Love Math</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div class="disqus" style="width:100%">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_config = function() {
+        this.page.url = 'https://greydr34d.github.io/2019/12/04/IPV6%E5%AD%A6%E4%B9%A0/';
+        this.page.identifier = '/2019/12/04/IPV6%E5%AD%A6%E4%B9%A0/';
+      };
+      Fluid.utils.waitElementVisible('disqus_thread', function () {
+        var d = document, s = d.createElement('script');
+        s.src = '//' + '' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', new Date());
+        (d.head || d.body).appendChild(s);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the
+      <a target="_blank" href="https://disqus.com/?ref_noscript" rel="nofollow noopener noopener">comments powered by Disqus.</a>
+    </noscript>
+  </div>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>
