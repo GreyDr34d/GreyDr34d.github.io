@@ -128,35 +128,6 @@
   
   
   <entry>
-    <title>linux 学习资料汇总</title>
-    <link href="/2021/03/13/linux-%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%E6%B1%87%E6%80%BB/"/>
-    <url>/2021/03/13/linux-%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%E6%B1%87%E6%80%BB/</url>
-    
-    <content type="html"><![CDATA[<p>汇总平时遇到的linux问题与解决参考文献</p><ul><li><a href="http://www.ruanyifeng.com/blog/2016/02/linux-daemon.html">Linux 守护进程的启动方法</a></li></ul>]]></content>
-    
-    
-    <categories>
-      
-      <category>资料收集</category>
-      
-      <category>linux</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>linux</tag>
-      
-      <tag>后台守护进程</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>【转载】渗透测试资源合集</title>
     <link href="/2021/03/10/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E8%B5%84%E6%BA%90%E5%90%88%E9%9B%86/"/>
     <url>/2021/03/10/%E3%80%90%E8%BD%AC%E8%BD%BD%E3%80%91%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E8%B5%84%E6%BA%90%E5%90%88%E9%9B%86/</url>
