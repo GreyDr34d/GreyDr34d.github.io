@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      314 字
+      572 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      4
+      7
        分钟
     </span>
   
@@ -229,12 +229,24 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：15 天前
+                  本文最后更新于：5 分钟前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="teler守护进程化思路"><a href="#teler守护进程化思路" class="headerlink" title="teler守护进程化思路"></a>teler守护进程化思路</h1><h2 id="思路一：利用disown"><a href="#思路一：利用disown" class="headerlink" title="思路一：利用disown"></a>思路一：利用disown</h2><p>teler如果能够成为后台守护进程就好了，经过尝试，可以使用 disown实现。</p>
+              <h1 id="teler守护进程化思路"><a href="#teler守护进程化思路" class="headerlink" title="teler守护进程化思路"></a>teler守护进程化思路</h1><h2 id="0x00-teler简介"><a href="#0x00-teler简介" class="headerlink" title="0x00 teler简介"></a>0x00 teler简介</h2><p><strong>Teler</strong>是基于Web日志的实时入侵检测和威胁警报项目</p>
+<p>特点：</p>
+<ul>
+<li><strong>实时</strong>：<strong>实时</strong>分析日志并识别可疑活动。</li>
+<li><strong>警报</strong>：Teler在检测到威胁时提供警报，推送通知包括Slack，Telegram和Discord。</li>
+<li><strong>监控</strong>：如果您想轻松监控威胁，我们有自己的指标，为此，我们使用Prometheus。</li>
+<li><strong>最新资源</strong>：不断更新的特征库：<a target="_blank" rel="noopener" href="https://github.com/kitabisa/teler-resources"> teler-resources</a>。</li>
+<li><strong>最少的配置</strong>：您可以仅对日志文件运行它，编写日志格式，然后让Teler分析日志并向您显示警报！</li>
+<li><strong>灵活的日志格式</strong>：teler允许任何自定义日志格式字符串！这完全取决于您如何在配置文件中写入日志格式。</li>
+<li><strong>增量日志处理</strong>：需要数据持久性而不是<a target="_blank" rel="noopener" href="https://linux.die.net/man/1/stdbuf">缓冲区流</a>吗？teler可以通过磁盘上的持久性选项逐步处理日志。</li>
+</ul>
+<h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>由于使用需要，我需要teler以后台守护进程的方式运行，于是有了本文。</p>
+<h2 id="0x02-思路一：利用disown"><a href="#0x02-思路一：利用disown" class="headerlink" title="0x02 思路一：利用disown"></a>0x02 思路一：利用disown</h2><p>teler如果能够成为后台守护进程就好了，经过尝试，可以使用 disown实现。</p>
 <p>需要将对终端的输出屏蔽掉。</p>
 <div class="hljs code-wrapper"><pre><code class="hljs sh">tail -f /var/<span class="hljs-built_in">log</span>/nginx/access.log | teler -c teler.yaml  -o ./result.json --json &gt; /dev/null 2&gt;&amp;1  &amp;
 <span class="hljs-built_in">disown</span></code></pre></div>
@@ -251,15 +263,15 @@
 
 
 
-<h2 id="思路二：利用docker后台运行功能"><a href="#思路二：利用docker后台运行功能" class="headerlink" title="思路二：利用docker后台运行功能"></a>思路二：利用docker后台运行功能</h2><p>docker-compose 中-d参数可以使容器在后台运行，恰好满足要求。下面是我编写的docker-compose.yml以及Dockerfile</p>
+<h2 id="0x03-思路二：利用docker后台运行功能"><a href="#0x03-思路二：利用docker后台运行功能" class="headerlink" title="0x03 思路二：利用docker后台运行功能"></a>0x03 思路二：利用docker后台运行功能</h2><p>docker-compose 中-d参数可以使容器在后台运行，恰好满足要求。下面是我编写的docker-compose.yml以及Dockerfile</p>
 <div class="hljs code-wrapper"><pre><code class="hljs yml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;2.3&#x27;</span>
 
-<span class="hljs-attr">services:</span> 
+<span class="hljs-attr">services:</span>
   <span class="hljs-attr">teler:</span>
     <span class="hljs-attr">container_name:</span> <span class="hljs-string">teler_analysis</span>
     <span class="hljs-attr">build:</span>
       <span class="hljs-attr">context:</span> <span class="hljs-string">.</span>
-    <span class="hljs-attr">volumes:</span> 
+    <span class="hljs-attr">volumes:</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;./teler.yaml:/teler.yaml&quot;</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;./access.log:/access.log&quot;</span>
       <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;./teler-resources/:/.cache/teler-resources/&quot;</span>

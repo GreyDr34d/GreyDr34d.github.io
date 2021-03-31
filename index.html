@@ -180,6 +180,74 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/03/31/teler%E5%BC%95%E5%85%A5libinjection%E5%BA%93/" target="_self">
+          <img src="/img/teler_index.png" alt="teler引入libinjection库">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/03/31/teler%E5%BC%95%E5%85%A5libinjection%E5%BA%93/">teler引入libinjection库</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2021/03/31/teler%E5%BC%95%E5%85%A5libinjection%E5%BA%93/">
+          
+          
+            
+          
+          teler引入libinjection库0x00 前言teler是基于Web日志的实时入侵检测和威胁警报，可以在终端中运行，拥有由社区收集和提供的资源（包括：web攻击检测正则、CVE特征、Bad IP字典、Bad Referer字典、Bad Crawler字典），teler使用Go语言编写，拥有Go语言简洁、高并发、跨平台的特点，目前star 1.3k。
+项目地址： teler
+资源地址： te
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-31 13:06" pubdate>
+              2021-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/">安全工具</a>
+            
+              <a href="/categories/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/teler/">teler</a>
+            
+              <a href="/categories/%E5%AE%89%E5%85%A8%E5%BC%80%E5%8F%91/">安全开发</a>
+            
+              <a href="/categories/%E5%AE%89%E5%85%A8%E5%BC%80%E5%8F%91/go/">go</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/teler/">teler</a>
+            
+              <a href="/tags/%E5%AE%89%E5%85%A8%E5%B7%A5%E5%85%B7/">安全工具</a>
+            
+              <a href="/tags/go/">go</a>
+            
+              <a href="/tags/%E5%AE%89%E5%85%A8%E5%BC%80%E5%8F%91/">安全开发</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2021/03/28/VolgaCTF-2021-Qualifier-writeup/" target="_self">
           <img src="/img/CTF_index.png" alt="VolgaCTF 2021 Qualifier writeup">
         </a>
@@ -462,10 +530,14 @@ log_format  main  &#x27;$remote_addr $remote_user - [$time_iso8601] &quot;$reque
           
             
           
-          teler守护进程化思路思路一：利用disownteler如果能够成为后台守护进程就好了，经过尝试，可以使用 disown实现。
-需要将对终端的输出屏蔽掉。
-tail -f /var/log/nginx/access.log | teler -c teler.yaml  -o ./result.json --json &gt; /dev/null 2&gt;&amp;1  &amp;
-disown
+          teler守护进程化思路0x00 teler简介Teler是基于Web日志的实时入侵检测和威胁警报项目
+特点：
+
+实时：实时分析日志并识别可疑活动。
+警报：Teler在检测到威胁时提供警报，推送通知包括Slack，Telegram和Discord。
+监控：如果您想轻松监控威胁，我们有自己的指标，为此，我们使用Prometheus。
+最新资源：不断更新的特征库： teler-resources。
+最
         </a>
       </p>
 
